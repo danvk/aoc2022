@@ -1,17 +1,12 @@
 // https://adventofcode.com/2018/day/1
 
-const [path] = Deno.args;
+import { readLinesFromArgs } from "../util.ts";
 
-const contents = await Deno.readTextFile(path);
-const lines = contents.split('\n');
-if (lines[lines.length - 1] === '') {
-    lines.pop();
-}
+const lines = await readLinesFromArgs();
 const nums = lines.map(Number);
 
 const sum = nums.reduce((a, b) => a + b);
 console.log('part 1', sum);
-console.log(nums[nums.length - 1]);
 
 const seen = new Set<number>();
 let tally = 0;
