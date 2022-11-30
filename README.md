@@ -65,6 +65,11 @@ This may be a helpful reference for debugging Deno code in VSCode <https://deno.
 - Is it typical to use lodash with Deno? Is there a more Deno-y equivalent?
 - Is there a deno equivalent of a shebang line?
 
+## Notes
+
+I'm using `Set` and `Map` a lot more than I usually do. One footgun is that `key in set` does not work like you'd hope.
+I'm thinking that <code>obj[`${x},${y}`]</code> is the JS equivalent of a Python dict keyed by `(x, y)` tuples.
+
 ## Background
 
 My first recollection of Deno is from a talk at tsconf 2019. My mental model is "an attempt to redo Node.js with the benefit of hindsight." I liked Deno's approach to security (you can't do much without explicit permissions) but I also remember having some questions about how transitive dependencies would work.
