@@ -1,7 +1,7 @@
 #!/usr/bin/env -S deno run --allow-read --allow-write
 // https://adventofcode.com/2018/day/4
 
-import { readLinesFromArgs } from "../util.ts";
+import { assert, readLinesFromArgs, tuple } from "../util.ts";
 
 interface Timestamp {
   year: number;
@@ -27,9 +27,7 @@ type Record = StartShift | FallAsleep | WakeUp;
 export function parseRecord(txt: string): Record {
   // [1518-11-01 00:00] Guard #10 begins shift
   const m = txt.match(/^\[(\d+)-(\d+)-(\d+) (\d+):(\d+)\] (.*)$/);
-  if (!m) {
-    throw new Error(`Unable to parse ${txt}`);
-  }
+  assert(m, `Unable to parse ${txt}`);
   const [, year, month, date, hour, minute, message] = m;
   const timestamp: Timestamp = {
     year: Number(year),
@@ -44,9 +42,7 @@ export function parseRecord(txt: string): Record {
     return {...timestamp, type: 'wake-up'};
   }
   const m2 = message.match(/Guard #(\d+) begins shift/);
-  if (!m2) {
-    throw new Error(`Unable to parse ${message}`);
-  }
+  assert(m2, `Unable to parse ${message}`);
   const [, id] = m2;
   return {...timestamp, type: 'start', id: Number(id)};
 }
@@ -65,9 +61,7 @@ function argmax<K>(m: Map<K, number>): K {
       maxKV = {k, v};
     }
   }
-  if (!maxKV) {
-    throw new Error('map was empty');
-  }
+  assert(maxKV, 'map was empty');
   return maxKV.k;
 }
 
@@ -131,16 +125,10 @@ function mostAsleepMinute(records: readonly Record[], id: number): [number, numb
       continue;
     } else if (record.type === 'fall-asleep' && onShift === id) {
       const next = records[i + 1];
-      if (next.type !== 'wake-up') {
-        throw new Error();
-      }
+      assert(next.type === 'wake-up');
       const m = elapsedMinutes(record, next);
-      if (m > 60) {
-        throw new Error(`${record}, ${next}`);
-      }
-      if (record.hour !== 0 || next.hour !== 0) {
-        throw new Error();
-      }
+      assert(m <= 60, `${record}, ${next}`);
+      assert (record.hour === 0 && next.hour === 0);
       for (let m = record.minute; m < next.minute; m++) {
         asleep[m]++;
       }
@@ -162,10 +150,6 @@ function allIds(records: readonly Record[]): Set<number> {
   return ids;
 }
 
-function tuple<T extends Array<unknown>>(...x: T) {
-  return x;
-}
-
 function mostSleepyMinute(records: readonly Record[]): [number, number] {
   let max = null;
   for (const id of allIds(records)) {
@@ -174,9 +158,7 @@ function mostSleepyMinute(records: readonly Record[]): [number, number] {
       max = {k: tuple(id, minute), v: timesAsleep};
     }
   }
-  if (!max) {
-    throw new Error();  // TODO: add assert
-  }
+  assert(max);
   return max.k;
 }
 

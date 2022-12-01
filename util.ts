@@ -34,3 +34,25 @@ export const increment = (
   key: string,
   amount = 1
 ) => upsert(obj, key, amount, (v) => amount + v);
+
+export function tuple<T extends Array<unknown>>(...x: T) {
+  return x;
+}
+
+/** type-safe assertion, useful for narrowing */
+export function assert<T>(
+  x: T,
+  message?: string
+): asserts x is Exclude<T, null | undefined> {
+  if (x === null || x === undefined) {
+    throw new Error(message ?? String(x));
+  }
+}
+
+export function mapObject<K extends PropertyKey, T, U>(obj: Record<K, T>, fn: (v: T, k: K) => U): Record<K, U> {
+  const o = {} as Record<K, U>;
+  for (const [k, v] of Object.entries(obj) as any) {
+    o[k] = fn(v, k);
+  }
+  return o;
+}
