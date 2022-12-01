@@ -1,7 +1,7 @@
 #!/usr/bin/env -S deno run --allow-read --allow-write
 // https://adventofcode.com/2018/day/4
 
-import { assert, readLinesFromArgs, tuple } from "../util.ts";
+import { argmax, argmaxArray, assert, readLinesFromArgs, tuple } from "../util.ts";
 
 interface Timestamp {
   year: number;
@@ -54,30 +54,6 @@ function elapsedMinutes(a: Timestamp, b: Timestamp): number {
   return (b.minute - a.minute) + 60 * (b.hour - a.hour) + 24 * 60 * (b.date - a.date);
 }
 
-function argmax<K>(m: Map<K, number>): K {
-  let maxKV = null;
-  for (const [k, v] of m.entries()) {
-    if (maxKV === null || v > maxKV.v) {
-      maxKV = {k, v};
-    }
-  }
-  assert(maxKV, 'map was empty');
-  return maxKV.k;
-}
-
-function argmaxArray(xs: number[]): number {
-  let maxKV = null;
-  for (let k = 0; k < xs.length; k++) {
-    const v = xs[k];
-    if (maxKV === null || v > maxKV.v) {
-      maxKV = {k, v};
-    }
-  }
-  if (!maxKV) {
-    throw new Error('map was empty');
-  }
-  return maxKV.k;
-}
 
 function minutesAsleep(records: readonly Record[]): Map<number, number> {
   const minutes = new Map<number, number>();

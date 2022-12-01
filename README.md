@@ -1,5 +1,12 @@
 # Advent of Code 2022
 
+## Daily Notes
+
+### Day 1
+
+Reading the input file into "chunks" has been a theme in past years, too.
+I got a wrong answer on part two, but I don't think for an interesting reason -- I think I ran my code before saving the file.
+
 ## Setup
 
 https://deno.land/manual@v1.28.2/getting_started/setup_your_environment

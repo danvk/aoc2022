@@ -49,10 +49,37 @@ export function assert<T>(
   }
 }
 
+/*
 export function mapObject<K extends PropertyKey, T, U>(obj: Record<K, T>, fn: (v: T, k: K) => U): Record<K, U> {
   const o = {} as Record<K, U>;
   for (const [k, v] of Object.entries(obj) as any) {
     o[k] = fn(v, k);
   }
   return o;
+}
+*/
+
+export function argmax<K>(m: Map<K, number>): K {
+  let maxKV = null;
+  for (const [k, v] of m.entries()) {
+    if (maxKV === null || v > maxKV.v) {
+      maxKV = { k, v };
+    }
+  }
+  assert(maxKV, "map was empty");
+  return maxKV.k;
+}
+
+export function argmaxArray(xs: number[]): number {
+  let maxKV = null;
+  for (let k = 0; k < xs.length; k++) {
+    const v = xs[k];
+    if (maxKV === null || v > maxKV.v) {
+      maxKV = { k, v };
+    }
+  }
+  if (!maxKV) {
+    throw new Error("map was empty");
+  }
+  return maxKV.k;
 }
