@@ -100,15 +100,6 @@ export function argmaxArray(xs: number[]): number {
   return maxKV.k;
 }
 
-export function sum(xs: number[]): number {
-  return xs.reduce((a, b) => a + b);
-}
-
-/** Sorts an array of numbers in-place, returning a reference to the array. */
-export function sortNums(xs: number[]): number[] {
-  return xs.sort((a, b) => a - b);
-}
-
 export function assertUnreachable(x: never): never {
   throw new Error("should be unreachable " + x);
 }
