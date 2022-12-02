@@ -108,3 +108,7 @@ export function sum(xs: number[]): number {
 export function sortNums(xs: number[]): number[] {
   return xs.sort((a, b) => a - b);
 }
+
+export function assertUnreachable(x: never): never {
+  throw new Error("should be unreachable " + x);
+}

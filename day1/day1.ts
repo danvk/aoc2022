@@ -1,11 +1,12 @@
 #!/usr/bin/env -S deno run --allow-read --allow-write
 // https://adventofcode.com/2022/day/1
 
-import { chunkLines, readLinesFromArgs, sum } from "../util.ts";
+import { _ } from '../deps.ts';
+import { chunkLines, readLinesFromArgs } from "../util.ts";
 
 function getSums(lines: readonly string[]): number[] {
   return chunkLines(lines).map((chunkLines) =>
-    sum(chunkLines.map(Number))
+    _.sum(chunkLines.map(Number))
   );
 }
 
