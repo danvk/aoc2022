@@ -5,7 +5,17 @@
 ### Day 1
 
 Reading the input file into "chunks" has been a theme in past years, too.
-I got a wrong answer on part two, but I don't think for an interesting reason -- I think I ran my code before saving the file.
+I got a wrong answer on part two because of an annoying JS footgun:
+
+    declare let sums: number[];
+    sums.sort();  // sorts sums lexicographically!
+
+Reference for using lodash with Deno: <https://github.com/lodash/lodash/issues/5411>. Getting types seems like a real headache https://stackoverflow.com/a/66073607/388951.
+
+Solution via Twitter https://twitter.com/brenelz/status/1598503663097503744
+
+    // @deno-types="npm:@types/lodash"
+    import _ from "npm:lodash";
 
 ## Setup
 

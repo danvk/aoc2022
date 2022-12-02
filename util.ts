@@ -14,6 +14,22 @@ export async function readLinesFromArgs(): Promise<string[]> {
   return lines;
 }
 
+/** Group lines into blank-delimited "chunks". */
+export function chunkLines(lines: readonly string[]): string[][] {
+  let current = [];
+  const output = [];
+  for (const line of lines) {
+    if (line === "") {
+      output.push(current);
+      current = [];
+    } else {
+      current.push(line);
+    }
+  }
+  output.push(current);
+  return output;
+}
+
 /** Helper for inserting / updating a value in an object. */
 export function upsert<T>(
   obj: { [key: string]: T },
@@ -82,4 +98,13 @@ export function argmaxArray(xs: number[]): number {
     throw new Error("map was empty");
   }
   return maxKV.k;
+}
+
+export function sum(xs: number[]): number {
+  return xs.reduce((a, b) => a + b);
+}
+
+/** Sorts an array of numbers in-place, returning a reference to the array. */
+export function sortNums(xs: number[]): number[] {
+  return xs.sort((a, b) => a - b);
 }
