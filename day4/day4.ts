@@ -9,7 +9,6 @@ type Pair = [number, number];
 function parseLine(line: string): [Pair, Pair] {
   const parts = line.split(/[-,]/);
   assert(parts.length === 4);
-  console.log(parts);
   const ns = parts.map(Number);
   const [a1, a2, b1, b2] = ns;
   return [[a1, a2], [b1, b2]];
@@ -22,13 +21,13 @@ function contained(a: Pair, b: Pair) {
 }
 
 function overlaps([a1, a2]: Pair, [b1, b2]: Pair) {
-  return !((a1 > b2) || (b1 > a2));
+  // return !((a1 > b2) || (b1 > a2));
+  return (a1 <= b2) && (b1 <= a2);
 }
 
 if (import.meta.main) {
   const lines = await readLinesFromArgs();
   const pairs = lines.map(parseLine);
-  console.log(pairs);
   const n = pairs.filter(([a, b]) => contained(a, b) || contained(b, a)).length;
   console.log('part 1', n);
   const p2 = pairs.filter(([a, b]) => overlaps(a, b)).length;
