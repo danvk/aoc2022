@@ -1,6 +1,6 @@
 // https://adventofcode.com/2018/day/1
 
-import { readLinesFromArgs } from "../util.ts";
+import { readLinesFromArgs } from "../../util.ts";
 
 const lines = await readLinesFromArgs();
 const nums = lines.map(Number);

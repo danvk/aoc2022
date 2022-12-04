@@ -1,6 +1,6 @@
 // https://adventofcode.com/2018/day/2
 
-import { readLinesFromArgs } from "../util.ts";
+import { readLinesFromArgs } from "../../util.ts";
 
 function hasNOfAny(text: string, n: number): boolean {
     const counts = new Map<string, number>();

@@ -1,7 +1,7 @@
 #!/usr/bin/env -S deno run --allow-read --allow-write
 // https://adventofcode.com/2018/day/4
 
-import { argmax, argmaxArray, assert, readLinesFromArgs, tuple } from "../util.ts";
+import { argmax, argmaxArray, assert, readLinesFromArgs, tuple } from "../../util.ts";
 
 interface Timestamp {
   year: number;

@@ -1,6 +1,7 @@
 // https://adventofcode.com/2018/day/2
 
-import { increment, readLinesFromArgs } from "../util.ts";
+import { _ } from "../../deps.ts";
+import { increment, readLinesFromArgs } from "../../util.ts";
 
 interface Claim {
   num: number;
@@ -17,13 +18,7 @@ function parseClaim(claim: string): Claim {
     throw new Error(`Unable to parse ${claim}`);
   }
   const [, num, x, y, w, h] = m;
-  return {
-    num: Number(num),
-    x: Number(x),
-    y: Number(y),
-    w: Number(w),
-    h: Number(h),
-  };
+  return _.mapValues({num, x, y, w, h}, Number);
 }
 
 function countOverlaps(claims: readonly Claim[]): number {

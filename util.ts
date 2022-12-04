@@ -1,3 +1,5 @@
+import { _ } from "./deps.ts";
+
 /** Read lines from a file specified as a command line argument */
 export async function readLinesFromArgs(): Promise<string[]> {
   const [path] = Deno.args;
@@ -65,16 +67,6 @@ export function assert<T>(
   }
 }
 
-/*
-export function mapObject<K extends PropertyKey, T, U>(obj: Record<K, T>, fn: (v: T, k: K) => U): Record<K, U> {
-  const o = {} as Record<K, U>;
-  for (const [k, v] of Object.entries(obj) as any) {
-    o[k] = fn(v, k);
-  }
-  return o;
-}
-*/
-
 // lodash does not have argmin/argmax: <https://github.com/lodash/lodash/issues/3141>
 export function argmax<K>(m: Map<K, number>): K {
   let maxKV = null;
@@ -103,4 +95,13 @@ export function argmaxArray(xs: number[]): number {
 
 export function assertUnreachable(x: never): never {
   throw new Error("should be unreachable " + x);
+}
+
+/** Closed interval -- both endpoints are in the range. */
+export type Range = [number, number];
+
+/** Do two ranges overlap one another? */
+export function rangeOverlaps([a1, a2]: Range, [b1, b2]: Range) {
+  // return !((a1 > b2) || (b1 > a2));
+  return (a1 <= b2) && (b1 <= a2);
 }

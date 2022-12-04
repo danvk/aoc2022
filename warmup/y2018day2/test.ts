@@ -1,4 +1,4 @@
-import { assert } from "https://deno.land/std@0.166.0/testing/asserts.ts";
+import { assert } from "../../deps.ts";
 import { hasThree, hasTwo } from "./y2018day2.ts";
 
 Deno.test('hasTwo', () => {
