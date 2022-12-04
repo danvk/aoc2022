@@ -75,6 +75,7 @@ export function mapObject<K extends PropertyKey, T, U>(obj: Record<K, T>, fn: (v
 }
 */
 
+// lodash does not have argmin/argmax: <https://github.com/lodash/lodash/issues/3141>
 export function argmax<K>(m: Map<K, number>): K {
   let maxKV = null;
   for (const [k, v] of m.entries()) {

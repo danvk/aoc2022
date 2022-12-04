@@ -2,7 +2,11 @@
 
 ## Daily Notes
 
-### Day 1
+### Day 2 (69695 / 64681)
+
+An opportunity to use one of my favorite tricsk: exhaustiveness checking with a cross product of unions using template literal types.
+
+### Day 1 (58706 / 55390)
 
 Reading the input file into "chunks" has been a theme in past years, too.
 I got a wrong answer on part two because of an annoying JS footgun:
