@@ -105,3 +105,14 @@ export function rangeOverlaps([a1, a2]: Range, [b1, b2]: Range) {
   // return !((a1 > b2) || (b1 > a2));
   return (a1 <= b2) && (b1 <= a2);
 }
+
+/** Returns the intersection of two sets. */
+export function intersect<T>(a: Set<T>, b: Set<T>): Set<T> {
+  const out = new Set<T>();
+  for (const x of a.keys()) {
+    if (b.has(x)) {
+      out.add(x);
+    }
+  }
+  return out;
+}

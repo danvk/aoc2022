@@ -2,7 +2,7 @@
 // https://adventofcode.com/2022/day/3
 
 import { _ } from "../deps.ts";
-import { assert, readLinesFromArgs, tuple } from "../util.ts";
+import { assert, intersect, readLinesFromArgs, tuple } from "../util.ts";
 
 function readRucksack(line: string): [Set<string>, Set<string>] {
   const n = line.length;
@@ -25,16 +25,6 @@ function findOverlap<T>(a: Set<T>, b: Set<T>): T {
     throw new Error('no overlap');
   }
   return item;
-}
-
-function intersect<T>(a: Set<T>, b: Set<T>): Set<T> {
-  const out = new Set<T>();
-  for (const x of a.keys()) {
-    if (b.has(x)) {
-      out.add(x);
-    }
-  }
-  return out;
 }
 
 function intersectThree<T>(a: Set<T>, b: Set<T>, c: Set<T>): T {

@@ -2,9 +2,21 @@
 
 ## Daily Notes
 
+### Day 4 (68911 / 66646)
+
+Saw the clock was midnight when I was going to bed last night and thought about opening up AoC. But I couldn't find my laptop so I just went to bed. Probably the right decision!
+
+I remember that there's a simple expression for whether two intervals overlap, but it always takes some head scratching to remember what that expression is.
+
+[deno_dom](https://deno.land/x/deno_dom@v0.1.36-alpha) is nice. I used it today to make my setup script write out all the code samples to text files.
+
+### Day 3 (58736 / 53036)
+
+Had a few off-by-one errors, as well as an off-by-26 error.
+
 ### Day 2 (69695 / 64681)
 
-An opportunity to use one of my favorite tricsk: exhaustiveness checking with a cross product of unions using template literal types.
+An opportunity to use one of my favorite tricks: exhaustiveness checking with a cross product of unions using template literal types.
 
 ### Day 1 (58706 / 55390)
 
