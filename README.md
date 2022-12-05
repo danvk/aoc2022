@@ -2,6 +2,14 @@
 
 ## Daily Notes
 
+### Day 5 (49161 / 47164)
+
+Immediate reaction after seeing the input: "crap, they're going to make us do Towers of Hanoi on day 5!?" Fortunately not but maybe that will come later.
+
+My parser was pretty half-assed, but even so, converting the inputs to JSON might have been the speedier move today.
+
+The only tricky bit today was remembering which direction all your arrays went. Was zero the top or the bottom?
+
 ### Day 4 (68911 / 66646)
 
 Saw the clock was midnight when I was going to bed last night and thought about opening up AoC. But I couldn't find my laptop so I just went to bed. Probably the right decision!
