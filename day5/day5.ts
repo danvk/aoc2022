@@ -2,12 +2,12 @@
 // https://adventofcode.com/2022/day/5
 
 import { _ } from "../deps.ts";
-import { assert, chunkLines, readLinesFromArgs } from "../util.ts";
+import { assert, chunkLines, readLinesFromArgs, safeParseInt, zeros } from "../util.ts";
 
 /** Parse the first part of the input. Index zero = top of stack. */
 function parseStacks(stacks: readonly string[]): string[][] {
-  const numStacks = (stacks[0].length + 1) / 4;
-  const out: string[][] = _.range(0, numStacks + 1).map(() => []);
+  const numStacks = 1 + (stacks[0].length + 1) / 4;
+  const out: string[][] = zeros(numStacks).map(() => []);
   for (const line of stacks) {
     if (!line.includes('[')) {
       break;  // ignore the "1 2 3 4 5 6 7" line at the end
@@ -33,7 +33,7 @@ function parseMove(move: string): Move {
   const m = move.match(/move (\d+) from (\d+) to (\d+)/);
   assert(m, move);
   const [, num, from, to] = m;
-  return _.mapValues({num, from, to}, Number);
+  return _.mapValues({num, from, to}, safeParseInt);
 }
 
 function applyMove(stacks: string[][], m: Move) {

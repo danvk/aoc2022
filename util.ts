@@ -116,3 +116,16 @@ export function intersect<T>(a: Set<T>, b: Set<T>): Set<T> {
   }
   return out;
 }
+
+/** Returns an array of n zeros. */
+export function zeros(n: number): number[] {
+  return _.range(0, n).map(() => 0);
+}
+
+export function safeParseInt(txt: string): number {
+  const n = parseInt(txt, 10);
+  if (n !== n) {
+    throw new Error(`Unable to parse ${txt} as an integer.`);
+  }
+  return n;
+}
