@@ -4,20 +4,19 @@
 import { _ } from "../deps.ts";
 import { assert, chunkLines, readLinesFromArgs } from "../util.ts";
 
-function parseStacks(stacks: string[]): string[][] {
+/** Parse the first part of the input. Index zero = top of stack. */
+function parseStacks(stacks: readonly string[]): string[][] {
   const numStacks = (stacks[0].length + 1) / 4;
-  console.log(numStacks);
   const out: string[][] = _.range(0, numStacks + 1).map(() => []);
   for (const line of stacks) {
     if (!line.includes('[')) {
-      break;
+      break;  // ignore the "1 2 3 4 5 6 7" line at the end
     }
     for (let i = 1; i < line.length; i += 4) {
       const c = line[i];
-      const j = (i - 1) / 4;
-      console.log(j, c);
+      const stack = (i - 1) / 4;
       if (c !== ' ') {
-        out[j].push(c);
+        out[stack].push(c);
       }
     }
   }
@@ -26,8 +25,8 @@ function parseStacks(stacks: string[]): string[][] {
 
 interface Move {
   num: number;
-  from: number;
-  to: number;
+  from: number;  // 1-based
+  to: number;  // 1-based
 }
 
 function parseMove(move: string): Move {
@@ -64,20 +63,16 @@ if (import.meta.main) {
   const [init, movesStr] = chunkLines(lines);
 
   const stacks = parseStacks(init);
-  console.log(stacks);
 
   const moves = movesStr.map(parseMove);
   const stacks2 = _.cloneDeep(stacks);
-  console.log(moves);
   for (const move of moves) {
     applyMove(stacks, move);
-    console.log(stacks);
   }
   console.log('part 1', stacks.map(s => s[0]).join(''));
 
   for (const move of moves) {
     applyMove2(stacks2, move);
-    console.log(stacks2);
   }
   console.log('part 2', stacks2.map(s => s[0]).join(''));
 }
