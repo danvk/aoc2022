@@ -48,6 +48,17 @@ function applyMove(stacks: string[][], m: Move) {
   }
 }
 
+function applyMove2(stacks: string[][], m: Move) {
+  const from = m.from - 1;
+  const to = m.to - 1;
+  // 0 = top of stack
+  const f = stacks[from];
+  assert(f.length > m.num);
+  const [toMove, rest] = [f.slice(0, m.num), f.slice(m.num)];
+  stacks[from] = rest;
+  stacks[to] = [...toMove, ...stacks[to]];
+}
+
 if (import.meta.main) {
   const lines = await readLinesFromArgs();
   const [init, movesStr] = chunkLines(lines);
@@ -56,12 +67,17 @@ if (import.meta.main) {
   console.log(stacks);
 
   const moves = movesStr.map(parseMove);
+  const stacks2 = _.cloneDeep(stacks);
   console.log(moves);
   for (const move of moves) {
     applyMove(stacks, move);
     console.log(stacks);
   }
-
   console.log('part 1', stacks.map(s => s[0]).join(''));
-  console.log('part 2');
+
+  for (const move of moves) {
+    applyMove2(stacks2, move);
+    console.log(stacks2);
+  }
+  console.log('part 2', stacks2.map(s => s[0]).join(''));
 }
