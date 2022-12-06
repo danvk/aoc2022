@@ -17,6 +17,8 @@ Here was the bug:
 
 So if the first marker was in the first N characters, I'd miss it, which is much more likely to happen in the sample inputs than the real input.
 
+For kicks, I also added a linear implementation that performs the same regardless of sliding window length.
+
 ### Day 5 (49161 / 47164)
 
 Immediate reaction after seeing the input: "crap, they're going to make us do Towers of Hanoi on day 5!?" Fortunately not but maybe that will come later.
