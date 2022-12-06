@@ -129,3 +129,18 @@ export function safeParseInt(txt: string): number {
   }
   return n;
 }
+
+export function coord2str([x, y]: readonly [number, number]): string {
+  return `${x},${y}`
+}
+
+export function str2coord(coord: string): [number, number] {
+  const comma = coord.indexOf(',');
+  if (comma === -1) {
+    throw new Error(`"${coord}" is not a valid coordinate`);
+  }
+  return [
+    safeParseInt(coord.slice(0, comma)),
+    safeParseInt(coord.slice(comma + 1)),
+  ];
+}
