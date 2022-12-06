@@ -2,6 +2,10 @@
 
 ## Daily Notes
 
+### Day 5 (62854 / 61636)
+
+I got the samples wrong on part two but the answer right. What's going on?
+
 ### Day 5 (49161 / 47164)
 
 Immediate reaction after seeing the input: "crap, they're going to make us do Towers of Hanoi on day 5!?" Fortunately not but maybe that will come later.
