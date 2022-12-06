@@ -6,6 +6,17 @@
 
 I got the samples wrong on part two but the answer right. What's going on?
 
+Here was the bug:
+
+```
+ function findFirstMarker(chars: readonly string[], n: number): number {
+-  for (let i = n - 1; i < chars.length; i++) {
++  for (let i = 0; i < chars.length - n; i++) {
+     const s = new Set(chars.slice(i, i + n));
+```
+
+So if the first marker was in the first N characters, I'd miss it, which is much more likely to happen in the sample inputs than the real input.
+
 ### Day 5 (49161 / 47164)
 
 Immediate reaction after seeing the input: "crap, they're going to make us do Towers of Hanoi on day 5!?" Fortunately not but maybe that will come later.
