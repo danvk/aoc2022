@@ -2,7 +2,7 @@
 // https://adventofcode.com/2018/day/6
 
 import { _ } from "../../deps.ts";
-import { assert, coord2str, readLinesFromArgs, str2coord, tuple, zeros } from "../../util.ts";
+import { argminArray, assert, coord2str, increment, minmax, readLinesFromArgs, str2coord, tuple, zeros } from "../../util.ts";
 
 function readLine(line: string): [number, number] {
   const m = /(\d+), (\d+)/.exec(line);
@@ -11,7 +11,7 @@ function readLine(line: string): [number, number] {
   return [Number(x), Number(y)];
 }
 
-function neighbors8(coord: string): string[] {
+function _neighbors8(coord: string): string[] {
   const [x, y] = str2coord(coord);
   const out = [];
   for (let dx = -1; dx <= 1; dx++) {
@@ -46,7 +46,8 @@ function countByKey(m: Map<string, number>): number[] {
   return counts;
 }
 
-function search(
+// This is a BFS implementation that turns out to be way overkill
+function _search(
   seeds: string[],
   neighbors: (node: string) => string[],
   rounds: number,
@@ -106,17 +107,57 @@ function search(
   return _.max(finiteAreas)!;
 }
 
+function maxFiniteArea(seeds: readonly [number, number][]): number {
+  const [xmin, xmax] = minmax(seeds.map(([x, _y]) => x));
+  const [ymin, ymax] = minmax(seeds.map(([_x, y]) => y));
+  const infiniteSeeds = new Set<number>();
+
+  const closestSeed = (x: number, y: number) => {
+    const ds = _.sortBy(seeds.map(([sx, sy], i) => tuple(Math.abs(x - sx) + Math.abs(y - sy), i)), ([d, _i]) => d);
+    const d0 = ds[0][0];
+    const d1 = ds[1][0];
+    if (d0 !== d1) {
+      return ds[0][1];
+    }
+    return -1;
+  }
+
+  // If it's closest to the bounding rect, then it's infinite.
+  for (let x = xmin; x <= xmax; x++) {
+    infiniteSeeds.add(closestSeed(x, ymin));
+    infiniteSeeds.add(closestSeed(x, ymax));
+  }
+  for (let y = ymin; y <= ymax; y++) {
+    infiniteSeeds.add(closestSeed(xmin, y));
+    infiniteSeeds.add(closestSeed(xmax, y));
+  }
+
+  const counts = new Map<number, number>();
+  for (let x = xmin; x <= xmax; x++) {
+    for (let y = ymin; y <= ymax; y++) {
+      const s = closestSeed(x, y);
+      if (s >= 0 && !infiniteSeeds.has(s)) {
+        counts.set(s, 1 + (counts.get(s) ?? 0));
+      }
+    }
+  }
+  console.log(counts);
+  return _.max([...counts.values()])!;
+}
+
+function oneAxisBound(xs: readonly number[], n: number): [number, number] {
+  const [a, b] = minmax(xs);
+  return [a - Math.ceil(n / xs.length), b + Math.ceil(n / xs.length)];
+}
+
 function areaWithinN(seeds: readonly [number, number][], n: number): number {
-  const vals = seeds.flat();
-  const a = _.min(vals)!;
-  const b = _.max(vals)!;
+  // This rectangle contains all possible coordinates within n of all seeds
+  const [xmin, xmax] = oneAxisBound(seeds.map(([x, _y]) => x), n);
+  const [ymin, ymax] = oneAxisBound(seeds.map(([_x, y]) => y), n);
 
   let area = 0;
-  for (let x = a - n; x < b + n; x++) {
-    if (x % 100 === 0) {
-      console.log(x);
-    }
-    for (let y = a - n; y < b + n; y++) {
+  for (let x = xmin; x <= xmax; x++) {
+    for (let y = ymin; y <= ymax; y++) {
       const d = _.sumBy(seeds, ([sx, sy]) => Math.abs(x - sx) + Math.abs(y - sy));
       if (d < n) {
         area++;
@@ -130,9 +171,10 @@ if (import.meta.main) {
   const lines = await readLinesFromArgs();
   const inits = lines.map(readLine);
   // const seeds = inits.map(coord2str);
-  const max = _.max(inits.flat())!;
-  console.log(max, 'rounds');
+  // const max = _.max(inits.flat())!;
+  // console.log(max, 'rounds');
   // const largestFinite = search(seeds, neighbors4, max);
   // console.log('part 1', largestFinite);
+  console.log('part 1', maxFiniteArea(inits));
   console.log('part 2', areaWithinN(inits, 10000));
 }

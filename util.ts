@@ -88,9 +88,23 @@ export function argmaxArray(xs: number[]): number {
     }
   }
   if (!maxKV) {
-    throw new Error("map was empty");
+    throw new Error("array was empty");
   }
   return maxKV.k;
+}
+
+export function argminArray(xs: number[]): number {
+  let minKV = null;
+  for (let k = 0; k < xs.length; k++) {
+    const v = xs[k];
+    if (minKV === null || v < minKV.v) {
+      minKV = { k, v };
+    }
+  }
+  if (!minKV) {
+    throw new Error("array was empty");
+  }
+  return minKV.k;
 }
 
 export function assertUnreachable(x: never): never {
@@ -143,4 +157,18 @@ export function str2coord(coord: string): [number, number] {
     safeParseInt(coord.slice(0, comma)),
     safeParseInt(coord.slice(comma + 1)),
   ];
+}
+
+export function minmax(xs: readonly number[]): [number, number] {
+  assert(xs.length > 0);
+  let min = xs[0], max = xs[0];
+  for (let i = 1; i < xs.length; i++) {
+    const x = xs[i];
+    if (x < min) {
+      min = x;
+    } else if (x > max) {
+      max = x;
+    }
+  }
+  return [min, max];
 }
