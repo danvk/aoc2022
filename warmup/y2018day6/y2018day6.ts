@@ -106,13 +106,33 @@ function search(
   return _.max(finiteAreas)!;
 }
 
+function areaWithinN(seeds: readonly [number, number][], n: number): number {
+  const vals = seeds.flat();
+  const a = _.min(vals)!;
+  const b = _.max(vals)!;
+
+  let area = 0;
+  for (let x = a - n; x < b + n; x++) {
+    if (x % 100 === 0) {
+      console.log(x);
+    }
+    for (let y = a - n; y < b + n; y++) {
+      const d = _.sumBy(seeds, ([sx, sy]) => Math.abs(x - sx) + Math.abs(y - sy));
+      if (d < n) {
+        area++;
+      }
+    }
+  }
+  return area;
+}
+
 if (import.meta.main) {
   const lines = await readLinesFromArgs();
   const inits = lines.map(readLine);
-  const seeds = inits.map(coord2str);
+  // const seeds = inits.map(coord2str);
   const max = _.max(inits.flat())!;
   console.log(max, 'rounds');
-  const largestFinite = search(seeds, neighbors4, max);
-  console.log('part 1', largestFinite);
-  console.log('part 2');
+  // const largestFinite = search(seeds, neighbors4, max);
+  // console.log('part 1', largestFinite);
+  console.log('part 2', areaWithinN(inits, 10000));
 }
