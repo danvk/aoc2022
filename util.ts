@@ -159,6 +159,7 @@ export function str2coord(coord: string): [number, number] {
   ];
 }
 
+/** Simultaneously calculate the min and max of a sequence */
 export function minmax(xs: readonly number[]): [number, number] {
   assert(xs.length > 0);
   let min = xs[0], max = xs[0];
@@ -171,4 +172,9 @@ export function minmax(xs: readonly number[]): [number, number] {
     }
   }
   return [min, max];
+}
+
+/** Sort by something, preserving the original indices in a tuple with the values */
+export function sortWithIndex<T>(xs: readonly T[], sortBy: (x: T, index: number) => string|number): [T, number][] {
+  return _.sortBy(xs.map((x, i) => tuple(x, i)), ([x, i]) => sortBy(x, i));
 }

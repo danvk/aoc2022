@@ -2,7 +2,7 @@
 // https://adventofcode.com/2018/day/6
 
 import { _ } from "../../deps.ts";
-import { argminArray, assert, coord2str, increment, minmax, readLinesFromArgs, str2coord, tuple, zeros } from "../../util.ts";
+import { assert, coord2str, minmax, readLinesFromArgs, sortWithIndex, str2coord, tuple, zeros } from "../../util.ts";
 
 function readLine(line: string): [number, number] {
   const m = /(\d+), (\d+)/.exec(line);
@@ -24,7 +24,7 @@ function _neighbors8(coord: string): string[] {
   return out;
 }
 
-function neighbors4(coord: string): string[] {
+function _neighbors4(coord: string): string[] {
   const [x, y] = str2coord(coord);
   return [
     tuple(x - 1, y),
@@ -113,7 +113,8 @@ function maxFiniteArea(seeds: readonly [number, number][]): number {
   const infiniteSeeds = new Set<number>();
 
   const closestSeed = (x: number, y: number) => {
-    const ds = _.sortBy(seeds.map(([sx, sy], i) => tuple(Math.abs(x - sx) + Math.abs(y - sy), i)), ([d, _i]) => d);
+    // const ds = _.sortBy(seeds.map(([sx, sy], i) => tuple(Math.abs(x - sx) + Math.abs(y - sy), i)), ([d, _i]) => d);
+    const ds = sortWithIndex(seeds, ([sx, sy]) => Math.abs(x - sx) + Math.abs(y - sy));
     const d0 = ds[0][0];
     const d1 = ds[1][0];
     if (d0 !== d1) {
