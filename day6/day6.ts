@@ -5,7 +5,7 @@ import { _ } from "../deps.ts";
 import { assert, readLinesFromArgs } from "../util.ts";
 
 function findFirstMarker(chars: readonly string[], n: number): number {
-  for (let i = n - 1; i < chars.length; i++) {
+  for (let i = 0; i < chars.length - n; i++) {
     const s = new Set(chars.slice(i, i + n));
     if (s.size === n) {
       return i + n;
