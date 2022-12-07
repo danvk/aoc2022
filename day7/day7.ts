@@ -120,6 +120,22 @@ function part1(node: Directory, x: number): number {
   return sum + _.sum(node.contents.filter(isDir).map(n => part1(n, x)));
 }
 
+function allSizes(node: Directory): number[] {
+  assert(node.totalSize);
+  return [node.totalSize, ...node.contents.filter(isDir).map(allSizes).flat()];
+}
+
+function part2(root: Directory, totalSize: number): number {
+  const sizes = _.sortBy(allSizes(root));
+  console.log(sizes);
+  for (const size of sizes) {
+    if (totalSize - size <= (70000000 - 30000000)) {
+      return size;
+    }
+  }
+  return 0;
+}
+
 if (import.meta.main) {
   const lines = await readLinesFromArgs();
   const commands = extractCommands(lines);
@@ -128,5 +144,5 @@ if (import.meta.main) {
   console.log('total bytes', totalSize);
   console.log(root);
   console.log('part 1', part1(root, 100_000));
-  console.log('part 2');
+  console.log('part 2', part2(root, totalSize));
 }
