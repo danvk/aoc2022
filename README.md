@@ -2,7 +2,11 @@
 
 ## Daily Notes
 
-### Day 5 (62854 / 61636)
+### Day 7 (35036 / 33194)
+
+Eerily reminiscent of one of Sidewalk's interview questions! Storing a pointer to the parent node was helpful for that question, and was also a good strategy here.
+
+### Day 6 (62854 / 61636)
 
 I got the samples wrong on part two but the answer right. What's going on?
 
