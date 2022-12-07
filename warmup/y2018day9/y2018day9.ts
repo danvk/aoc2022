@@ -2,11 +2,20 @@
 // https://adventofcode.com/2018/day/9
 
 import { _ } from "../../deps.ts";
-import { safeParseInt, zeros } from "../../util.ts";
+import { assert, safeParseInt, zeros } from "../../util.ts";
+
+interface Marble {
+  num: number;
+  prev: Marble;
+  next: Marble;
+}
 
 function playGame(numElves: number, maxMarble: number) {
-  const marbles = [0, 1];
-  let curI = 1;
+  const m0: Marble = { num: 0, prev: null!, next: null!};
+  const m1: Marble = { num: 1, prev: m0, next: m0};
+  m0.prev = m1;
+  m0.next = m1;
+  let cur = m1;
   const scores = zeros(1 + numElves);
   for (let m = 2; m <= maxMarble; m++) {
     if (m % 10_000 === 0) {
@@ -14,17 +23,39 @@ function playGame(numElves: number, maxMarble: number) {
     }
     const elf = 1 + ((m - 1) % numElves);
     if (m % 23 !== 0) {
-      const i = (curI + 1) % marbles.length;
-      marbles.splice(i + 1, 0, m);
-      curI = i + 1;
+      const cw1 = cur.next;  // m0
+      const cw2 = cw1.next;  // m1
+      const newM: Marble = {
+        num: m,
+        prev: cw1,
+        next: cw2,
+      };
+      cw1.next = newM;
+      cw2.prev = newM;
+      cur = newM;
     } else {
       scores[elf] += m;
-      const i = (curI + marbles.length - 8) % marbles.length;
-      const [m2] = marbles.splice(i + 1, 1);
-      scores[elf] += m2;
-      curI = (i + 1) % marbles.length;
+      for (let i = 0; i < 7; i++) {
+        cur = cur.prev;
+      }
+      scores[elf] += cur.num;
+      cur.prev.next = cur.next;
+      cur.next.prev = cur.prev;
+      cur = cur.next;
     }
-    // console.log(m, marbles.map((x, i) => i === curI ? `(${x})` : x).join(' '));
+    /*
+    const parts = [];
+    let c = m0;
+    do {
+      if (c === cur) {
+        parts.push(`(${c.num})`);
+      } else {
+        parts.push(`${c.num}`);
+      }
+      c = c.next;
+    } while (c !== m0);
+    console.log(parts.join(' '));
+    */
   }
   console.log(scores);
   return _.max(scores)!;
