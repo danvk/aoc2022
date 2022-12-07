@@ -61,8 +61,8 @@ export function tuple<T extends Array<unknown>>(...x: T) {
 export function assert<T>(
   x: T,
   message?: string
-): asserts x is Exclude<T, null | undefined> {
-  if (x === null || x === undefined) {
+): asserts x is Exclude<T, null | undefined | false> {
+  if (x === null || x === undefined || x === false) {
     throw new Error(message ?? String(x));
   }
 }
