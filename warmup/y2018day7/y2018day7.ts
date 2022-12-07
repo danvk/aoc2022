@@ -2,7 +2,7 @@
 // https://adventofcode.com/2018/day/7
 
 import { _ } from "../../deps.ts";
-import { argminArray, assert, readLinesFromArgs } from "../../util.ts";
+import { argminArray, assert, makeObject, readLinesFromArgs } from "../../util.ts";
 
 interface Edge {
   before: string;
@@ -17,14 +17,14 @@ function parseLine(txt: string) {
 }
 
 function process(edges: Edge[]): string {
-  const seq = [];
   const beforeToAfter = _.mapValues(_.groupBy(edges, e => e.before), es => es.map(e => e.after));
   const allSteps = _.uniq(edges.map(({before, after}) => [before, after]).flat());
-  const preReqs = _.fromPairs(allSteps.map(step => [step, new Set<string>()]));
+  const preReqs = makeObject(allSteps, () => new Set<string>());
   for (const {before, after} of edges) {
     preReqs[after].add(before);
   }
 
+  const seq = [];
   while (!_.isEmpty(preReqs)) {
     const ready = _.keys(preReqs).filter(k => preReqs[k].size === 0);
     assert(ready.length);
@@ -47,11 +47,10 @@ interface Event {
   freeAt: number;
 }
 
-
 function process2(edges: Edge[], numElves: number, delay: number): number {
   const beforeToAfter = _.mapValues(_.groupBy(edges, e => e.before), es => es.map(e => e.after));
   const allSteps = _.uniq(edges.map(({before, after}) => [before, after]).flat());
-  const preReqs = _.fromPairs(allSteps.map(step => [step, new Set<string>()]));
+  const preReqs = makeObject(allSteps, () => new Set<string>());
   for (const {before, after} of edges) {
     preReqs[after].add(before);
   }

@@ -178,3 +178,8 @@ export function minmax(xs: readonly number[]): [number, number] {
 export function sortWithIndex<T>(xs: readonly T[], sortBy: (x: T, index: number) => string|number): [T, number][] {
   return _.sortBy(xs.map((x, i) => tuple(x, i)), ([x, i]) => sortBy(x, i));
 }
+
+/** Make an object using a list of keys and a function. */
+export function makeObject<K extends string, T>(keys: readonly K[], fn: (k: string, i: number) => T): Record<K, T> {
+  return _.fromPairs(keys.map((k, i) => [k, fn(k, i)])) as Record<K, T>;
+}
