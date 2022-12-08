@@ -46,15 +46,12 @@ function markVisibleGrid(xs: number[][]): number {
   return num;
 }
 
-
-
 function scenicScore(xs: number[][], i: number, j: number): number {
   const n = xs.length;
   const h0 = xs[i][j];
   const scoreInDir = (dx: number, dy: number): number => {
     let score = 0;
     let x = i + dx, y = j + dy;
-    // console.log(x, y, dx, dy);
     while (x >= 0 && y >= 0 && x < n && y < n) {
       const t = xs[x][y];
       score++;
@@ -63,7 +60,6 @@ function scenicScore(xs: number[][], i: number, j: number): number {
       }
       x += dx;
       y += dy;
-      // console.log(x, y);
     }
     return score;
   };
