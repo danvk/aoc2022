@@ -2,6 +2,10 @@
 
 ## Daily Notes
 
+### Day 8 (41149 / 34438)
+
+Good opportunity to implement `transpose` in part 1. I thought part 2 was easier than part 1, though I'm curious why `3a494d6` gave me an infinite loop until I refactored it from a `for` loop to a `while` loop.
+
 ### Day 7 (35036 / 33194)
 
 Eerily reminiscent of one of Sidewalk's interview questions! Storing a pointer to the parent node was helpful for that question, and was also a good strategy here.

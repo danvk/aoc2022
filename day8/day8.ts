@@ -74,10 +74,10 @@ function scenicScore(xs: number[][], i: number, j: number): number {
 if (import.meta.main) {
   const lines = await readLinesFromArgs();
   const grid = lines.map(line => line.split('').map(safeParseInt));
-  // console.log('part 1', markVisibleGrid(grid));
+  console.log('part 1', markVisibleGrid(grid));
 
   const scores = grid.map((row, i) => row.map((_, j) => scenicScore(grid, i, j)));
-  console.log(scores);
+  // console.log(scores);
   const top = _.max(scores.flat());
   console.log('part 2', top);
 }
