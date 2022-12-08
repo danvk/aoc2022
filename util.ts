@@ -131,14 +131,15 @@ export function intersect<T>(a: Set<T>, b: Set<T>): Set<T> {
   return out;
 }
 
-/** Returns an array of n zeros. */
-export function zeros(n: number): number[] {
-  return _.range(0, n).map(() => 0);
-}
-
-/** Returns an array of n zeros. */
-export function zeros2d(n: number, m: number): number[][] {
-  return _.range(0, n).map(() => zeros(m));
+/** Return a 1- or 2-dimensional array of zeros */
+export function zeros<A extends [number] | []>(n: number, ...rest: A): (A extends [] ? number[] : number[][]) {
+  if (rest.length > 0) {
+    const m = rest[0]!;
+    // deno-lint-ignore no-explicit-any
+    return _.range(0, n).map(() => zeros(m)) as any;
+  }
+  // deno-lint-ignore no-explicit-any
+  return _.range(0, n) as any;
 }
 
 export function safeParseInt(txt: string): number {
