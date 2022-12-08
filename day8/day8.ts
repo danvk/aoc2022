@@ -53,15 +53,17 @@ function scenicScore(xs: number[][], i: number, j: number): number {
   const h0 = xs[i][j];
   const scoreInDir = (dx: number, dy: number): number => {
     let score = 0;
-    for (
-      let x = i + dx, y = j + dy;
-      x += dx, y += dy;
-      x >= 0 && y >= 0 && x < n && y < n) {
+    let x = i + dx, y = j + dy;
+    // console.log(x, y, dx, dy);
+    while (x >= 0 && y >= 0 && x < n && y < n) {
       const t = xs[x][y];
       score++;
       if (t >= h0) {
         break;
       }
+      x += dx;
+      y += dy;
+      // console.log(x, y);
     }
     return score;
   };
