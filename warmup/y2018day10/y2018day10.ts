@@ -21,12 +21,13 @@ function readPoint(txt: string): Point {
   return {x, y, dx, dy};
 }
 
-function maybePrintGrid(points: readonly Point[]) {
+function maybePrintGrid(secs: number, points: readonly Point[]) {
   const [xmin, xmax] = minmax(points.map(p => p.x));
   const [ymin, ymax] = minmax(points.map(p => p.y));
   if (xmax - xmin > 100 || ymax - ymin > 100) {
     return;
   }
+  console.log(secs, ':');
   const dots = _.range(ymin, ymax + 1).map(() => _.range(xmin, xmax+1).map(() => '.'));
   for (const point of points) {
     dots[point.y - ymin][point.x - xmin] = '#';
@@ -50,7 +51,7 @@ if (import.meta.main) {
   console.log(points);
   for (let i = 0; i < 100000; i++) {
     // console.log(i, ':');
-    maybePrintGrid(points);
+    maybePrintGrid(i, points);
     advance(points);
   }
   console.log('part 1', lines.length);
