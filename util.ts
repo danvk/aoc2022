@@ -183,3 +183,15 @@ export function sortWithIndex<T>(xs: readonly T[], sortBy: (x: T, index: number)
 export function makeObject<K extends string, T>(keys: readonly K[], fn: (k: string, i: number) => T): Record<K, T> {
   return _.fromPairs(keys.map((k, i) => [k, fn(k, i)])) as Record<K, T>;
 }
+
+/** Transpose a square matrix in-place */
+export function transpose<T>(grid: T[][]) {
+  assert(grid.length === grid[0].length);
+  for (let i = 0; i < grid.length; i++) {
+    for (let j = 0; j < i; j++) {
+      const t = grid[i][j];
+      grid[i][j] = grid[j][i];
+      grid[j][i] = t;
+    }
+  }
+}
