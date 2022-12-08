@@ -46,9 +46,36 @@ function markVisibleGrid(xs: number[][]): number {
   return num;
 }
 
+
+
+function scenicScore(xs: number[][], i: number, j: number): number {
+  const n = xs.length;
+  const h0 = xs[i][j];
+  const scoreInDir = (dx: number, dy: number): number => {
+    let score = 0;
+    for (
+      let x = i + dx, y = j + dy;
+      x += dx, y += dy;
+      x >= 0 && y >= 0 && x < n && y < n) {
+      const t = xs[x][y];
+      score++;
+      if (t >= h0) {
+        break;
+      }
+    }
+    return score;
+  };
+
+  return scoreInDir(-1, 0) * scoreInDir(+1, 0) * scoreInDir(0, -1) * scoreInDir(0, +1);
+}
+
 if (import.meta.main) {
   const lines = await readLinesFromArgs();
   const grid = lines.map(line => line.split('').map(safeParseInt));
-  console.log('part 1', markVisibleGrid(grid));
-  console.log('part 2');
+  // console.log('part 1', markVisibleGrid(grid));
+
+  const scores = grid.map((row, i) => row.map((_, j) => scenicScore(grid, i, j)));
+  console.log(scores);
+  const top = _.max(scores.flat());
+  console.log('part 2', top);
 }
