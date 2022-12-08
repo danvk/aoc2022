@@ -136,6 +136,11 @@ export function zeros(n: number): number[] {
   return _.range(0, n).map(() => 0);
 }
 
+/** Returns an array of n zeros. */
+export function zeros2d(n: number, m: number): number[][] {
+  return _.range(0, n).map(() => zeros(m));
+}
+
 export function safeParseInt(txt: string): number {
   const n = parseInt(txt, 10);
   if (n !== n) {
