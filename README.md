@@ -2,6 +2,13 @@
 
 ## Daily Notes
 
+### Day 9 (31369 / 23800)
+
+Key part for part 2 today was to realize that the tail's movement is independent of the head's movement. Rather, it's just a function of the head and tail's position. I was very happy that my solution just worked the first time on this one, I think it would have been a PITA to debug.
+
+Star 1: ~23 minutes
+Star 2: ~40 minutes
+
 ### Day 8 (41149 / 34438)
 
 Good opportunity to implement `transpose` in part 1. I thought part 2 was easier than part 1, though I'm curious why `3a494d6` gave me an infinite loop until I refactored it from a `for` loop to a `while` loop.
