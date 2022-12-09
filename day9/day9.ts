@@ -2,7 +2,7 @@
 // https://adventofcode.com/2022/day/9
 
 import { _ } from "../deps.ts";
-import { assert, coord2str, readLinesFromArgs, safeParseInt, tuple } from "../util.ts";
+import { assert, coord2str, readLinesFromArgs, safeParseInt, tuple, zeros } from "../util.ts";
 
 type Point = [number, number];
 
@@ -87,18 +87,19 @@ if (import.meta.main) {
     const [dir, num] = line.split(' ');
     return tuple(dir, safeParseInt(num));
   });
-  let head: Point = [0, 0];
-  let tail: Point = [0, 0];
+  const rope: Point[] = zeros(10).map(() => [0, 0]);
   const spots = new Set<string>([coord2str([0, 0])]);
   for (const [dir, num] of moves) {
     for (let i = 0; i < num; i++) {
       // [head, tail] = move(head, tail, dir);
-      const [hx, hy] = head;
+      const [hx, hy] = rope[0];
       const [dx, dy] = dirs[dir];
-      head = [hx + dx, hy + dy];
-      tail = moveTail(head, tail);
-      console.log(tail);
-      spots.add(coord2str(tail));
+      rope[0] = [hx + dx, hy + dy];
+      for (let i = 1; i < rope.length; i++) {
+        rope[i] = moveTail(rope[i - 1], rope[i]);
+        // console.log(tail);
+      }
+      spots.add(coord2str(rope[9]));
     }
   }
   console.log('part 1', spots.size);
