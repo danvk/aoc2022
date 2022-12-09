@@ -47,6 +47,40 @@ function move(head: Point, tail: Point, dir: string): [Point, Point] {
   throw new Error('no touch!');
 }
 
+function moveTail(head: Point, tail: Point): Point {
+  if (touching(head, tail)) {
+    return tail;
+  }
+  const [hx, hy] = head;
+  const [tx, ty] = tail;
+  if (hx === tx) {
+    for (let dy = -1; dy <= 1; dy += 2) {
+      const t: Point = [tx, ty + dy];
+      if (touching(head, t)) {
+        return t;
+      }
+    }
+  } else if (hy === ty) {
+    for (let dx = -1; dx <= 1; dx += 2) {
+      const t: Point = [tx + dx, ty];
+      if (touching(head, t)) {
+        return t;
+      }
+    }
+  } else {
+    for (let dx = -1; dx <= 1; dx += 2) {
+      for (let dy = -1; dy <= 1; dy += 2) {
+        const t: Point = [tx + dx, ty + dy];
+        if (touching(head, t)) {
+          return t;
+        }
+      }
+    }
+    throw new Error('no touch diag!');
+  }
+  throw new Error('no touch!');
+}
+
 if (import.meta.main) {
   const lines = await readLinesFromArgs();
   const moves = lines.map(line => {
@@ -58,7 +92,11 @@ if (import.meta.main) {
   const spots = new Set<string>([coord2str([0, 0])]);
   for (const [dir, num] of moves) {
     for (let i = 0; i < num; i++) {
-      [head, tail] = move(head, tail, dir);
+      // [head, tail] = move(head, tail, dir);
+      const [hx, hy] = head;
+      const [dx, dy] = dirs[dir];
+      head = [hx + dx, hy + dy];
+      tail = moveTail(head, tail);
       console.log(tail);
       spots.add(coord2str(tail));
     }
