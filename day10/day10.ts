@@ -33,32 +33,21 @@ function run(commands: readonly Command[]) {
   const signals = [];
   const display = zeros(40, 6);
   for (const command of commands) {
-    let n = 0;
+    let numCycles = 0;
     let newX = x;
     if (command.command === 'noop') {
-      n = 1;
+      numCycles = 1;
     } else if (command.command === 'addx') {
-      n = 2;
+      numCycles = 2;
       newX = x + command.value;
     } else {
       assertUnreachable(command);
     }
-    for (let i = 0; i < n; i++) {
+
+    for (let i = 0; i < numCycles; i++) {
       const col = (cycles) % 40;
       const row = (Math.floor((cycles) / 40)) % 6;
-      if (Math.abs(x - col) <= 1) {
-        display[col][row] = 1;
-        if (cycles < 20) {
-          console.log('cycle', cycles + 1, 'set', row, col, '=1');
-          printDisplay(display);
-        }
-      } else {
-        display[col][row] = 0;
-        if (cycles < 20) {
-          console.log('cycle', cycles + 1, 'set', row, col, '=0');
-          printDisplay(display);
-        }
-      }
+      display[col][row] = (Math.abs(x - col) <= 1) ? 1 : 0;
       cycles++;
       if (cycles % 40 === 20) {
         const signal = cycles * x;
@@ -84,10 +73,8 @@ function printDisplay(display: number[][]) {
 if (import.meta.main) {
   const lines = await readLinesFromArgs();
   const commands = lines.map(parseCommand);
-  const [part1, display, x, cycles] = run(commands);
+  const [part1, display] = run(commands);
   console.log('part 1', part1);
-  console.log('x=', x);
-  console.log('cycles=', cycles);
   console.log('part 2');
   printDisplay(display);
 }

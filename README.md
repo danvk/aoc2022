@@ -2,6 +2,15 @@
 
 ## Daily Notes
 
+### Day 10 (32665 / 28284)
+
+IntCode returns?? Union types are a great way to represent commands.
+
+I got tripped up on part two by confusing which index was x and which was y on my display.
+
+Star 1: 8 minutes
+Star 2: 24 minutes
+
 ### Day 9 (31369 / 23800)
 
 Key part for part 2 today was to realize that the tail's movement is independent of the head's movement. Rather, it's just a function of the head and tail's position. I was very happy that my solution just worked the first time on this one, I think it would have been a PITA to debug.
