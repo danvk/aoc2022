@@ -2,7 +2,7 @@
 // https://adventofcode.com/2022/day/10
 
 import { _ } from "../deps.ts";
-import { assert, assertUnreachable, readLinesFromArgs, safeParseInt } from "../util.ts";
+import { assert, assertUnreachable, readLinesFromArgs, safeParseInt, tuple, zeros } from "../util.ts";
 
 interface Noop {
   command: 'noop';
@@ -31,6 +31,7 @@ function run(commands: readonly Command[]) {
   let x = 1;
   let cycles = 0;
   const signals = [];
+  const display = zeros(40, 6);
   for (const command of commands) {
     let n = 0;
     let newX = x;
@@ -43,6 +44,21 @@ function run(commands: readonly Command[]) {
       assertUnreachable(command);
     }
     for (let i = 0; i < n; i++) {
+      const col = (cycles) % 40;
+      const row = (Math.floor((cycles) / 40)) % 6;
+      if (Math.abs(x - col) <= 1) {
+        display[col][row] = 1;
+        if (cycles < 20) {
+          console.log('cycle', cycles + 1, 'set', row, col, '=1');
+          printDisplay(display);
+        }
+      } else {
+        display[col][row] = 0;
+        if (cycles < 20) {
+          console.log('cycle', cycles + 1, 'set', row, col, '=0');
+          printDisplay(display);
+        }
+      }
       cycles++;
       if (cycles % 40 === 20) {
         const signal = cycles * x;
@@ -51,12 +67,27 @@ function run(commands: readonly Command[]) {
     }
     x = newX;
   }
-  return [_.sum(signals), x, cycles, signals];
+  return tuple(_.sum(signals), display, x, cycles, signals);
+}
+
+function printDisplay(display: number[][]) {
+  for (let row = 0; row < display[0].length; row++) {
+    const chars = [];
+    for (let col = 0; col < display.length; col++) {
+      const c = display[col][row];
+      chars.push(c === 1 ? '#' : '.');
+    }
+    console.log(chars.join(''));
+  }
 }
 
 if (import.meta.main) {
   const lines = await readLinesFromArgs();
   const commands = lines.map(parseCommand);
-  console.log('part 1', run(commands));
+  const [part1, display, x, cycles] = run(commands);
+  console.log('part 1', part1);
+  console.log('x=', x);
+  console.log('cycles=', cycles);
   console.log('part 2');
+  printDisplay(display);
 }
