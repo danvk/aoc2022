@@ -135,8 +135,9 @@ function printTrack(track: Track, carts: Cart[]) {
   console.log(txt.map(row => row.join('')).join('\n'));
 }
 
-function tick(track: Track, carts: Cart[]): Cart[] | null {
+function tick(track: Track, carts: Cart[]): Cart[] {
   carts = _.sortBy(carts, 'y', 'x');
+  const toDelete = [];
   for (const cart of carts) {
     move(track, cart);
     const {x, y} = cart;
@@ -144,24 +145,32 @@ function tick(track: Track, carts: Cart[]): Cart[] | null {
     for (const other of carts) {
       if (other !== cart && other.x === cart.x && other.y === cart.y) {
         console.log('Collision at', x, y);
-        return null;
+        toDelete.push(other);
+        toDelete.push(cart);
       }
     }
   }
 
-  return carts;
+  return _.difference(carts, toDelete);
 }
 
 function part1(track: Track, carts: Cart[]) {
-  let c: Cart[] | null = carts;
   while (true) {
-    c = tick(track, c);
-    if (c === null) {
+    const numCarts = carts.length;
+    carts = tick(track, carts);
+    if (carts.length < numCarts) {
       return;
     }
-    printTrack(track, carts);
-    console.log('');
+    // printTrack(track, carts);
+    // console.log('');
   }
+}
+
+function part2(track: Track, carts: Cart[]) {
+  while (carts.length > 1) {
+    carts = tick(track, carts);
+  }
+  console.log(carts[0].x, carts[0].y);
 }
 
 if (import.meta.main) {
@@ -169,5 +178,7 @@ if (import.meta.main) {
   const [tracks, carts] = readTrack(lines);
   printTrack(tracks, carts);
   part1(tracks, carts);
-  console.log('part 2');
+
+  const [tracks2, carts2] = readTrack(lines);
+  part2(tracks2, carts2);
 }
