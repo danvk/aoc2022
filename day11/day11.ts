@@ -16,7 +16,7 @@ interface Monkey {
 
 function parseMonkey(chunk: string[]): Monkey {
   let line = chunk.shift()!;
-  const [num] = readInts(line);
+  const [num] = readInts(line, {expect: 1});
   line = chunk.shift()!;
   const items = readInts(line);
   line = chunk.shift()!;
@@ -25,21 +25,21 @@ function parseMonkey(chunk: string[]): Monkey {
   if (opStr === 'old * old') {
     op = (old: number) => old * old;
   } else if (opStr.startsWith('old * ')) {
-    const [m] = readInts(opStr);
+    const [m] = readInts(opStr, {expect: 1});
     op = (old: number) => old * m;
   } else if (opStr.startsWith('old + ')) {
-    const [m] = readInts(opStr);
+    const [m] = readInts(opStr, {expect: 1});
     op = (old: number) => old + m;
   } else {
     throw new Error('Unparseable op ' + opStr);
   }
 
   line = chunk.shift()!;
-  const [test] = readInts(line);
+  const [test] = readInts(line, {expect: 1});
   line = chunk.shift()!;
-  const [trueMonkey] = readInts(line);
+  const [trueMonkey] = readInts(line, {expect: 1});
   line = chunk.shift()!;
-  const [falseMonkey] = readInts(line);
+  const [falseMonkey] = readInts(line, {expect: 1});
   return {num, items, op, test, trueMonkey, falseMonkey, numInspected: 0};
 }
 

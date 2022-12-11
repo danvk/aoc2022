@@ -202,7 +202,14 @@ export function transpose<T>(grid: T[][]) {
   }
 }
 
-export function readInts(txt: string): number[] {
+/** Extract all (possibly negative) integers from a string. */
+export function readInts(txt: string, options?: {expect: number}): number[] {
   const matches = txt.matchAll(/(-?\d+)/g);
-  return [...matches].map(m => safeParseInt(m[1]));
+  const nums = [...matches].map(m => safeParseInt(m[1]));
+  if (options) {
+    if (nums.length !== options.expect) {
+      throw new Error(`Got ${nums.length} nums, expected ${options.expect}: '${txt}'`);
+    }
+  }
+  return nums;
 }
