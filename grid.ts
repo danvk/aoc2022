@@ -1,9 +1,9 @@
-import { coord2str, map2d, minmax, str2coord, zeros } from "./util.ts";
+import { coord2str, map2d, minmax, str2coord, tuple, zeros } from "./util.ts";
 
 export type Coord = [number, number];
 
 /** A two dimensional grid, implemented as a sparse Map */
-export class Grid<V> {
+export class Grid<V> implements Iterable<[[number, number], V]> {
   m: Map<string, V>;
   constructor() {
     this.m = new Map();
@@ -39,5 +39,20 @@ export class Grid<V> {
 
   format(format: (v: V, c: Coord) => string): string {
     return this.formatCells(format).map(row => row.join('')).join('\n');
+  }
+
+  [Symbol.iterator](): Iterator<[[number,number],V], unknown, undefined> {
+    // It's nice that Generator is assignable to Iterator.
+    // Questions here:
+    // - any way to avoid that = this?
+    // - why do I need to `return fn()` instead of `return fn`?
+    // deno-lint-ignore no-this-alias
+    const that = this;
+    const fn = function*() {
+      for (const [k, v] of that.m) {
+        yield tuple(str2coord(k), v);
+      }
+    };
+    return fn();
   }
 }

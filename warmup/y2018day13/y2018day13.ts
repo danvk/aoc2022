@@ -10,6 +10,7 @@
 //   - No type errors or anything
 //   - Lookups use reference equality, not structural equality
 //   - This will be much better with Records + Tuples
+//   - This inspired me to make a Grid class to handle this better
 
 import { _ } from "../../deps.ts";
 import { Grid } from "../../grid.ts";
