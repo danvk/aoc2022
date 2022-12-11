@@ -2,7 +2,7 @@
 
 ## Daily Notes
 
-### Day 11
+### Day 11 (27219 / 19839)
 
 Got my first stack trace from Deno -- quite ugly! Was trying to do math on `undefined`.
 
@@ -13,6 +13,8 @@ My answers on part two were slightly off. Turns out it's loss of precision on `n
     error: Uncaught RangeError: Maximum BigInt size exceeded
         op = (old: bigint) => old * old;
                             ^
+
+Fortunately all the "test" divisors are prime, so you can just multiply them all and do the arithmetic in a ring. This was the first day that required some thought on part 2.
 
 ### Day 10 (32665 / 28284)
 

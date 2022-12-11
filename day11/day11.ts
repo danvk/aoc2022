@@ -74,30 +74,6 @@ function part1(monkeys: Monkey[]): number {
   printItems(monkeys);
   for (let i = 0; i < 20; i++) {
     round(monkeys);
-    console.log(i);
-    printItems(monkeys);
-  }
-  const inspects = _.sortBy(monkeys.map(m => m.numInspected)).reverse();
-  console.log(inspects);
-  return inspects[0] * inspects[1];
-}
-
-// 24543765554 is too high
-
-function part2(monkeys: Monkey[]): number {
-  // printItems(monkeys);
-  const modulus = monkeys.map(m => m.test).reduce((a, b) => a * b, 1);
-  console.log('modulus', modulus);
-  for (let i = 0; i < 10_000; i++) {
-    round(monkeys, 2, modulus);
-
-    if (i + 1 === 1 || i + 1 === 20 || (i + 1) % 1000 === 0) {
-      console.log('after', 1 + i, 'rounds');
-      for (const m of monkeys) {
-        console.log(m.num, 'inspected', m.numInspected);
-      }
-    }
-
     // console.log(i);
     // printItems(monkeys);
   }
@@ -106,10 +82,29 @@ function part2(monkeys: Monkey[]): number {
   return inspects[0] * inspects[1];
 }
 
+function part2(monkeys: Monkey[]): number {
+  // printItems(monkeys);
+  const modulus = monkeys.map(m => m.test).reduce((a, b) => a * b, 1);
+  // console.log('modulus', modulus);
+  for (let i = 0; i < 10_000; i++) {
+    round(monkeys, 2, modulus);
+
+    // if (i + 1 === 1 || i + 1 === 20 || (i + 1) % 1000 === 0) {
+    //   console.log('after', 1 + i, 'rounds');
+    //   for (const m of monkeys) {
+    //     console.log(m.num, 'inspected', m.numInspected);
+    //   }
+    // }
+  }
+  const inspects = _.sortBy(monkeys.map(m => m.numInspected)).reverse();
+  console.log(inspects);
+  return inspects[0] * inspects[1];
+}
+
 if (import.meta.main) {
   const lines = await readLinesFromArgs();
-  // const monkeys = chunkLines(lines).map(parseMonkey);
+  const monkeys = chunkLines(lines).map(parseMonkey);
   const monkeys2 = chunkLines(lines).map(parseMonkey);
-  // console.log('part 1', part1(monkeys));
+  console.log('part 1', part1(monkeys));
   console.log('part 2', part2(monkeys2));
 }
