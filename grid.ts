@@ -1,3 +1,4 @@
+import { _ } from "./deps.ts";
 import { coord2str, map2d, minmax, str2coord, tuple, zeros } from "./util.ts";
 
 export type Coord = [number, number];
@@ -7,6 +8,21 @@ export class Grid<V> implements Iterable<[[number, number], V]> {
   m: Map<string, V>;
   constructor() {
     this.m = new Map();
+  }
+
+  static fromLines(lines: readonly string[]): Grid<string> {
+    const g = new Grid<string>();
+    const numRows = lines.length;
+    const numCols = _.max(lines.map(line => line.length))!;
+    for (let y = 0; y < numRows; y++) {
+      for (let x = 0; x < numCols; x++ ) {
+        const c = lines[y][x];
+        if (c && c !== ' ') {
+          g.set([x, y], c);
+        }
+      }
+    }
+    return g;
   }
 
   get(c: Coord): V | undefined {
