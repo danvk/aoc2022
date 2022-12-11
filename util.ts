@@ -68,17 +68,6 @@ export function assert<T>(
 }
 
 // lodash does not have argmin/argmax: <https://github.com/lodash/lodash/issues/3141>
-export function argmax<K>(m: Map<K, number>): K {
-  let maxKV = null;
-  for (const [k, v] of m.entries()) {
-    if (maxKV === null || v > maxKV.v) {
-      maxKV = { k, v };
-    }
-  }
-  assert(maxKV, "map was empty");
-  return maxKV.k;
-}
-
 export function argmaxArray(xs: number[]): number {
   let maxKV = null;
   for (let k = 0; k < xs.length; k++) {

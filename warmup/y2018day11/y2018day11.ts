@@ -7,7 +7,8 @@
 // - Calculating just the changes as you increase square size was sufficient O(n^2) -> O(n)
 
 import { _ } from "../../deps.ts";
-import { argmax, coord2str, safeParseInt, zeros } from "../../util.ts";
+import { argmax } from "../../map.ts";
+import { coord2str, safeParseInt, zeros } from "../../util.ts";
 
 export function calcPower(x: number, y: number, serial: number): number {
   const rackId = x + 10;
