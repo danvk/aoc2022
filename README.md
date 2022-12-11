@@ -8,6 +8,12 @@ Got my first stack trace from Deno -- quite ugly! Was trying to do math on `unde
 
 My answers on part two were slightly off. Turns out it's loss of precision on `new = old * old`. Time to bust out `BigInt`!
 
+... or not!
+
+    error: Uncaught RangeError: Maximum BigInt size exceeded
+        op = (old: bigint) => old * old;
+                            ^
+
 ### Day 10 (32665 / 28284)
 
 IntCode returns?? Union types are a great way to represent commands.

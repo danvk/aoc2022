@@ -43,15 +43,14 @@ function parseMonkey(chunk: string[]): Monkey {
   return {num, items, op, test, trueMonkey, falseMonkey, numInspected: 0};
 }
 
-function round(monkeys: Monkey[], part=1) {
+function round(monkeys: Monkey[], part=1, modulus=0) {
   for (const m of monkeys) {
     while (m.items.length) {
       m.numInspected++;
       let worry = m.items.shift()!;
-      const oldWorry = worry;
       worry = m.op(worry);
-      if (m.num === 2) {
-        console.log(worry, oldWorry);
+      if (modulus) {
+        worry = worry % modulus;
       }
       if (part === 1) {
         worry = Math.floor(worry / 3);
@@ -87,8 +86,10 @@ function part1(monkeys: Monkey[]): number {
 
 function part2(monkeys: Monkey[]): number {
   // printItems(monkeys);
+  const modulus = monkeys.map(m => m.test).reduce((a, b) => a * b, 1);
+  console.log('modulus', modulus);
   for (let i = 0; i < 10_000; i++) {
-    round(monkeys, 2);
+    round(monkeys, 2, modulus);
 
     if (i + 1 === 1 || i + 1 === 20 || (i + 1) % 1000 === 0) {
       console.log('after', 1 + i, 'rounds');
