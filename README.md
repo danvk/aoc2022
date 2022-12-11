@@ -16,6 +16,10 @@ My answers on part two were slightly off. Turns out it's loss of precision on `n
 
 Fortunately all the "test" divisors are prime, so you can just multiply them all and do the arithmetic in a ring. This was the first day that required some thought on part 2.
 
+- Start: 08:13:19
+- ⭐️: 08:32:41 (19m)
+- ⭐️⭐️: 08:51:19 (38m)
+
 ### Day 10 (32665 / 28284)
 
 IntCode returns?? Union types are a great way to represent commands.

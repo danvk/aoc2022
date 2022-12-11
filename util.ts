@@ -131,6 +131,13 @@ export function zeros<A extends [number] | []>(n: number, ...rest: A): (A extend
   return _.range(0, n) as any;
 }
 
+export function map2d<U, V>(
+  xs: readonly U[][],
+  fn: (x: U, i: number, j: number) => V,
+): V[][] {
+  return xs.map((row, i) => row.map((val, j) => fn(val, i, j)));
+}
+
 export function safeParseInt(txt: string): number {
   const n = parseInt(txt, 10);
   if (n !== n) {
