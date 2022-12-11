@@ -11,6 +11,7 @@ interface Monkey {
   test: number;
   trueMonkey: number;
   falseMonkey: number;
+  numInspected: number;
 }
 
 function parseMonkey(chunk: string[]): Monkey {
@@ -39,12 +40,13 @@ function parseMonkey(chunk: string[]): Monkey {
   const [trueMonkey] = readInts(line);
   line = chunk.shift()!;
   const [falseMonkey] = readInts(line);
-  return {num, items, op, test, trueMonkey, falseMonkey};
+  return {num, items, op, test, trueMonkey, falseMonkey, numInspected: 0};
 }
 
 function round(monkeys: Monkey[]) {
   for (const m of monkeys) {
-    while (m.items) {
+    while (m.items.length) {
+      m.numInspected++;
       let worry = m.items.shift()!;
       worry = m.op(worry);
       worry = Math.floor(worry / 3);
@@ -65,11 +67,14 @@ function printItems(monkeys: Monkey[]) {
 
 function part1(monkeys: Monkey[]): number {
   printItems(monkeys);
-  for (let i = 0; i < 1; i++) {
+  for (let i = 0; i < 20; i++) {
     round(monkeys);
+    console.log(i);
     printItems(monkeys);
   }
-  return 0;
+  const inspects = _.sortBy(monkeys.map(m => m.numInspected)).reverse();
+  console.log(inspects);
+  return inspects[0] * inspects[1];
 }
 
 if (import.meta.main) {
