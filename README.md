@@ -4,7 +4,9 @@
 
 ### Day 11
 
-Got my first stack trace from Deno -- quite ugly!
+Got my first stack trace from Deno -- quite ugly! Was trying to do math on `undefined`.
+
+My answers on part two were slightly off. Turns out it's loss of precision on `new = old * old`. Time to bust out `BigInt`!
 
 ### Day 10 (32665 / 28284)
 

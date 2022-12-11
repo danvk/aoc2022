@@ -43,13 +43,19 @@ function parseMonkey(chunk: string[]): Monkey {
   return {num, items, op, test, trueMonkey, falseMonkey, numInspected: 0};
 }
 
-function round(monkeys: Monkey[]) {
+function round(monkeys: Monkey[], part=1) {
   for (const m of monkeys) {
     while (m.items.length) {
       m.numInspected++;
       let worry = m.items.shift()!;
+      const oldWorry = worry;
       worry = m.op(worry);
-      worry = Math.floor(worry / 3);
+      if (m.num === 2) {
+        console.log(worry, oldWorry);
+      }
+      if (part === 1) {
+        worry = Math.floor(worry / 3);
+      }
       if (worry % m.test === 0) {
         monkeys[m.trueMonkey].items.push(worry);
       } else {
@@ -77,9 +83,32 @@ function part1(monkeys: Monkey[]): number {
   return inspects[0] * inspects[1];
 }
 
+// 24543765554 is too high
+
+function part2(monkeys: Monkey[]): number {
+  // printItems(monkeys);
+  for (let i = 0; i < 10_000; i++) {
+    round(monkeys, 2);
+
+    if (i + 1 === 1 || i + 1 === 20 || (i + 1) % 1000 === 0) {
+      console.log('after', 1 + i, 'rounds');
+      for (const m of monkeys) {
+        console.log(m.num, 'inspected', m.numInspected);
+      }
+    }
+
+    // console.log(i);
+    // printItems(monkeys);
+  }
+  const inspects = _.sortBy(monkeys.map(m => m.numInspected)).reverse();
+  console.log(inspects);
+  return inspects[0] * inspects[1];
+}
+
 if (import.meta.main) {
   const lines = await readLinesFromArgs();
-  const monkeys = chunkLines(lines).map(parseMonkey);
-  console.log('part 1', part1(monkeys));
-  console.log('part 2');
+  // const monkeys = chunkLines(lines).map(parseMonkey);
+  const monkeys2 = chunkLines(lines).map(parseMonkey);
+  // console.log('part 1', part1(monkeys));
+  console.log('part 2', part2(monkeys2));
 }
