@@ -1,5 +1,6 @@
 import { _ } from "./deps.ts";
 import { coord2str, map2d, minmax, str2coord, tuple, zeros } from "./util.ts";
+import * as itertools from './itertools.ts';
 
 export type Coord = [number, number];
 
@@ -70,5 +71,7 @@ export class Grid<V> implements Iterable<[[number, number], V]> {
       }
     };
     return fn();
+    // Why can't I do this? What's the difference between Iterable, Iterator and IterableIterator?
+    // return itertools.map(this.m, (cStr, v) => tuple(str2coord(cStr), v));
   }
 }

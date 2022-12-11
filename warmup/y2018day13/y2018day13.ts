@@ -49,37 +49,29 @@ interface Cart {
 type Track = Grid<string>;
 
 function readTrack(lines: readonly string[]): [Track, Cart[]] {
-  const numRows = lines.length;
-  const numCols = _.max(lines.map(line => line.length))!;
-
-  const tracks = new Grid<string>();
+  const tracks = Grid.fromLines(lines);
   const carts: Cart[] = [];
 
-  for (let y = 0; y < numRows; y++) {
-    for (let x = 0; x < numCols; x++ ) {
-      const c = lines[y][x];
-      if (c === ' ' || !c) {
-        continue;
-      } else if ('-|\\/+'.includes(c)) {
-        tracks.set([x, y], c);
+  for (const [[x, y], c] of tracks) {
+    if ('-|\\/+'.includes(c)) {
+      // no change
+    } else {
+      const base = {x, y, numIntersections: 0};
+      const pos = tuple(x, y);
+      if (c === '>') {
+        tracks.set(pos, '-');
+        carts.push({...base, dir: 'right'});
+      } else if (c === '<') {
+        tracks.set(pos, '-');
+        carts.push({...base, dir: 'left'});
+      } else if (c === '^') {
+        tracks.set(pos, '|');
+        carts.push({...base, dir: 'up'});
+      } else if (c === 'v') {
+        tracks.set(pos, '|');
+        carts.push({...base, dir: 'down'});
       } else {
-        const base = {x, y, numIntersections: 0};
-        const pos = tuple(x, y);
-        if (c === '>') {
-          tracks.set(pos, '-');
-          carts.push({...base, dir: 'right'});
-        } else if (c === '<') {
-          tracks.set(pos, '-');
-          carts.push({...base, dir: 'left'});
-        } else if (c === '^') {
-          tracks.set(pos, '|');
-          carts.push({...base, dir: 'up'});
-        } else if (c === 'v') {
-          tracks.set(pos, '|');
-          carts.push({...base, dir: 'down'});
-        } else {
-          throw new Error('Invalid symbol ' + c);
-        }
+        throw new Error('Invalid symbol ' + c);
       }
     }
   }
@@ -180,6 +172,7 @@ if (import.meta.main) {
   printTrack(tracks, carts);
   part1(tracks, carts);
 
+  console.log('\npart2\n');
   const [tracks2, carts2] = readTrack(lines);
   part2(tracks2, carts2);
 }
