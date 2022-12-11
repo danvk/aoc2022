@@ -2,6 +2,10 @@
 
 ## Daily Notes
 
+### Day 11
+
+Got my first stack trace from Deno -- quite ugly!
+
 ### Day 10 (32665 / 28284)
 
 IntCode returns?? Union types are a great way to represent commands.

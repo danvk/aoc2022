@@ -2,12 +2,7 @@
 // https://adventofcode.com/2018/day/10
 
 import { _ } from "../../deps.ts";
-import { minmax, readLinesFromArgs, safeParseInt, zeros } from "../../util.ts";
-
-function readInts(txt: string): number[] {
-  const matches = txt.matchAll(/(-?\d+)/g);
-  return [...matches].map(m => safeParseInt(m[1]));
-}
+import { minmax, readInts, readLinesFromArgs } from "../../util.ts";
 
 interface Point {
   x: number;

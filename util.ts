@@ -201,3 +201,8 @@ export function transpose<T>(grid: T[][]) {
     }
   }
 }
+
+export function readInts(txt: string): number[] {
+  const matches = txt.matchAll(/(-?\d+)/g);
+  return [...matches].map(m => safeParseInt(m[1]));
+}
