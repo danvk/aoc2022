@@ -1,6 +1,5 @@
 import { _ } from "./deps.ts";
 import { coord2str, map2d, minmax, str2coord, tuple, zeros } from "./util.ts";
-import * as itertools from './itertools.ts';
 
 export type Coord = [number, number];
 
@@ -56,6 +55,14 @@ export class Grid<V> implements Iterable<[[number, number], V]> {
 
   format(format: (v: V, c: Coord) => string): string {
     return this.formatCells(format).map(row => row.join('')).join('\n');
+  }
+
+  mapValues<U>(fn: (v: V, c: Coord) => U): Grid<U> {
+    const out = new Grid<U>();
+    for (const [c, v] of this) {
+      out.set(c, fn(v, c));
+    }
+    return out;
   }
 
   [Symbol.iterator](): Iterator<[[number,number],V], unknown, undefined> {
