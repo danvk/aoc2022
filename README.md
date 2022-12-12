@@ -2,6 +2,20 @@
 
 ## Daily Notes
 
+### Day 12 (18690 / 17813)
+
+I regret not preemptively implementing Dijkstra!
+
+I was happy I'd implemented a `Grid` class yesterday for 2018 day 13. Representing a grid as a `dict` with `(x, y)` tuples for keys is [one of my favorite tricks in Python][1] but it doesn't work very well in JS/TS since `[number, number]` doesn't work well as a `Map` key (it uses reference equality, not structural equality). The records/tuples proposal would help immensely here. Hence my `Grid` class, which uses a `Map<string, T>` internally and does all the `string` ↔ `[number, number]` mapping for you.
+
+My Dijkstra is a hack, but good enough. For part 2, implementing a search out from the end point would be more efficient, but I was relieved that iterating over all the `a` start points wound up being fast enough.
+
+- Start: 08:12:08
+- ⭐️: 08:34:38 (22m)
+- ⭐️⭐️: 08:38:39 (26m)
+
+[1]: https://danvdk.medium.com/python-tips-tricks-for-the-advent-of-code-2019-89ec23a595dd
+
 ### Day 11 (27219 / 19839)
 
 Got my first stack trace from Deno -- quite ugly! Was trying to do math on `undefined`.
