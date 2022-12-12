@@ -31,7 +31,7 @@ function dijkstra(g: Grid<number>, start: Coord, end: Coord) {
   const distance = g.mapValues(() => -1);
   distance.set(start, 0);
   let fringe = [start];
-  const parent: {[coord: string]: string} = {};
+  // const parent: {[coord: string]: string} = {};
 
   const neighbors = (c: Coord) => {
     const [x, y] = c;
@@ -58,7 +58,8 @@ function dijkstra(g: Grid<number>, start: Coord, end: Coord) {
     fringe = _.sortBy(fringe, c => distance.get(c));
     const c = fringe.shift();
     if (!c) {
-      throw new Error('out of paths!');
+      return null;
+      // throw new Error('out of paths!');
     }
     const d = distance.get(c);
     if (d === undefined || d === -1) {
@@ -70,11 +71,13 @@ function dijkstra(g: Grid<number>, start: Coord, end: Coord) {
       if (dn === -1 || dn > 1 + d) {
         distance.set(n, 1 + d);
         fringe.push(n);
-        parent[coord2str(n)] = coord2str(c);
+        // parent[coord2str(n)] = coord2str(c);
       }
     }
   }
+  return distance.get(end);
 
+  /*
   const path = [];
   let n = end;
   while (n) {
@@ -85,8 +88,22 @@ function dijkstra(g: Grid<number>, start: Coord, end: Coord) {
     }
     n = str2coord(p);
   }
+  */
 
-  return tuple(distance.get(end)!, _.reverse(path));
+  // return tuple(distance.get(end)!, _.reverse(path));
+}
+
+function part2(g: Grid<number>, end: Coord): number {
+  let minD: number | null = null;
+  for (const [c, h] of g) {
+    if (h !== 0) continue;
+    const d = dijkstra(g, c, end)!;
+    if (d !== null && (minD === null || d < minD)) {
+      minD = d;
+    }
+  }
+  assert(minD);
+  return minD;
 }
 
 if (import.meta.main) {
@@ -95,5 +112,5 @@ if (import.meta.main) {
 
   console.log(grid.format((v) => String.fromCharCode("a".charCodeAt(0) + v)));
   console.log("part 1", dijkstra(grid, start, end));
-  console.log("part 2");
+  console.log("part 2", part2(grid, end));
 }
