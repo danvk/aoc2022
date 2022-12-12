@@ -28,23 +28,26 @@ function readGrid(lines: readonly string[]) {
   return tuple(g, start, end);
 }
 
+const dirs: Coord[] = [
+  [-1, 0],
+  [1, 0],
+  [0, -1],
+  [0, 1],
+];
+
 function findPath(g: Grid<number>, start: Coord, end: Coord) {
   const neighbors = (c: Coord) => {
     const [x, y] = c;
     const out = [];
-    for (let dx = -1; dx <= 1; dx++) {
-      for (let dy = -1; dy <= 1; dy++) {
-        if (dx === 0 && dy === 0) continue;
-        if (dx && dy) continue;  // no diagonals
-        const n = tuple(x + dx, y + dy);
-        const h0 = g.get(c);
-        const h1 = g.get(n);
-        if (h0 === undefined || h1 === undefined) {
-          continue;  // off the grid
-        }
-        if (h1 - h0 <= 1) {  // go up at most one step, down any number.
-          out.push(tuple(n, 1));
-        }
+    for (const [dx, dy] of dirs) {
+      const n = tuple(x + dx, y + dy);
+      const h0 = g.get(c);
+      const h1 = g.get(n);
+      if (h0 === undefined || h1 === undefined) {
+        continue;  // off the grid
+      }
+      if (h1 - h0 <= 1) {  // go up at most one step, down any number.
+        out.push(tuple(n, 1));
       }
     }
     return out;
