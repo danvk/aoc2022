@@ -31,7 +31,7 @@ function findTargets(me: Unit, units: Unit[]): Unit[] {
   );
 }
 
-function round(g: Grid<string>, units: Unit[]) {
+function round(g: Grid<string>, units: Unit[]): boolean {
   // Find the order in which the units move
   const orderedUnits = _.sortBy(
     units,
@@ -58,7 +58,8 @@ function round(g: Grid<string>, units: Unit[]) {
       // If not, figure out which direction to move.
       const others = units.filter((u) => u.type !== unit.type && u.hitPoints > 0);
       if (!others.length) {
-        continue;  // we're the last one!
+        return false;
+        // continue;  // we're the last one!
       }
       const target = others[0].type;
       const neighborFn = (n: Coord) =>
@@ -104,22 +105,38 @@ function round(g: Grid<string>, units: Unit[]) {
       g.set(unit.pos, ".");
       unit.pos = next;
       g.set(unit.pos, unit.type);
+
+      // try to attack
+      const targets2 = findTargets(unit, units);
+      if (targets2.length) {
+        // Attack!
+        const t = _.sortBy(targets2, t => t.hitPoints, t => t.pos[1], t => t.pos[0])[0];
+        t.hitPoints -= 3;
+        if (t.hitPoints <= 0) {
+          g.set(t.pos, '.');
+        }
+      }
     }
   }
+  return true;
 }
+
+// 192848 = too high
 
 function part1(g: Grid<string>, units: Unit[]): number {
   let roundNum = 0;
+  let wasCompleteRound = true;
   while (new Set(units.map(u => u.type)).size > 1) {
-    round(g, units);
-    console.log(roundNum);
-    console.log(g.format((x) => x));
+    wasCompleteRound = round(g, units);
     const nextUnits = units.filter(u => u.hitPoints > 0);
     units = nextUnits;
     roundNum++;
+    console.log('After', roundNum, 'rounds');
+    console.log(g.format((x) => x));
+    // console.log(units.map(u => [u.type, u.hitPoints]));
+    console.log('');
   }
-  console.log(units.map(u => u.hitPoints));
-  return roundNum * _.sum(units.map(u => u.hitPoints));
+  return (roundNum - (wasCompleteRound ? 0 : 1)) * _.sum(units.map(u => u.hitPoints));
 }
 
 function read(lines: readonly string[]): [Grid<string>, Unit[]] {
