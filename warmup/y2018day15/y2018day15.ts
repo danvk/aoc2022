@@ -27,7 +27,7 @@ function manhattan(a: Coord, b: Coord) {
 function findTargets(me: Unit, units: Unit[]): Unit[] {
   const target = me.type === "G" ? "E" : "G";
   return units.filter(
-    (u) => u.type === target && manhattan(u.pos, me.pos) === 1
+    (u) => u.type === target && u.hitPoints > 0 && manhattan(u.pos, me.pos) === 1
   );
 }
 
@@ -40,16 +40,26 @@ function round(g: Grid<string>, units: Unit[]) {
   );
   // console.log(orderedUnits);
   for (const unit of orderedUnits) {
+    if (unit.hitPoints <= 0) {
+      continue;  // already dead
+    }
     // console.log("Considering", unit);
     // Are any targets in range?
     const targets = findTargets(unit, units);
     // If yes, pick one to attack.
     if (targets.length) {
       // Attack!
-      console.log("Attack!");
+      const t = _.sortBy(targets, t => t.hitPoints, t => t.pos[1], t => t.pos[0])[0];
+      t.hitPoints -= 3;
+      if (t.hitPoints <= 0) {
+        g.set(t.pos, '.');
+      }
     } else {
       // If not, figure out which direction to move.
-      const others = units.filter((u) => u.type !== unit.type);
+      const others = units.filter((u) => u.type !== unit.type && u.hitPoints > 0);
+      if (!others.length) {
+        continue;  // we're the last one!
+      }
       const target = others[0].type;
       const neighborFn = (n: Coord) =>
         neighbors4(n)
@@ -99,12 +109,17 @@ function round(g: Grid<string>, units: Unit[]) {
 }
 
 function part1(g: Grid<string>, units: Unit[]): number {
-  for (let i = 0; i < 3; i++) {
+  let roundNum = 0;
+  while (new Set(units.map(u => u.type)).size > 1) {
     round(g, units);
-    console.log(i);
+    console.log(roundNum);
     console.log(g.format((x) => x));
+    const nextUnits = units.filter(u => u.hitPoints > 0);
+    units = nextUnits;
+    roundNum++;
   }
-  return 0;
+  console.log(units.map(u => u.hitPoints));
+  return roundNum * _.sum(units.map(u => u.hitPoints));
 }
 
 function read(lines: readonly string[]): [Grid<string>, Unit[]] {
