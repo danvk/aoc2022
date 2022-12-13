@@ -4,7 +4,7 @@
 import { _ } from "../deps.ts";
 import { chunkLines, readLinesFromArgs } from "../util.ts";
 
-// returns true if a < b
+/** returns negative if a < b, 0 if a == b, positive if a > b. */
 function compare(a: any, b: any): number {
   if (typeof a === 'number' && typeof b === 'number') {
     return a === b ? 0 : a < b ? -1 : +1;
@@ -29,26 +29,20 @@ if (import.meta.main) {
   let i = 0;
   let sum = 0;
   for (const [a, b] of pairs) {
-    console.log(a);
-    console.log(b);
     const c = compare(JSON.parse(a), JSON.parse(b));
-    console.log('');
     i++;
     if (c < 0) {
       sum += i;
-      console.log(i, 'is ok');
     }
   }
 
   const packets = [...pairs.flat().map(x => JSON.parse(x)), [[2]], [[6]]];
   packets.sort(compare);
-  console.log(packets);
 
   let part2 = 1;
   for (let i = 0; i < packets.length; i++) {
     const p = packets[i];
     if (_.isEqual(p, [[2]]) || _.isEqual(p, [[6]])) {
-      console.log(i+1, p);
       part2 *= (1+i);
     }
   }
