@@ -1,6 +1,16 @@
 #!/usr/bin/env -S deno run --allow-read --allow-write
 // https://adventofcode.com/2018/day/16
 
+// Notes:
+// - I was fortunate to not have a bug in `runOp`, that would have been a PITA to debug later.
+// - I started implementing the logic to determine what each op was before reading the question
+//   for part 1, which turned out to be much simpler than I expected.
+//   Fortunately part 2 was the thing I was expecting (run the program).
+// - It was fortunate that a greedy approach worked for determining the ops.
+//   Otherwise this feels like something that could be done with a constraint solver.
+//   Alternatively, just iterate through possibilities starting with the most constrained op.
+// - This was _dramatically_ easier / more straightforward than day 15!
+
 import { _ } from "../../deps.ts";
 import { assert, assertUnreachable, chunkLines, isNonNullish, readInts, readLinesFromArgs, tuple, zeros } from "../../util.ts";
 
