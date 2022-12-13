@@ -1,11 +1,28 @@
 #!/usr/bin/env -S deno run --allow-read --allow-write
 // https://adventofcode.com/2018/day/15
 
+// Notes:
+// - I didn't like this problem. The complexity of the setup was way out of
+//   proportion to the actual problem solving part. My initial reaction was
+//   "ugh, I don't want to do this."
+// - The instructions were also very precise and easy to misinterpret.
+//   It took me a while to realize that a single unit could move _and_ attack
+//   in a single round.
+// - I'd hoped that I could get away with just storing the grid without a
+//   separate list of Units. But it seems hard to track the identity of each
+//   unit this way, e.g. for tracking remaining hit power.
+// - I was a bit frustrated about having to find all equally long paths to the
+//   target, but I hit on implementing `floodfill` with a max distance threshold
+//   as a general but also convenient way to make this work.
+// - This took me much longer than any other day in 2018 (at least so far), at
+//   least five hours of on/off working.
+// - One silver lining was that `console.log`ging the board state after every
+//   had the happy effect of producing a cool animation in my terminal.
+
 import { _ } from "../../deps.ts";
 import { dijkstra, flood } from "../../dijkstra.ts";
 import { Coord, Grid, neighbors4 } from "../../grid.ts";
 import {
-  assert,
   coord2str,
   isNonNullish,
   readLinesFromArgs,
