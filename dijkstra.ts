@@ -64,3 +64,44 @@ export function dijkstra<N>(
 
   return tuple(distance.get(serialize(end))!, _.reverse(path));
 }
+
+/** Flood fill from a starting node */
+export function flood<N>(
+  start: N,
+  neighbors: (n: N) => [N, number][],
+  serialize: (n: N) => string,
+  deserialize: (txt: string) => N,
+  maxDistance?: number,
+): [number, N][] {
+  const distance = new Map<string, number>();
+  distance.set(serialize(start), 0);
+
+  let fringe = [tuple(0, start)];
+  const parent = new Map<string, string>();
+  while (true) {
+    fringe = _.sortBy(fringe, ([d, _c]) => d);
+    const next = fringe.shift();
+    if (!next) {
+      break;  // exploration is done
+    }
+    const [d0, n] = next;
+    const ns = serialize(n);
+    for (const [m, dm] of neighbors(n)) {
+      const d = d0 + dm;
+      if (maxDistance !== undefined && d > maxDistance) {
+        continue;
+      }
+      const ms = serialize(m);
+      const prevD = distance.get(ms);
+      if (prevD === undefined || d < prevD) {
+        distance.set(ms, d);
+        // Filter out any existing occurrence of this node in the fringe.
+        fringe = fringe.filter(([_, s]) => serialize(s) !== ms);
+        fringe.push([d, m]);
+        parent.set(ms, ns);
+      }
+    }
+  }
+
+  return _.sortBy([...distance].map(([cStr, d]) => tuple(d, deserialize(cStr))), 0);
+}

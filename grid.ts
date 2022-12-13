@@ -1,7 +1,7 @@
 import { _ } from "./deps.ts";
 import { coord2str, map2d, minmax, str2coord, tuple, zeros } from "./util.ts";
 
-export type Coord = [number, number];
+export type Coord = readonly [number, number];
 
 /** A two dimensional grid, implemented as a sparse Map */
 export class Grid<V> implements Iterable<[[number, number], V]> {
@@ -41,6 +41,7 @@ export class Grid<V> implements Iterable<[[number, number], V]> {
     };
   }
 
+  // TODO: make formatter optional if V=string
   formatCells(format: (v: V, c: Coord) => string): string[][] {
     const {x: [minX, maxX], y: [minY, maxY]} = this.boundingBox();
 
@@ -65,6 +66,17 @@ export class Grid<V> implements Iterable<[[number, number], V]> {
     return out;
   }
 
+  findIndices(pred: (v: V, c: Coord) => boolean): Coord[] {
+    const out = [];
+    for (const [cStr, v] of this.m) {
+      const c = str2coord(cStr);
+      if (pred(v, c)) {
+        out.push(c);
+      }
+    }
+    return out;
+  }
+
   [Symbol.iterator](): Iterator<[[number,number],V], unknown, undefined> {
     // It's nice that Generator is assignable to Iterator.
     // Questions here:
@@ -81,4 +93,14 @@ export class Grid<V> implements Iterable<[[number, number], V]> {
     // Why can't I do this? What's the difference between Iterable, Iterator and IterableIterator?
     // return itertools.map(this.m, (cStr, v) => tuple(str2coord(cStr), v));
   }
+}
+
+export function neighbors4(c: Coord): Coord[] {
+  const [x, y] = c;
+  return [
+    tuple(x - 1, y),
+    tuple(x + 1, y),
+    tuple(x, y - 1),
+    tuple(x, y + 1),
+  ];
 }
