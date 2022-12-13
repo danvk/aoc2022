@@ -31,7 +31,7 @@ function findTargets(me: Unit, units: Unit[]): Unit[] {
   );
 }
 
-function round(g: Grid<string>, units: Unit[]): boolean {
+function round(g: Grid<string>, units: Unit[], elfPower: number): boolean {
   // Find the order in which the units move
   const orderedUnits = _.sortBy(
     units,
@@ -43,6 +43,7 @@ function round(g: Grid<string>, units: Unit[]): boolean {
     if (unit.hitPoints <= 0) {
       continue;  // already dead
     }
+    const power = unit.type === 'E' ? elfPower : 3;
     // console.log("Considering", unit);
     // Are any targets in range?
     const targets = findTargets(unit, units);
@@ -50,7 +51,7 @@ function round(g: Grid<string>, units: Unit[]): boolean {
     if (targets.length) {
       // Attack!
       const t = _.sortBy(targets, t => t.hitPoints, t => t.pos[1], t => t.pos[0])[0];
-      t.hitPoints -= 3;
+      t.hitPoints -= power;
       if (t.hitPoints <= 0) {
         g.set(t.pos, '.');
       }
@@ -111,7 +112,7 @@ function round(g: Grid<string>, units: Unit[]): boolean {
       if (targets2.length) {
         // Attack!
         const t = _.sortBy(targets2, t => t.hitPoints, t => t.pos[1], t => t.pos[0])[0];
-        t.hitPoints -= 3;
+        t.hitPoints -= power;
         if (t.hitPoints <= 0) {
           g.set(t.pos, '.');
         }
@@ -123,20 +124,28 @@ function round(g: Grid<string>, units: Unit[]): boolean {
 
 // 192848 = too high
 
-function part1(g: Grid<string>, units: Unit[]): number {
+function part1(g: Grid<string>, units: Unit[], elfPower=3) {
   let roundNum = 0;
   let wasCompleteRound = true;
   while (new Set(units.map(u => u.type)).size > 1) {
-    wasCompleteRound = round(g, units);
+    wasCompleteRound = round(g, units, elfPower);
     const nextUnits = units.filter(u => u.hitPoints > 0);
     units = nextUnits;
     roundNum++;
-    console.log('After', roundNum, 'rounds');
-    console.log(g.format((x) => x));
+    // console.log('After', roundNum, 'rounds');
+    // console.log(g.format((x) => x));
     // console.log(units.map(u => [u.type, u.hitPoints]));
-    console.log('');
+    // console.log('');
   }
-  return (roundNum - (wasCompleteRound ? 0 : 1)) * _.sum(units.map(u => u.hitPoints));
+  const fullRounds = (roundNum - (wasCompleteRound ? 0 : 1));
+  const points = _.sum(units.map(u => u.hitPoints));
+  return tuple(
+    units[0].type,
+    fullRounds,
+    points,
+    fullRounds * points,
+    units,
+  );
 }
 
 function read(lines: readonly string[]): [Grid<string>, Unit[]] {
@@ -151,10 +160,30 @@ function read(lines: readonly string[]): [Grid<string>, Unit[]] {
   return [g, units];
 }
 
+// 7169 = too low
+function part2(lines: readonly string[]): number {
+  for (let elfPower = 4; elfPower < 1000; elfPower++) {
+    const [g, units] = read(lines);
+    const initElves = units.filter(u => u.type === 'E').length;
+    const [winner, rounds, points, score, endUnits] = part1(g, units, elfPower);
+    console.log('Elf Power=', elfPower);
+    console.log('Done after', rounds, 'full rounds');
+    console.log(points, score);
+    console.log(g.format(v=>v));
+    console.log('');
+
+    const finalElves = endUnits.filter(u => u.type === 'E').length;
+    if (winner === 'E' && initElves === finalElves) {
+      return score;
+    }
+  }
+  throw new Error('Elves are hopeless');
+}
+
 if (import.meta.main) {
   const lines = await readLinesFromArgs();
   const [g, units] = read(lines);
   console.log(g.format((x) => x));
   console.log("part 1", part1(g, units));
-  console.log("part 2");
+  console.log("part 2", part2(lines));
 }
