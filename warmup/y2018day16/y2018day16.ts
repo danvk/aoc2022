@@ -90,6 +90,11 @@ export function runOp(
   return out;
 }
 
+export function possibleOps(before: readonly number[], opNums: readonly number[], after: readonly number[]): Op[] {
+  const [, a, b, c] = opNums;
+  return ops.filter(op => _.isEqual(after, runOp([op, a, b, c], before)));
+}
+
 function read(lines: readonly string[]) {
   const [opsStr, programLines] = split(lines);
   const obs: Observation[] = chunkLines(opsStr).map(chunk => {
