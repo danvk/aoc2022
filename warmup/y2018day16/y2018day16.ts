@@ -2,7 +2,7 @@
 // https://adventofcode.com/2018/day/16
 
 import { _ } from "../../deps.ts";
-import { assert, chunkLines, readInts, readLinesFromArgs } from "../../util.ts";
+import { assert, assertUnreachable, chunkLines, readInts, readLinesFromArgs } from "../../util.ts";
 
 /** Split on three blanks */
 function split(lines: readonly string[]): [string[], string[]] {
@@ -18,6 +18,76 @@ interface Observation {
   instruction: [number, number, number, number];
   before: number[];
   after: number[];
+}
+
+const ops = [
+  'addr',
+  'addi',
+  'mulr',
+  'muli',
+  'banr',
+  'bani',
+  'borr',
+  'bori',
+  'setr',
+  'seti',
+  'gtir',
+  'gtri',
+  'gtrr',
+  'eqir',
+  'eqri',
+  'eqrr'
+] as const;
+export type Op = typeof ops[number];
+
+export function runOp(
+  instruction: readonly [Op, number, number, number],
+  before: readonly number[]
+): number[] {
+  const [op, a, b, c] = instruction;
+  const isImmediate = op.endsWith('i');
+  const inB = isImmediate ? b : before[b];
+  const regA = before[a];
+  const out = [...before];
+  switch (op) {
+    case 'addr':
+    case 'addi':
+      out[c] = regA + inB;
+      break;
+    case 'mulr':
+    case 'muli':
+      out[c] = regA * inB;
+      break;
+    case 'banr':
+    case 'bani':
+      out[c] = regA & inB;
+      break;
+    case 'borr':
+    case 'bori':
+      out[c] = regA | inB;
+      break;
+    case 'setr':
+    case 'seti':
+      out[c] = isImmediate ? a : regA;
+      break;
+    case 'gtir':
+    case 'gtri':
+    case 'gtrr': {
+      const inA = op[2] === 'i' ? a : regA;
+      out[c] = inA > inB ? 1 : 0;
+      break;
+    }
+    case 'eqir':
+    case 'eqri':
+    case 'eqrr': {
+      const inA = op[2] === 'i' ? a : regA;
+      out[c] = inA === inB ? 1 : 0;
+      break;
+    }
+    default:
+      assertUnreachable(op);
+  }
+  return out;
 }
 
 function read(lines: readonly string[]) {
