@@ -2,7 +2,7 @@
 // https://adventofcode.com/2018/day/16
 
 import { _ } from "../../deps.ts";
-import { assert, assertUnreachable, chunkLines, readInts, readLinesFromArgs } from "../../util.ts";
+import { assert, assertUnreachable, chunkLines, isNonNullish, readInts, readLinesFromArgs, tuple, zeros } from "../../util.ts";
 
 /** Split on three blanks */
 function split(lines: readonly string[]): [string[], string[]] {
@@ -108,12 +108,56 @@ function read(lines: readonly string[]) {
     }
   });
   const program = programLines.map(line => readInts(line, {expect: 4}));
-  return [obs, program];
+  return tuple(obs, program);
+}
+
+function deduceOps(observations: Observation[]) {
+  const possibilities: Op[][] = zeros(16).map(() => [...ops]);
+  for (const obs of observations) {
+    const num = obs.instruction[0];
+    const possOps = possibleOps(obs.before, obs.instruction, obs.after);
+    possibilities[num] = _.intersection(possibilities[num], possOps);
+  }
+
+  const soln: (Op|null)[] = zeros(16).map(() => null);
+  while (soln.filter(isNonNullish).length < soln.length) {
+    const detI = possibilities.findIndex(ops => ops.length === 1);
+    if (detI === -1) {
+      throw new Error('stuck!');
+    }
+    const op = possibilities[detI][0];
+    soln[detI] = op;
+    for (const [i, poss] of possibilities.entries()) {
+      possibilities[i] = poss.filter(x => x !== op);
+    }
+  }
+  return soln.filter(isNonNullish);
+}
+
+function part1(observations: Observation[]) {
+  let n = 0;
+  for (const obs of observations) {
+    const possOps = possibleOps(obs.before, obs.instruction, obs.after);
+    if (possOps.length >= 3) {
+      n++;
+    }
+  }
+  return n;
+}
+
+function runProgram(program: number[][], ops: Op[]): number[] {
+  let reg = [0, 0, 0, 0];
+  for (const [opNum, a, b, c] of program) {
+    const op = ops[opNum];
+    reg = runOp([op, a, b, c], reg);
+  }
+  return reg;
 }
 
 if (import.meta.main) {
   const lines = await readLinesFromArgs();
   const [obs, program] = read(lines);
-  console.log('part 1', obs.length, program.length);
-  console.log('part 2');
+  const ops = deduceOps(obs);
+  console.log('part 1', part1(obs));
+  console.log('part 2', runProgram(program, ops));
 }
