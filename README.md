@@ -2,6 +2,16 @@
 
 ## Daily Notes
 
+### Day 13 (16516 / 15428)
+
+One of the rare cases where passing a `compare` function to `sort` is more convenient than passing a `key` function. Very convenient that the inputs are all valid JSON.
+
+I ran into some trouble with a stack overflow on part 2. I wasted some time trying to increase the stack size before realizing that I'd forgotton to `JSON.parse` the packets and was comparing the strings.
+
+- Start: 07:24:14
+- ⭐️: 07:34:59 (11m)
+- ⭐️⭐️: 07:41:53 (18m)
+
 ### Day 12 (18690 / 17813)
 
 I regret not preemptively implementing Dijkstra!
