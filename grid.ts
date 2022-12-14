@@ -49,7 +49,7 @@ export class Grid<V> implements Iterable<[[number, number], V]> {
     for (const [c, v] of this.m) {
       const coord = str2coord(c);
       const [x, y] = coord;
-      txt[y][x] = format(v, [x, y]);
+      txt[y - minY][x - minX] = format(v, [x, y]);
     }
     return txt;
   }
