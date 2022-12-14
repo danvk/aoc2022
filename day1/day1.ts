@@ -5,8 +5,8 @@ import { _ } from '../deps.ts';
 import { chunkLines, readLinesFromArgs } from "../util.ts";
 
 function getSums(lines: readonly string[]): number[] {
-  return chunkLines(lines).map((chunkLines) =>
-    _.sum(chunkLines.map(Number))
+  return chunkLines(lines).map((chunk) =>
+    _.sum(chunk.map(Number))
   );
 }
 

@@ -2,6 +2,12 @@
 
 ## Daily Notes
 
+### Day 14 (17110 / 15870)
+
+- Start: 07:18:37
+- ⭐️: 07:46:27 (28m)
+- ⭐️⭐️: 07:54:17 (36m)
+
 ### Day 13 (16516 / 15428)
 
 One of the rare cases where passing a `compare` function to `sort` is more convenient than passing a `key` function. Very convenient that the inputs are all valid JSON.
