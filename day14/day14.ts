@@ -121,7 +121,7 @@ function part2(lines: string[]) {
     // console.log();
     numDrops++;
   }
-  return numDrops;
+  return 1 + numDrops;
 }
 
 if (import.meta.main) {
