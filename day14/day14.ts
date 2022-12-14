@@ -48,12 +48,41 @@ function read(lines: readonly string[]): Grid<string> {
   return g;
 }
 
+function dropSand(g: Grid<string>) {
+  let x = 500;
+  let y = 0;
+  const {y: [, maxY]} = g.boundingBox();
+  while (y < maxY) {
+    const c = g.get([x, y + 1]);
+    if (c === undefined) {
+      y++;
+    } else if (c === '#' || c === 'o') {
+      // try down and left
+      if (g.get([x - 1, y + 1]) === undefined) {
+        x -= 1;
+        y += 1;
+      } else if (g.get([x + 1, y + 1]) === undefined) {
+        x += 1;
+        y += 1;
+      } else {
+        g.set([x, y], 'o');
+        return;
+      }
+    } else {
+      throw new Error();
+    }
+  }
+}
+
 if (import.meta.main) {
   const lines = await readLinesFromArgs();
   const g=  read(lines);
   // console.log(g);
   // console.log(g.boundingBox());
 
+  console.log(g.format(x => x));
+  console.log();
+  dropSand(g);
   console.log(g.format(x => x));
   console.log('part 1', lines.length);
   console.log('part 2');
