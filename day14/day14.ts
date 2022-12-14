@@ -26,8 +26,11 @@ function read(lines: readonly string[]): Grid<string> {
       assert(Math.abs(dx) + Math.abs(dy) === 1);
       let x = ax;
       let y = ay;
-      while (x != bx || y != by) {
+      while (true) {
         g.set([x, y], '#');
+        if (x === bx && y === by) {
+          break;
+        }
         x += dx;
         y += dy;
       }
@@ -48,7 +51,7 @@ function read(lines: readonly string[]): Grid<string> {
   return g;
 }
 
-function dropSand(g: Grid<string>) {
+function dropSand(g: Grid<string>): boolean {
   let x = 500;
   let y = 0;
   const {y: [, maxY]} = g.boundingBox();
@@ -66,12 +69,13 @@ function dropSand(g: Grid<string>) {
         y += 1;
       } else {
         g.set([x, y], 'o');
-        return;
+        return true;
       }
     } else {
       throw new Error();
     }
   }
+  return false;
 }
 
 if (import.meta.main) {
@@ -82,8 +86,13 @@ if (import.meta.main) {
 
   console.log(g.format(x => x));
   console.log();
-  dropSand(g);
-  console.log(g.format(x => x));
-  console.log('part 1', lines.length);
+  let numDrops = 0;
+  while (dropSand(g)) {
+    console.log(g.format(x => x));
+    console.log();
+    numDrops++;
+  }
+
+  console.log('part 1', numDrops);
   console.log('part 2');
 }
