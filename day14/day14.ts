@@ -37,24 +37,12 @@ function read(lines: readonly string[]): Grid<string> {
     }
   }
 
-  /*
-  const {x: [ax, bx], y: [ay, by]} = g.boundingBox();
-  for (let x = ax; x <= bx; x++) {
-    for (let y = ay; y <= by; y++) {
-      if (!g.get([x, y])) {
-        g.set([x, y], '.');
-      }
-    }
-  }
-  */
-
   return g;
 }
 
-function dropSand(g: Grid<string>): boolean {
+function dropSand(g: Grid<string>, maxY: number): boolean {
   let x = 500;
   let y = 0;
-  const {y: [, maxY]} = g.boundingBox();
   while (y < maxY) {
     const c = g.get([x, y + 1]);
     if (c === undefined) {
@@ -69,34 +57,8 @@ function dropSand(g: Grid<string>): boolean {
         y += 1;
       } else {
         g.set([x, y], 'o');
-        return true;
-      }
-    } else {
-      throw new Error();
-    }
-  }
-  return false;
-}
-
-function dropSand2(g: Grid<string>): boolean {
-  let x = 500;
-  let y = 0;
-  while (true) {
-    const c = g.get([x, y + 1]);
-    if (c === undefined) {
-      y++;
-    } else if (c === '#' || c === 'o') {
-      // try down and left
-      if (g.get([x - 1, y + 1]) === undefined) {
-        x -= 1;
-        y += 1;
-      } else if (g.get([x + 1, y + 1]) === undefined) {
-        x += 1;
-        y += 1;
-      } else {
-        g.set([x, y], 'o');
         if (y === 0) {
-          return false;
+          return false;  // part 2 exit condition
         }
         return true;
       }
@@ -104,6 +66,24 @@ function dropSand2(g: Grid<string>): boolean {
       throw new Error();
     }
   }
+  return false;  // part 1 exit condition
+}
+
+function part1(lines: string[]) {
+  const g = read(lines);
+  console.log(g.format(x => x));
+  console.log();
+  console.log(g.boundingBox());
+  console.log();
+
+  const {y: [, maxY]} = g.boundingBox();
+  let numDrops = 0;
+  while (dropSand(g, maxY)) {
+    // console.log(g.format(x => x));
+    // console.log();
+    numDrops++;
+  }
+  return numDrops;
 }
 
 function part2(lines: string[]) {
@@ -116,30 +96,17 @@ function part2(lines: string[]) {
   }
 
   let numDrops = 0;
-  while (dropSand2(g)) {
+  while (dropSand(g, newY)) {
     // console.log(g.format(x => x));
     // console.log();
     numDrops++;
   }
-  return 1 + numDrops;
+  return 1 + numDrops;  // need to count the last drop
 }
 
 if (import.meta.main) {
   const lines = await readLinesFromArgs();
-  const g=  read(lines);
-  // console.log(g);
 
-  console.log(g.format(x => x));
-  console.log();
-  console.log(g.boundingBox());
-  console.log();
-  let numDrops = 0;
-  while (dropSand(g)) {
-    // console.log(g.format(x => x));
-    // console.log();
-    numDrops++;
-  }
-
-  console.log('part 1', numDrops);
+  console.log('part 1', part1(lines));
   console.log('part 2', part2(lines));
 }

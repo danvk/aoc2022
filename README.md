@@ -4,6 +4,10 @@
 
 ### Day 14 (17110 / 15870)
 
+Ironically, I'd done days 1–16 of 2018's Advent of Code before today, but this problem references day 17! I think the problems are different enough that it didn't really matter in the end. Probably the biggest time waste on this problem was debugging an existing issue in my `Grid` class's `format` method.
+
+Paired with @mshron on this one. He said that having helpers (especially the `Grid` class), not worrying too much about code efficiency / compactness, and speed at debugging finnicky things really helped me with my time vs. how he does these.
+
 - Start: 07:18:37
 - ⭐️: 07:46:27 (28m)
 - ⭐️⭐️: 07:54:17 (36m)
