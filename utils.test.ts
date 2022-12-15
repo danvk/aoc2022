@@ -16,3 +16,7 @@ Deno.test('transpose', () => {
     [2, 4],
   ]);
 });
+
+Deno.test('unionRanges', () => {
+
+});
