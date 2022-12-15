@@ -2,6 +2,22 @@
 
 ## Daily Notes
 
+### Day 15 (1184 / 831)
+
+I was in bed at 11:50 PM, wasn't _totally_ tired and figured this might just be my opportunity to do an Advent of Code puzzle when it came out. It was exciting to see the "15" on the calendar fade in at midnight.
+
+Doing this one at midnight made it much more of an emotional rollercoaster. If I didn't get my stars, I would have cost myself a good night of sleep for no reason! Debugging off-by-one errors while you're sleepy is no fun. This isn't something I've done since college.
+
+I had an off-by-one on part 1 because I didn't realize that one end of the span for each sensor/beacon pair could possibly be a beacon (it's an inclusive interval) and I needed to just not overwrite the beacons. This probably cost me 10–15 minutes of debugging on part 1.
+
+For part 2, I realized quickly that I needed to separate the x and y search. I'd hoped that a single sensor might be enough to exclude an entire y value, but it wasn't. So I switched to tracking a set of disjoint intervals, which worked perfectly to eliminate all but one y. I had some more confusion at this point where I thought I needed to feed that y value back into part 1. But actually finding the x value was much simpler. I just needed to print the two intervals and use the x value that was in between them.
+
+Overall I really liked this problem! And I was very happy to see AoC report my overall ranking, I think that's my first time cracking the top 1,000.
+
+- Start: 00:00:00
+- ⭐️: 00:26:51
+- ⭐️⭐️: 00:51:12
+
 ### Day 14 (17110 / 15870)
 
 Ironically, I'd done days 1–16 of 2018's Advent of Code before today, but this problem references day 17! I think the problems are different enough that it didn't really matter in the end. Probably the biggest time waste on this problem was debugging an existing issue in my `Grid` class's `format` method.
