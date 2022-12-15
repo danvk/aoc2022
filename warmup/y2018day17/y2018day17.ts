@@ -87,7 +87,7 @@ function drip(g: Grid<string>, maxY: number, x=500, y=0): boolean {
         // drip on both sides
         const a = drip(g, maxY, leftX, y);
         const b = drip(g, maxY, rightX, y);
-        return a && b;
+        return a || b;
       }
     }
   }
@@ -96,18 +96,22 @@ function drip(g: Grid<string>, maxY: number, x=500, y=0): boolean {
 if (import.meta.main) {
   const lines = await readLinesFromArgs();
   const g = read(lines);
-  const {y: [, maxY]} = g.boundingBox();
+  const {y: [minY, maxY]} = g.boundingBox();
   console.log(g.format(x => x, '.'));
   while (drip(g, maxY)) {
     // keep going
-    console.log('\n');
-    console.log(g.format(x => x, '.'));
+    // console.log('\n');
+    // console.log(g.format(x => x, '.'));
   }
+  g.set([500, 0], '+');
   console.log('\n');
   console.log(g.format(x => x, '.'));
-  const water = g.findIndices(v => v === '~' || v === '|');
+  const water = g.findIndices((v, [, y]) => (v === '~' || v === '|' && y >= minY && y <= maxY));
 
   // 7938 = too low
-  console.log('part 1', water.length - 1);
+  // 31476 = too high
+  // 31475 = too high
+  // 31471
+  console.log('part 1', water.length);
   console.log('part 2');
 }
