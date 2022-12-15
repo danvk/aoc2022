@@ -1,6 +1,10 @@
 #!/usr/bin/env -S deno run --allow-read --allow-write
 // https://adventofcode.com/2018/day/17
 
+// Loved this problem!
+// My challenge was not reading the instructions carefully enough:
+// ignore all water above _or_ below the max y value in the input (not necessarily y=0).
+
 import { _ } from "../../deps.ts";
 import { Coord, Grid } from "../../grid.ts";
 import { assert, readInts, readLinesFromArgs } from "../../util.ts";
@@ -113,5 +117,7 @@ if (import.meta.main) {
   // 31475 = too high
   // 31471
   console.log('part 1', water.length);
-  console.log('part 2');
+
+  const restingWater = g.findIndices((v, [, y]) => (v === '~' && y >= minY && y <= maxY));
+  console.log('part 2', restingWater.length);
 }
