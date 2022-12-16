@@ -52,9 +52,8 @@ function part1(valves: _.Dictionary<Valve>) {
   const cur = "AA";
   const t = 0;
   const pressure = 0;
-  const openValves = new Set<string>();
 
-  return search(valves, cur, t, pressure, openValves);
+  return search(valves, cur, t, pressure);
 }
 
 function search(
@@ -62,24 +61,28 @@ function search(
   cur: string,
   t: number,
   pressure: number,
-  openValves: Set<string>
 ): [number, string[]] {
   if (t > 30) {
     return tuple(pressure, []);
   }
 
+  let event = '';
   const v = valves[cur];
-  if (v.flow && !openValves.has(cur)) {
-    openValves = new Set([...openValves, v.valve]);
-    pressure += v.flow * (30 - t);
+  if (v.flow) {
+    const newPressure = v.flow * (30 - t);
+    pressure += newPressure;
+    valves = _.cloneDeep(valves);
+    valves[cur].flow = 0;
+    collapse(valves);
+    event = `Open ${v.valve} at t=${t} releasing total of ${newPressure}`;
   }
 
-  const nexts = Object.entries(v.tunnels).map(([next, d]) => search(valves, next, t + d, pressure, openValves));
-  if (!nexts) {
-    return [pressure, [cur]];
+  const nexts = Object.entries(v.tunnels).map(([next, d]) => search(valves, next, t + d, pressure));
+  if (!nexts.length) {
+    return [pressure, [event + `; stay at ${cur}`]];
   }
   const [bestP, bestPath] = _.maxBy(nexts, n => n[0])!;
-  return [bestP, [cur, ...bestPath]];
+  return [bestP, [event + `; walk to ${cur}`, ...bestPath]];
 }
 
 if (import.meta.main) {
