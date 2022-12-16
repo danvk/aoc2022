@@ -22,9 +22,9 @@ function readLine(line: string): Valve {
 
 // Input: 41/56 valves have zero flow
 
-function collapse(valves: _.Dictionary<Valve>) {
+function collapse(valves: _.Dictionary<Valve>, killAA=false) {
   // find a valve with flow rate of zero and eliminate it.
-  const zeros = _.values(valves).filter(v => v.flow === 0).filter(v => v.valve !== 'AA');
+  const zeros = _.values(valves).filter(v => v.flow === 0).filter(v => v.valve !== 'AA' || killAA);
   if (zeros.length === 0) {
     return;
   }
@@ -52,8 +52,11 @@ function part1(valves: _.Dictionary<Valve>) {
   const cur = "AA";
   const t = 0;
   const pressure = 0;
+  const v = valves[cur];
+  collapse(valves, true);
 
-  return search(valves, cur, t, pressure);
+  const paths = Object.entries(v.tunnels).map(([next, d]) => search(valves, next, t + d, pressure));
+  return _.maxBy(paths, n => n[0])!;
 }
 
 function search(
@@ -107,6 +110,6 @@ if (import.meta.main) {
   console.log(valves);
   collapse(valves);
   console.log(valves);
-  console.log("part 1", part1(valves));
+  console.log("part 1", part1(valves));  // 1500 = too high
   console.log("part 2");
 }
