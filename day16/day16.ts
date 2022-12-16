@@ -51,19 +51,17 @@ function explore(
     return pressure;
   }
 
-  /*
-
   if (beingsLeft === 0) {
+    /*
     // Early out if there's no hope
     const maxRemaining = _.sum(
       closedValves.map(v => (maxT - distances[`${cur},${v}`] - 1) * valves[v].flow)
     );
-    if (pressure + maxRemaining < 2000) {
+    if (pressure + maxRemaining < 1500) {
       return pressure;
     }
+    */
   }
-
-  */
 
   const choices = [];
   for (const valve of closedValves) {
