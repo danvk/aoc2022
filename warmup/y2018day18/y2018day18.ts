@@ -1,6 +1,13 @@
 #!/usr/bin/env -S deno run --allow-read --allow-write
 // https://adventofcode.com/2018/day/18
 
+// This one was quite easy.
+// Part 2 was tricky in that the part 1 solution obviously wouldn't work
+// and the sample input was useless (it all turns to open space).
+// I animated printing the large grid and saw that it seemed to be following
+// a pattern, so I pursued that and got the solution.
+// This felt much easier than day 17.
+
 import { _ } from "../../deps.ts";
 import { Grid, neighbors8, range2d } from "../../grid.ts";
 import { assert, isNonNullish, readLinesFromArgs } from "../../util.ts";
