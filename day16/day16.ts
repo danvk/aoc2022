@@ -3,7 +3,7 @@
 
 import { _ } from "../deps.ts";
 import { dijkstra } from "../dijkstra.ts";
-import { assert, makeObject, readLinesFromArgs, safeParseInt, tuple } from "../util.ts";
+import { assert, makeObject, readLinesFromArgs, safeParseInt } from "../util.ts";
 
 interface Valve {
   valve: string;
@@ -23,6 +23,9 @@ function readLine(line: string): Valve {
 
 // Input: 41/56 valves have zero flow
 
+/*
+This code wound up not being necessary but is interesting!
+
 function collapse(valves: _.Dictionary<Valve>, killAA=false) {
   // find a valve with flow rate of zero and eliminate it.
   const zeros = _.values(valves).filter(v => v.flow === 0).filter(v => v.valve !== 'AA' || killAA);
@@ -32,8 +35,6 @@ function collapse(valves: _.Dictionary<Valve>, killAA=false) {
 
   const valve = zeros[0];
   const ins = _.values(valves).filter(v => v.tunnels[valve.valve]);
-  // console.log('Will eliminate', valve);
-  // console.log('ins', ins);
   for (const inValve of ins) {
     const oldD = inValve.tunnels[valve.valve];
     for (const [outValve, d] of Object.entries(valve.tunnels)) {
@@ -48,17 +49,7 @@ function collapse(valves: _.Dictionary<Valve>, killAA=false) {
   delete valves[valve.valve];
   collapse(valves);
 }
-
-function part1(valves: _.Dictionary<Valve>) {
-  const cur = "AA";
-  const t = 0;
-  const pressure = 0;
-  const v = valves[cur];
-  collapse(valves, true);  // this optimization does seem quite important.
-
-  const paths = Object.entries(v.tunnels).map(([next, d]) => search(valves, next, t + d, pressure));
-  return _.maxBy(paths, n => n[0])!;
-}
+*/
 
 function distance(
   valves: _.Dictionary<Valve>,
@@ -72,116 +63,6 @@ function distance(
     v => v,
     v => v,
   )![0];
-}
-
-function search(
-  valves: _.Dictionary<Valve>,
-  cur: string,
-  t: number,
-  pressure: number,
-): [number, string[]] {
-  // console.log(t, cur, pressure, valves);
-  if (t >= 30) {
-    return tuple(pressure, []);
-  }
-
-  // early out if this isn't working.
-  const maxAdditional = _.sum(
-    Object.values(valves).map(v => v.flow * (30 - t))
-  );
-  if (pressure + maxAdditional < 1250) {
-    return tuple(pressure, []);
-  }
-
-  const v = valves[cur];
-  let nexts = Object.entries(v.tunnels).map(([next, d]) => search(valves, next, t + d, pressure));
-
-  // let event = '';
-  if (v.flow) {
-    const newPressure = v.flow * (30 - t - 1);
-    pressure += newPressure;
-    const newValves = _.cloneDeep(valves);
-    newValves[cur].flow = 0;
-    collapse(newValves);
-    const event = `Open ${v.valve} at t=${t} releasing total of ${newPressure}`;
-
-    nexts = nexts.concat(Object.entries(v.tunnels).map(([next, d]) => {
-      const [newP, newPath] = search(newValves, next, t + 1 + d, pressure);
-      return [newP, [event, ...newPath]];
-    }));
-  }
-
-  if (!nexts.length) {
-    return [pressure, [`Stay at ${cur}`]];
-  }
-  const [bestP, bestPath] = _.maxBy(nexts, n => n[0])!;
-  return [bestP, [`Walk to ${cur}`, ...bestPath]];
-}
-
-function search2(
-  valves: _.Dictionary<Valve>,
-  man: string,
-  manT: number,
-  ele: string,
-  eleT: number,
-  pressure: number,
-): [number, string[]] {
-  if (manT >= 26 && eleT >= 26) {
-    return tuple(pressure, []);
-  }
-
-  // early out if this isn't working.
-  const t = Math.min(manT, eleT);
-  const maxAdditional = _.sum(Object.values(valves).map(v => v.flow * (26 - t)));
-  if (pressure + maxAdditional < 1500) {
-    return tuple(pressure, []);
-  }
-
-  // Assume man acts; we'll flip as we recur to get the elephant in on the action.
-  const v = valves[man];
-  let nexts = Object.entries(v.tunnels).map(
-    ([next, d]) => search2(valves, ele, eleT, next, manT + d, pressure)
-  );
-
-  // let event = '';
-  if (v.flow) {
-    const newPressure = v.flow * (26 - t - 1);
-    pressure += newPressure;
-    const newValves = _.cloneDeep(valves);
-    newValves[man].flow = 0;
-    if (ele !== man) {
-      collapse(newValves);  // can't collapse the elephant's node.
-    }
-    const event = `Open ${v.valve} at t=${t} releasing total of ${newPressure}`;
-    assert(newValves[man]);
-    assert(newValves[ele]);
-
-    nexts = nexts.concat(Object.entries(v.tunnels).map(([next, d]) => {
-      const [newP, newPath] = search2(newValves, ele, eleT, next, t + 1 + d, pressure);
-      return [newP, [event, ...newPath]];
-    }));
-  }
-
-  if (!nexts.length) {
-    return [pressure, [`Stay at ${man} / ${ele}`]];
-  }
-  const [bestP, bestPath] = _.maxBy(nexts, n => n[0])!;
-  return [bestP, [`${man}@${manT}, ${ele}@${eleT}`, ...bestPath]];
-}
-
-function part2(valves: _.Dictionary<Valve>) {
-  const t = 0;
-  const pressure = 0;
-  const v = valves['AA'];
-  collapse(valves, true);
-
-  const paths = [];
-  for (const [nextMan, manD] of Object.entries(v.tunnels)) {
-    for (const [nextElephant, eleD] of Object.entries(v.tunnels)) {
-      paths.push(search2(valves, nextMan, t + manD, nextElephant, t + eleD, pressure));
-    }
-  }
-  return _.maxBy(paths, n => n[0])!;
 }
 
 function flowForSeq(valves: _.Dictionary<Valve>, seq: string[], maxT: number): number {
@@ -217,10 +98,6 @@ function explore(
   if (t > maxT) {
     return pressure;
   }
-  // console.log(beingsLeft, t, cur, pressure);
-  // if (numOpened > 9) {
-  //   return pressure;
-  // }
 
   const choices = [];
   for (const valve of closedValves) {
@@ -261,19 +138,27 @@ if (import.meta.main) {
   console.log("total vales:", valvesArray.length);
   console.log("zero counts:", valvesArray.filter((v) => v.flow === 0).length);
   const valves = _.keyBy(valvesArray, (v) => v.valve);
-  console.log(valves);
-  collapse(valves);
-  console.log(valves);
 
   for (const start of Object.keys(valves)) {
     for (const stop of Object.keys(valves)) {
       distances[`${start},${stop}`] = distance(valves, start, stop);
     }
   }
+  console.log('got all distances');
+
+  // Elephant sample, only works for input.txt
+  try {
+    console.log(
+      flowForSeq(valves, ['DD', 'HH', 'EE'], 26) +
+      flowForSeq(valves, ['JJ', 'BB', 'CC'], 26)
+    )
+  } catch (_e) {
+    // ...
+  }
 
   const closedValves = Object.values(valves).filter(v => v.flow > 0).map(v => v.valve);
-  console.log(explore(valves, 'AA', 0, 0, closedValves, 0, 30, 0));
-  console.log(explore(valves, 'AA', 0, 0, closedValves, 0, 26, 1));
+  console.log('part 1', explore(valves, 'AA', 0, 0, closedValves, 0, 30, 0));
+  console.log('part 2', explore(valves, 'AA', 0, 0, closedValves, 0, 26, 1));
 
   // 1460; takes 1:34.02 to run part 1.
   // console.log("part 1", part1(valves));  // 1000 = too low, 1500 = too high
@@ -283,11 +168,6 @@ if (import.meta.main) {
   // 1967 = too low (54.269s for numOpened <= 7)
   // 2051 = wrong (3:18.54 <= 8)
 
-  // Elephant sample
-  // console.log(
-  //   flowForSeq(valves, ['DD', 'HH', 'EE'], 26) +
-  //   flowForSeq(valves, ['JJ', 'BB', 'CC'], 26)
-  // )
 }
 
 // 15! is 1T which is too large
