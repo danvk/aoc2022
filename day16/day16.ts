@@ -2,6 +2,7 @@
 // https://adventofcode.com/2022/day/16
 
 import { _ } from "../deps.ts";
+import { dijkstra } from "../dijkstra.ts";
 import { assert, makeObject, readLinesFromArgs, safeParseInt, tuple } from "../util.ts";
 
 interface Valve {
@@ -59,6 +60,20 @@ function part1(valves: _.Dictionary<Valve>) {
   return _.maxBy(paths, n => n[0])!;
 }
 
+function distance(
+  valves: _.Dictionary<Valve>,
+  start: string,
+  stop: string,
+): number {
+  return dijkstra(
+    start,
+    stop,
+    v => Object.entries(valves[v].tunnels),
+    v => v,
+    v => v,
+  )![0];
+}
+
 function search(
   valves: _.Dictionary<Valve>,
   cur: string,
@@ -71,8 +86,10 @@ function search(
   }
 
   // early out if this isn't working.
-  const maxAdditional = _.sum(Object.values(valves).map(v => v.flow * (30 - t)));
-  if (pressure + maxAdditional < 1500) {
+  const maxAdditional = _.sum(
+    Object.values(valves).map(v => v.flow * (30 - t - distance(valves, cur, v.valve)))
+  );
+  if (pressure + maxAdditional < 1250) {
     return tuple(pressure, []);
   }
 
@@ -110,6 +127,6 @@ if (import.meta.main) {
   console.log(valves);
   collapse(valves);
   console.log(valves);
-  console.log("part 1", part1(valves));  // 1500 = too high
+  console.log("part 1", part1(valves));  // 1000 = too low, 1500 = too high
   console.log("part 2");
 }
