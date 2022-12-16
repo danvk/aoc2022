@@ -2,6 +2,28 @@
 
 ## Daily Notes
 
+### Day 16 (6564 / 4162)
+
+This was by far the hardest puzzle for me so far this year. I'm quite glad I didn't start it at midnight as that would have made for a very late night.
+
+I noticed that many of the valves had zero flow (4/10 in the sample, 41/56 in my input). So I started by writing some code to eliminate these from the graph (`collapse`). Notably this also removed zero-value cycles from the graph. This proved unnecessary in the end but helped me get the first star.
+
+My initial approach was a DFS. This proved too slow, so I added some pruning: I set the flow rate of valves to zero as I opened them, and then re-ran `collapse` to further simplify the graph. One thing that tripped me up here was that you could visit a valve but not open it. This is because opening the valve costs one unit of time. Allowing this significantly slowed down the search.
+
+I was eventually able to get this approach to work for the first star by adding some pruning: if the max remaining flow couldn't get you over some known lower bound on the answer, then there was no point in searching further. I implemented all-pairs distance calculation (using `dijkstra`) to try and improve this heuristic but couldn't quite get it to work.
+
+My solution for the first star took maybe 90 seconds to run. I had the inkling that I was missing some insight and part two bore this out. After a brief attempt to adapt my part 1 solution, I realized I needed a different approach.
+
+The key insight was that the only thing that matters is the order in which you open the valves. You'll always take the shortest path between them and that determines the pressure you release. You still have `15!` possible visitation orders, but in practice all of them will exceed the maximum time/distance quite quickly. I wrote a new part 1 solution to recur based just on the sequence of valves and it ran in maybe a second. Progress!
+
+I'd hoped this would adapt straightaway to part 2. It almost did, but things still seemed too slow. I tried pruning based on the number of valves opened, but this gave me incorrect answers (too low). I ran the code with a `console.log` on every recursive call and noticed lots of large times (`t=42`). So I added another early out that I didn't think was necessary. This got me the right answer in maybe 70s, but I do think I have a bug still.
+
+Overall: cool problem! I wish I'd realized that the valve order is all that matters more quickly. But based on my rank for part 2 (4162 after 10.5h) it seems like lots of other people had trouble with this one, too.
+
+- Start: 07:09:28
+- ⭐️: 08:29:33 (1h20m)
+- ⭐️⭐️: 10:29:47 (3h20m)
+
 ### Day 15 (1184 / 831)
 
 I was in bed at 11:50 PM, wasn't _totally_ tired and figured this might just be my opportunity to do an Advent of Code puzzle when it came out. It was exciting to see the "15" on the calendar fade in at midnight.
