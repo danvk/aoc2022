@@ -1,0 +1,89 @@
+#ip 3
+ A=1 initially
+
+ // prologue
+ 0 addi 3 16 3  // goto 17
+ 1 seti 1 2 1   // B=1
+ 2 seti 1 1 2   // C=1
+
+// Initial loop
+ 3 mulr 1 2 5  F=B*C
+ 4 eqrr 5 4 5  if B*C == 10551361
+ 5 addr 5 3 3    goto 7
+ 6 addi 3 1 3    goto 8
+ 7 addr 1 0 0  A += B
+ 8 addi 2 1 2  C += 1
+ 9 gtrr 2 4 5  if C > 10551361 goto 12
+10 addr 3 5 3
+11 seti 2 3 3  goto 3
+
+B=1
+while (true) {
+  C=1
+  while (true) {
+    if B * C == 10551361 {
+      A += B
+    }
+    C++
+    if C > 10551361 {
+      break
+    }
+  }
+  B++
+  if (B > 10551361) {
+    break
+  }
+}
+
+// 10551361 = 67 x 157483
+
+B   C
+1 * 10551361 = 10551361  A += 1
+67 * 157483  = 10551361  A += 67
+157483 * 67  = 10551361  A += 157483
+10551361 * 1 = 10551361  A += 10551361
+
+lines 12-16 are:
+
+
+
+A=1
+B=1
+while (true) {
+  A+=B;
+  B++;
+  if (B == 10551362) {
+    break;
+  }
+}
+
+// next bit
+12 addi 1 1 1   B += 1
+13 gtrr 1 4 5
+14 addr 5 3 3   if (B <= 10551361)
+15 seti 1 6 3     goto 2
+16 mulr 3 3 3   exit
+
+// These all seem to initialize the registers to:
+// [ 0, 1, 1, 3, 10551361, 0 ]
+// 10551361 = 67 x 157483
+// outside of this, register 4 (E) is never modified
+17 addi 4 2 4
+18 mulr 4 4 4
+19 mulr 3 4 4
+20 muli 4 11 4
+21 addi 5 5 5
+22 mulr 5 3 5
+23 addi 5 15 5
+24 addr 4 5 4
+25 addr 3 0 3
+26 seti 0 6 3
+27 setr 3 5 5
+28 mulr 5 3 5
+29 addr 3 5 5
+30 mulr 3 5 5
+31 muli 5 14 5
+32 mulr 5 3 5
+33 addr 4 5 4
+34 seti 0 5 0
+35 seti 0 1 3
