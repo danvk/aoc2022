@@ -31,8 +31,8 @@ function collapse(valves: _.Dictionary<Valve>) {
 
   const valve = zeros[0];
   const ins = _.values(valves).filter(v => v.tunnels[valve.valve]);
-  console.log('Will eliminate', valve);
-  console.log('ins', ins);
+  // console.log('Will eliminate', valve);
+  // console.log('ins', ins);
   for (const inValve of ins) {
     const oldD = inValve.tunnels[valve.valve];
     for (const [outValve, d] of Object.entries(valve.tunnels)) {
@@ -66,23 +66,29 @@ function search(
     return tuple(pressure, []);
   }
 
-  let event = '';
   const v = valves[cur];
+  let nexts = Object.entries(v.tunnels).map(([next, d]) => search(valves, next, t + d, pressure));
+
+  // let event = '';
   if (v.flow) {
     const newPressure = v.flow * (30 - t);
     pressure += newPressure;
     valves = _.cloneDeep(valves);
     valves[cur].flow = 0;
     collapse(valves);
-    event = `Open ${v.valve} at t=${t} releasing total of ${newPressure}`;
+    const event = `Open ${v.valve} at t=${t} releasing total of ${newPressure}`;
+
+    nexts = nexts.concat(Object.entries(v.tunnels).map(([next, d]) => {
+      const [newP, newPath] = search(valves, next, t + 1 + d, pressure);
+      return [newP, [event, ...newPath]];
+    }));
   }
 
-  const nexts = Object.entries(v.tunnels).map(([next, d]) => search(valves, next, t + d, pressure));
   if (!nexts.length) {
-    return [pressure, [event + `; stay at ${cur}`]];
+    return [pressure, [`Stay at ${cur}`]];
   }
   const [bestP, bestPath] = _.maxBy(nexts, n => n[0])!;
-  return [bestP, [event + `; walk to ${cur}`, ...bestPath]];
+  return [bestP, [`Walk to ${cur}`, ...bestPath]];
 }
 
 if (import.meta.main) {
