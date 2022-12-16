@@ -1,5 +1,5 @@
 import { assertEquals } from "./deps.ts";
-import { Grid } from "./grid.ts";
+import { Grid, range2d } from "./grid.ts";
 
 Deno.test('Iterate grid', () => {
   const g = new Grid<string>();
@@ -32,4 +32,18 @@ Deno.test('Grid.fromLines', () => {
   assertEquals(g.get([2, 1]), '-');
   assertEquals(g.get([0, 2]), 'x');
   assertEquals(g.get([0, 3]), undefined);
+});
+
+Deno.test('range2d', () => {
+  assertEquals(
+    [...range2d([0, 0], [2, 1])],
+    [
+      [0, 0],
+      [0, 1],
+      [1, 0],
+      [1, 1],
+      [2, 0],
+      [2, 1],
+    ]
+  );
 });

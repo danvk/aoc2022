@@ -140,7 +140,7 @@ export function* range2d(topLeft: Coord, bottomRight: Coord): Generator<Coord> {
 
   for (let x = x1; x <= x2; x++) {
     for (let y = y1; y <= y2; y++) {
-      yield tuple(x1, y1);
+      yield tuple(x, y);
     }
   }
 }
