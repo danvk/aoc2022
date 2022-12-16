@@ -23,34 +23,6 @@ function readLine(line: string): Valve {
 
 // Input: 41/56 valves have zero flow
 
-/*
-This code wound up not being necessary but is interesting!
-
-function collapse(valves: _.Dictionary<Valve>, killAA=false) {
-  // find a valve with flow rate of zero and eliminate it.
-  const zeros = _.values(valves).filter(v => v.flow === 0).filter(v => v.valve !== 'AA' || killAA);
-  if (zeros.length === 0) {
-    return;
-  }
-
-  const valve = zeros[0];
-  const ins = _.values(valves).filter(v => v.tunnels[valve.valve]);
-  for (const inValve of ins) {
-    const oldD = inValve.tunnels[valve.valve];
-    for (const [outValve, d] of Object.entries(valve.tunnels)) {
-      if (outValve === inValve.valve) continue;  // no self-loops
-      const newD = d + oldD;
-      if (!(outValve in inValve.tunnels) || inValve.tunnels[outValve] > newD) {
-        inValve.tunnels[outValve] = newD;
-      }
-    }
-    delete inValve.tunnels[valve.valve];
-  }
-  delete valves[valve.valve];
-  collapse(valves);
-}
-*/
-
 function distance(
   valves: _.Dictionary<Valve>,
   start: string,
@@ -63,26 +35,6 @@ function distance(
     v => v,
     v => v,
   )![0];
-}
-
-function flowForSeq(valves: _.Dictionary<Valve>, seq: string[], maxT: number): number {
-  let t = 0;
-  let pressure = 0;
-  let cur = 'AA';
-  for (const node of seq) {
-    const d = distances[`${cur},${node}`];
-    t += d;
-    if (t >= maxT) {
-      return -1;
-    }
-    t++;  // open valve
-    const newPressure = valves[node].flow * (maxT - t);
-    pressure += newPressure;
-    cur = node;
-
-    // console.log(`opened ${cur} at ${t} releasing ${newPressure}`);
-  }
-  return pressure;
 }
 
 function explore(
@@ -145,16 +97,6 @@ if (import.meta.main) {
     }
   }
   console.log('got all distances');
-
-  // Elephant sample, only works for input.txt
-  try {
-    console.log(
-      flowForSeq(valves, ['DD', 'HH', 'EE'], 26) +
-      flowForSeq(valves, ['JJ', 'BB', 'CC'], 26)
-    )
-  } catch (_e) {
-    // ...
-  }
 
   const closedValves = Object.values(valves).filter(v => v.flow > 0).map(v => v.valve);
   console.log('part 1', explore(valves, 'AA', 0, 0, closedValves, 0, 30, 0));
