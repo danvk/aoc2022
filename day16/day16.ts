@@ -62,6 +62,7 @@ function search(
   t: number,
   pressure: number,
 ): [number, string[]] {
+  console.log(t, cur);
   if (t > 30) {
     return tuple(pressure, []);
   }
@@ -73,13 +74,13 @@ function search(
   if (v.flow) {
     const newPressure = v.flow * (30 - t);
     pressure += newPressure;
-    valves = _.cloneDeep(valves);
-    valves[cur].flow = 0;
-    collapse(valves);
+    const newValves = _.cloneDeep(valves);
+    newValves[cur].flow = 0;
+    collapse(newValves);
     const event = `Open ${v.valve} at t=${t} releasing total of ${newPressure}`;
 
     nexts = nexts.concat(Object.entries(v.tunnels).map(([next, d]) => {
-      const [newP, newPath] = search(valves, next, t + 1 + d, pressure);
+      const [newP, newPath] = search(newValves, next, t + 1 + d, pressure);
       return [newP, [event, ...newPath]];
     }));
   }
