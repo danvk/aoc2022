@@ -47,39 +47,41 @@ function advance(g: Grid<string>, size: number): Grid<string> {
   return out;
 }
 
-if (import.meta.main) {
-  const lines = await readLinesFromArgs();
-  let g = Grid.fromLines(lines);
+function scoreAfterN(g: Grid<string>, n: number): number {
   const {x: [, maxX]} = g.boundingBox();
   const size = 1 + maxX;
-  console.log('size=', size);
-  console.log(g.format(v => v));
-  console.log();
+  for (let step = 1; step <= n; step++) {
+    g = advance(g, size);
+  }
+  const counts = g.counts();
+  return counts['#'] * counts['|'];
+}
+
+function findPeriod(g: Grid<string>): [number, number] {
+  const {x: [, maxX]} = g.boundingBox();
+  const size = 1 + maxX;
   const seen: Record<string, number> = {};
-  for (let step = 1; step <= 468; step++) {
+  let step = 1;
+  while (true) {
     const s = g.format(v => v);
     if (seen[s]) {
       console.log('step', step, '=', seen[s]);
+      return [seen[s], step - seen[s]];
     } else {
       seen[s] = step;
     }
     g = advance(g, size);
-    console.log(step, ':');
-    console.log(g.format(v => v));
-    const counts = g.counts();
-    console.log(counts);
-    console.log();
+    step++;
   }
-  // step 481 = 453 (period of 28)
-  // step 907 = 459
+}
 
-  // So if n >= 453, then
-  // grid(n) = grid(453 + (n - 453) % 28)
+if (import.meta.main) {
+  const lines = await readLinesFromArgs();
+  const g = Grid.fromLines(lines);
 
-  const counts = g.counts();
+  console.log('part 1', scoreAfterN(g, 10));
 
-  // 1_000_000_000
-
-  console.log('part 1', counts['#'] * counts['|']);
-  console.log('part 2');
+  const [a, b] = findPeriod(g);
+  const steps = a + (1_000_000_000 - a) % b;
+  console.log('part 1', scoreAfterN(g, steps));
 }
