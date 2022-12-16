@@ -62,8 +62,14 @@ function search(
   t: number,
   pressure: number,
 ): [number, string[]] {
-  console.log(t, cur);
-  if (t > 30) {
+  // console.log(t, cur, pressure, valves);
+  if (t >= 30) {
+    return tuple(pressure, []);
+  }
+
+  // early out if this isn't working.
+  const maxAdditional = _.sum(Object.values(valves).map(v => v.flow * (30 - t)));
+  if (pressure + maxAdditional < 1500) {
     return tuple(pressure, []);
   }
 
@@ -72,7 +78,7 @@ function search(
 
   // let event = '';
   if (v.flow) {
-    const newPressure = v.flow * (30 - t);
+    const newPressure = v.flow * (30 - t - 1);
     pressure += newPressure;
     const newValves = _.cloneDeep(valves);
     newValves[cur].flow = 0;
