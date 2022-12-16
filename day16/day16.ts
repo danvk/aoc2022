@@ -184,18 +184,18 @@ function part2(valves: _.Dictionary<Valve>) {
   return _.maxBy(paths, n => n[0])!;
 }
 
-function flowForSeq(valves: _.Dictionary<Valve>, seq: string[]): number {
+function flowForSeq(valves: _.Dictionary<Valve>, seq: string[], maxT: number): number {
   let t = 0;
   let pressure = 0;
   let cur = 'AA';
   for (const node of seq) {
     const d = distances[`${cur},${node}`];
     t += d;
-    if (t >= 30) {
+    if (t >= maxT) {
       return -1;
     }
     t++;  // open valve
-    const newPressure = valves[node].flow * (30 - t);
+    const newPressure = valves[node].flow * (maxT - t);
     pressure += newPressure;
     cur = node;
 
@@ -261,6 +261,11 @@ if (import.meta.main) {
   // console.log("part 1", part1(valves));  // 1000 = too low, 1500 = too high
 
   // console.log("part 2", part2(valves));  // 1500 = too low
+
+  console.log(
+    flowForSeq(valves, ['DD', 'HH', 'EE'], 26) +
+    flowForSeq(valves, ['JJ', 'BB', 'CC'], 26)
+  )
 }
 
 // 15! is 1T which is too large
