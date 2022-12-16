@@ -51,6 +51,20 @@ function explore(
     return pressure;
   }
 
+  /*
+
+  if (beingsLeft === 0) {
+    // Early out if there's no hope
+    const maxRemaining = _.sum(
+      closedValves.map(v => (maxT - distances[`${cur},${v}`] - 1) * valves[v].flow)
+    );
+    if (pressure + maxRemaining < 2000) {
+      return pressure;
+    }
+  }
+
+  */
+
   const choices = [];
   for (const valve of closedValves) {
     const d = distances[`${cur},${valve}`];
@@ -86,12 +100,17 @@ function jack(valves: _.Dictionary<Valve>): number {
   const closedValves = Object.values(valves).filter(v => v.flow > 0).map(v => v.valve);
   // Solve part 2 Jack-style
   const results = [];
+  const cache: Record<string, number> = {};  // cache gets us down to 32s.
   for (const me of powerset(closedValves)) {
     const elephant = _.difference(closedValves, me);
+    const meC = me.join('');
+    const eleC = elephant.join('');
 
-    const meP = explore(valves, 'AA', 0, 0, me, 0, 26, 0);
-    const eleP = explore(valves, 'AA', 0, 0, elephant, 0, 26, 0);
+    const meP = cache[meC] ?? explore(valves, 'AA', 0, 0, me, 0, 26, 0);
+    const eleP = cache[eleC] ?? explore(valves, 'AA', 0, 0, elephant, 0, 26, 0);
     results.push(meP + eleP);
+    cache[meC] = meP;
+    cache[eleC] = eleP;
   }
   return _.max(results)!;
 }
@@ -114,8 +133,8 @@ if (import.meta.main) {
 
   const closedValves = Object.values(valves).filter(v => v.flow > 0).map(v => v.valve);
   console.log('part 1', explore(valves, 'AA', 0, 0, closedValves, 0, 30, 0));
-  console.log('part 2', explore(valves, 'AA', 0, 0, closedValves, 0, 26, 1));
-  // console.log('part 2 jack-style', jack(valves));
+  // console.log('part 2', explore(valves, 'AA', 0, 0, closedValves, 0, 26, 1));
+  console.log('part 2 jack-style', jack(valves));
 
   // 1460; takes 1:34.02 to run part 1.
   // console.log("part 1", part1(valves));  // 1000 = too low, 1500 = too high
