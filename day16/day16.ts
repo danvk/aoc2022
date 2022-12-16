@@ -211,29 +211,38 @@ function explore(
   pressure: number,
   closedValves: string[],
   numOpened: number,
+  maxT: number,
   beingsLeft: number,
-): number {
-  // if (numOpened > 6) {
-  //   return [pressure, []];
-  // }
+): [number, string[]] {
+  if (numOpened > 10) {
+    return [pressure, []];
+  }
 
   const choices = [];
   for (const valve of closedValves) {
     const d = distances[`${cur},${valve}`];
     let nt = t + d;
-    if (t >= 30) {
+    if (t >= maxT) {
       continue;
     }
     const remainingValves = closedValves.filter(v => v !== valve);
     nt++;  // open valve
-    const newPressure = valves[valve].flow * Math.max(30 - nt, 0);
-    const p = explore(valves, valve, nt, pressure + newPressure, remainingValves, 1 + numOpened, beingsLeft);
-    choices.push(p);  // tuple(p, [valve, ...seq]));
+    const newPressure = valves[valve].flow * Math.max(maxT - nt, 0);
+    const [p, seq] = explore(valves, valve, nt, pressure + newPressure, remainingValves, 1 + numOpened, maxT, beingsLeft);
+    choices.push(tuple(p, [valve, ...seq]));
   }
-  const best = _.max(choices);
+
+  // With beings left, we can always stop and let the next one start.
+  if (beingsLeft > 0) {
+    const [p, seq] = explore(
+      valves, 'AA', 0, pressure, closedValves, numOpened, maxT, beingsLeft - 1
+    );
+    choices.push(tuple(p, ['next!', ...seq]));
+  }
+
+  const best = _.maxBy(choices, c => c[0]);
   if (best === undefined) {
-    // return [pressure, []];
-    return pressure;
+    return [pressure, []];
   }
   return best;
 }
@@ -257,7 +266,8 @@ if (import.meta.main) {
   }
 
   const closedValves = Object.values(valves).filter(v => v.flow > 0).map(v => v.valve);
-  console.log(explore(valves, 'AA', 0, 0, closedValves, 0, 0));
+  console.log(explore(valves, 'AA', 0, 0, closedValves, 0, 30, 0));
+  console.log(explore(valves, 'AA', 0, 0, closedValves, 0, 26, 1));
 
   // 1460; takes 1:34.02 to run part 1.
   // console.log("part 1", part1(valves));  // 1000 = too low, 1500 = too high
