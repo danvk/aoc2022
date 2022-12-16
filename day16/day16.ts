@@ -213,10 +213,14 @@ function explore(
   numOpened: number,
   maxT: number,
   beingsLeft: number,
-): [number, string[]] {
-  if (numOpened > 10) {
-    return [pressure, []];
+): number {
+  if (t > maxT) {
+    return pressure;
   }
+  // console.log(beingsLeft, t, cur, pressure);
+  // if (numOpened > 9) {
+  //   return pressure;
+  // }
 
   const choices = [];
   for (const valve of closedValves) {
@@ -228,21 +232,23 @@ function explore(
     const remainingValves = closedValves.filter(v => v !== valve);
     nt++;  // open valve
     const newPressure = valves[valve].flow * Math.max(maxT - nt, 0);
-    const [p, seq] = explore(valves, valve, nt, pressure + newPressure, remainingValves, 1 + numOpened, maxT, beingsLeft);
-    choices.push(tuple(p, [valve, ...seq]));
+    const p = explore(valves, valve, nt, pressure + newPressure, remainingValves, 1 + numOpened, maxT, beingsLeft);
+    choices.push(p);
   }
 
   // With beings left, we can always stop and let the next one start.
   if (beingsLeft > 0) {
-    const [p, seq] = explore(
+    const p = explore(
       valves, 'AA', 0, pressure, closedValves, numOpened, maxT, beingsLeft - 1
     );
-    choices.push(tuple(p, ['next!', ...seq]));
+    choices.push(p);
   }
 
-  const best = _.maxBy(choices, c => c[0]);
+  // const best = _.maxBy(choices, c => c[0]);
+  const best = _.max(choices);
   if (best === undefined) {
-    return [pressure, []];
+    // return [pressure, []];
+    return pressure;
   }
   return best;
 }
@@ -273,6 +279,9 @@ if (import.meta.main) {
   // console.log("part 1", part1(valves));  // 1000 = too low, 1500 = too high
 
   // console.log("part 2", part2(valves));  // 1500 = too low
+  // 1869 = too low
+  // 1967 = too low (54.269s for numOpened <= 7)
+  // 2051 = wrong (3:18.54 <= 8)
 
   // Elephant sample
   // console.log(
