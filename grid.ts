@@ -66,6 +66,15 @@ export class Grid<V> implements Iterable<[[number, number], V]> {
     return out;
   }
 
+  counts(): Record<V & string, number> {
+    const out = {} as Record<V & string, number>;
+    for (const v of this.m.values()) {
+      const vS = v as V & string;
+      out[vS] = (out[vS] ?? 0) + 1;
+    }
+    return out;
+  }
+
   findIndices(pred: (v: V, c: Coord) => boolean): Coord[] {
     const out = [];
     for (const [cStr, v] of this.m) {
@@ -102,5 +111,19 @@ export function neighbors4(c: Coord): Coord[] {
     tuple(x + 1, y),
     tuple(x, y - 1),
     tuple(x, y + 1),
+  ];
+}
+
+export function neighbors8(c: Coord): Coord[] {
+  const [x, y] = c;
+  return [
+    tuple(x - 1, y - 1),
+    tuple(x - 1, y),
+    tuple(x - 1, y + 1),
+    tuple(x, y - 1),
+    tuple(x, y + 1),
+    tuple(x + 1, y - 1),
+    tuple(x + 1, y),
+    tuple(x + 1, y + 1),
   ];
 }
