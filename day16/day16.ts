@@ -184,7 +184,59 @@ function part2(valves: _.Dictionary<Valve>) {
   return _.maxBy(paths, n => n[0])!;
 }
 
-// const distances: {[pair: string]: number} = {};
+function flowForSeq(valves: _.Dictionary<Valve>, seq: string[]): number {
+  let t = 0;
+  let pressure = 0;
+  let cur = 'AA';
+  for (const node of seq) {
+    const d = distances[`${cur},${node}`];
+    t += d;
+    if (t >= 30) {
+      return -1;
+    }
+    t++;  // open valve
+    const newPressure = valves[node].flow * (30 - t);
+    pressure += newPressure;
+    cur = node;
+
+    // console.log(`opened ${cur} at ${t} releasing ${newPressure}`);
+  }
+  return pressure;
+}
+
+function explore(
+  valves: _.Dictionary<Valve>,
+  cur: string,
+  t: number,
+  pressure: number,
+  closedValves: string[],
+  numOpened: number,
+): [number, string[]] {
+  if (numOpened > 6) {
+    return [pressure, []];
+  }
+
+  const choices = [];
+  for (const valve of closedValves) {
+    const d = distances[`${cur},${valve}`];
+    let nt = t + d;
+    if (t >= 30) {
+      continue;
+    }
+    const remainingValves = closedValves.filter(v => v !== valve);
+    nt++;  // open valve
+    const newPressure = valves[valve].flow * Math.max(30 - nt, 0);
+    const [p, seq] = explore(valves, valve, nt, pressure + newPressure, remainingValves, 1 + numOpened);
+    choices.push(tuple(p, [valve, ...seq]));
+  }
+  const best = _.maxBy(choices, c => c[0]);
+  if (!best) {
+    return [pressure, []];
+  }
+  return best;
+}
+
+const distances: {[pair: string]: number} = {};
 
 if (import.meta.main) {
   const lines = await readLinesFromArgs();
@@ -196,14 +248,22 @@ if (import.meta.main) {
   collapse(valves);
   console.log(valves);
 
-  // for (const start of Object.keys(valves)) {
-  //   for (const stop of Object.keys(valves)) {
-  //     distances[`${start},${stop}`] = distance(valves, start, stop);
-  //   }
-  // }
+  for (const start of Object.keys(valves)) {
+    for (const stop of Object.keys(valves)) {
+      distances[`${start},${stop}`] = distance(valves, start, stop);
+    }
+  }
+
+  const closedValves = Object.values(valves).filter(v => v.flow > 0).map(v => v.valve);
+  console.log(explore(valves, 'AA', 0, 0, closedValves, 0));
 
   // 1460; takes 1:34.02 to run part 1.
-  console.log("part 1", part1(valves));  // 1000 = too low, 1500 = too high
+  // console.log("part 1", part1(valves));  // 1000 = too low, 1500 = too high
 
   // console.log("part 2", part2(valves));  // 1500 = too low
 }
+
+// 15! is 1T which is too large
+// In the solution for part 1, I only open 6/14 valves.
+// 14^6 = 7,529,536 which is quite manageable.
+
