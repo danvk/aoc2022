@@ -3,7 +3,7 @@
 
 import { _ } from "../deps.ts";
 import { dijkstra } from "../dijkstra.ts";
-import { assert, makeObject, readLinesFromArgs, safeParseInt } from "../util.ts";
+import { assert, makeObject, powerset, readLinesFromArgs, safeParseInt } from "../util.ts";
 
 interface Valve {
   valve: string;
@@ -82,6 +82,20 @@ function explore(
   return best;
 }
 
+function jack(valves: _.Dictionary<Valve>): number {
+  const closedValves = Object.values(valves).filter(v => v.flow > 0).map(v => v.valve);
+  // Solve part 2 Jack-style
+  const results = [];
+  for (const me of powerset(closedValves)) {
+    const elephant = _.difference(closedValves, me);
+
+    const meP = explore(valves, 'AA', 0, 0, me, 0, 26, 0);
+    const eleP = explore(valves, 'AA', 0, 0, elephant, 0, 26, 0);
+    results.push(meP + eleP);
+  }
+  return _.max(results)!;
+}
+
 const distances: {[pair: string]: number} = {};
 
 if (import.meta.main) {
@@ -101,6 +115,7 @@ if (import.meta.main) {
   const closedValves = Object.values(valves).filter(v => v.flow > 0).map(v => v.valve);
   console.log('part 1', explore(valves, 'AA', 0, 0, closedValves, 0, 30, 0));
   console.log('part 2', explore(valves, 'AA', 0, 0, closedValves, 0, 26, 1));
+  // console.log('part 2 jack-style', jack(valves));
 
   // 1460; takes 1:34.02 to run part 1.
   // console.log("part 1", part1(valves));  // 1000 = too low, 1500 = too high

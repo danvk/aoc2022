@@ -204,3 +204,18 @@ export function readInts(txt: string, options?: {expect: number}): number[] {
 export function isNonNullish<T>(x: T): x is Exclude<T, null | undefined> {
   return x !== null && x !== undefined;
 }
+
+export function* powerset<T>(xs: readonly T[]): Generator<T[]> {
+  if (xs.length === 0) {
+    yield [];
+  } else {
+    const first = xs[0];
+    const rest = xs.slice(1);
+    for (const ss of powerset(rest)) {
+      yield ss;
+    }
+    for (const ss of powerset(rest)) {
+      yield [first, ...ss];
+    }
+  }
+}
