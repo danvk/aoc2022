@@ -127,3 +127,20 @@ export function neighbors8(c: Coord): Coord[] {
     tuple(x + 1, y + 1),
   ];
 }
+
+/** Manhattan distance aka L1 */
+export function manhattan(a: Coord, b: Coord) {
+  return Math.abs(a[0] - b[0]) + Math.abs(a[1] - b[1]);
+}
+
+/** Yields each coordinate in a rectangle. All boundaries are inclusive. */
+export function* range2d(topLeft: Coord, bottomRight: Coord): Generator<Coord> {
+  const [x1, y1] = topLeft;
+  const [x2, y2] = bottomRight;
+
+  for (let x = x1; x <= x2; x++) {
+    for (let y = y1; y <= y2; y++) {
+      yield tuple(x1, y1);
+    }
+  }
+}

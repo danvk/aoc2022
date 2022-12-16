@@ -2,8 +2,9 @@
 // https://adventofcode.com/2022/day/15
 
 import { _ } from "../deps.ts";
-import { Coord, Grid } from "../grid.ts";
-import { assert, Range, readInts, readLinesFromArgs, tuple, unionRanges } from "../util.ts";
+import { Coord, Grid, manhattan } from "../grid.ts";
+import { Interval, mergeIntIntervals, unionIntervals } from "../intervals.ts";
+import { assert, readInts, readLinesFromArgs, tuple } from "../util.ts";
 
 interface Observation {
   sensor: Coord;
@@ -18,24 +19,6 @@ function read(lines: string[]): Observation[] {
       beacon: tuple(bx, by),
     }
   });
-}
-
-function manhattan(a: Coord, b: Coord) {
-  return Math.abs(a[0] - b[0]) + Math.abs(a[1] - b[1]);
-}
-
-// Merge ranges that are exactly touching: [1, 4], [5, 10] --> [1, 10]
-function mergeRanges(ranges: Range[]): Range[] {
-  const out = [ranges[0]];
-  for (let i = 1; i < ranges.length; i++) {
-    const r = ranges[i];
-    if (r[0] === out[out.length - 1][1] + 1) {
-      out[out.length - 1][1] = r[1];
-    } else {
-      out.push(r);
-    }
-  }
-  return out;
 }
 
 function part1(g: Grid<string>, observations: Observation[]): number {
@@ -101,19 +84,19 @@ if (import.meta.main) {
   for (let y = 0; y < n; y++) {
     // does any observation entirely eliminate this row?
     // let isEliminated = false;
-    let ranges: Range[] = [];
+    let ranges: Interval[] = [];
     for (const {sensor, beacon} of observations) {
       const d = manhattan(sensor, beacon);
       const span = d - Math.abs(sensor[1] - y);
       const x1 = sensor[0] - span;
       const x2 = sensor[0] + span;
       if (x2 >= x1) {
-        const r: Range = [x1, x2];
-        ranges = unionRanges(ranges, r);
+        const r: Interval = [x1, x2];
+        ranges = unionIntervals(ranges, r);
       }
     }
     ranges = _.sortBy(ranges, r => r[0]);
-    ranges = mergeRanges(ranges);
+    ranges = mergeIntIntervals(ranges);
     if (ranges.length === 1 && ranges[0][0] <= 0 && ranges[0][1] >= n) {
       // eliminated!
     } else {
