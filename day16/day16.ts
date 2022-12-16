@@ -54,7 +54,7 @@ function part1(valves: _.Dictionary<Valve>) {
   const t = 0;
   const pressure = 0;
   const v = valves[cur];
-  collapse(valves, true);
+  collapse(valves, true);  // this optimization does seem quite important.
 
   const paths = Object.entries(v.tunnels).map(([next, d]) => search(valves, next, t + d, pressure));
   return _.maxBy(paths, n => n[0])!;
@@ -87,7 +87,7 @@ function search(
 
   // early out if this isn't working.
   const maxAdditional = _.sum(
-    Object.values(valves).map(v => v.flow * (30 - t - distance(valves, cur, v.valve)))
+    Object.values(valves).map(v => v.flow * (30 - t))
   );
   if (pressure + maxAdditional < 1250) {
     return tuple(pressure, []);
@@ -118,6 +118,74 @@ function search(
   return [bestP, [`Walk to ${cur}`, ...bestPath]];
 }
 
+function search2(
+  valves: _.Dictionary<Valve>,
+  man: string,
+  manT: number,
+  ele: string,
+  eleT: number,
+  pressure: number,
+): [number, string[]] {
+  if (manT >= 26 && eleT >= 26) {
+    return tuple(pressure, []);
+  }
+
+  // early out if this isn't working.
+  const t = Math.min(manT, eleT);
+  const maxAdditional = _.sum(Object.values(valves).map(v => v.flow * (26 - t)));
+  if (pressure + maxAdditional < 1500) {
+    return tuple(pressure, []);
+  }
+
+  // Assume man acts; we'll flip as we recur to get the elephant in on the action.
+  const v = valves[man];
+  let nexts = Object.entries(v.tunnels).map(
+    ([next, d]) => search2(valves, ele, eleT, next, manT + d, pressure)
+  );
+
+  // let event = '';
+  if (v.flow) {
+    const newPressure = v.flow * (26 - t - 1);
+    pressure += newPressure;
+    const newValves = _.cloneDeep(valves);
+    newValves[man].flow = 0;
+    if (ele !== man) {
+      collapse(newValves);  // can't collapse the elephant's node.
+    }
+    const event = `Open ${v.valve} at t=${t} releasing total of ${newPressure}`;
+    assert(newValves[man]);
+    assert(newValves[ele]);
+
+    nexts = nexts.concat(Object.entries(v.tunnels).map(([next, d]) => {
+      const [newP, newPath] = search2(newValves, ele, eleT, next, t + 1 + d, pressure);
+      return [newP, [event, ...newPath]];
+    }));
+  }
+
+  if (!nexts.length) {
+    return [pressure, [`Stay at ${man} / ${ele}`]];
+  }
+  const [bestP, bestPath] = _.maxBy(nexts, n => n[0])!;
+  return [bestP, [`${man}@${manT}, ${ele}@${eleT}`, ...bestPath]];
+}
+
+function part2(valves: _.Dictionary<Valve>) {
+  const t = 0;
+  const pressure = 0;
+  const v = valves['AA'];
+  collapse(valves, true);
+
+  const paths = [];
+  for (const [nextMan, manD] of Object.entries(v.tunnels)) {
+    for (const [nextElephant, eleD] of Object.entries(v.tunnels)) {
+      paths.push(search2(valves, nextMan, t + manD, nextElephant, t + eleD, pressure));
+    }
+  }
+  return _.maxBy(paths, n => n[0])!;
+}
+
+// const distances: {[pair: string]: number} = {};
+
 if (import.meta.main) {
   const lines = await readLinesFromArgs();
   const valvesArray = lines.map(readLine);
@@ -127,6 +195,15 @@ if (import.meta.main) {
   console.log(valves);
   collapse(valves);
   console.log(valves);
+
+  // for (const start of Object.keys(valves)) {
+  //   for (const stop of Object.keys(valves)) {
+  //     distances[`${start},${stop}`] = distance(valves, start, stop);
+  //   }
+  // }
+
+  // 1460; takes 1:34.02 to run part 1.
   console.log("part 1", part1(valves));  // 1000 = too low, 1500 = too high
-  console.log("part 2");
+
+  // console.log("part 2", part2(valves));  // 1500 = too low
 }
