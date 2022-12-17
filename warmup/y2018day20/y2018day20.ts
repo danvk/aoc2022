@@ -2,7 +2,7 @@
 // https://adventofcode.com/2018/day/20
 
 import { _ } from "../../deps.ts";
-import { Coord } from "../../grid.ts";
+import { Coord, Grid } from "../../grid.ts";
 import { assert, assertUnreachable, readLinesFromArgs } from "../../util.ts";
 
 export function extractParen(txt: string) {
@@ -168,7 +168,7 @@ function simplifyRegex(regex: Regex): Regex {
       return regex;
     case "concat":
       return {
-        type: 'concat',
+        type: "concat",
         parts: regex.parts.map(simplifyRegex),
       };
     case "choose":
@@ -177,23 +177,97 @@ function simplifyRegex(regex: Regex): Regex {
         if (
           c[0].type === "literal" &&
           c[1].type === "literal" &&
-          (c[0].literal === '' || c[1].literal === '') &&
+          (c[0].literal === "" || c[1].literal === "") &&
           _.isEqual(c[0].delta, c[1].delta)
         ) {
           return {
-            type: 'optional-loop',
+            type: "optional-loop",
             delta: c[0].delta,
             sequence: c[0].literal || c[1].literal,
           };
         }
       }
       return {
-        type: 'choose',
+        type: "choose",
         choices: regex.choices.map(simplifyRegex),
       };
     default:
       assertUnreachable(regex);
   }
+}
+
+function traceLiteral(literal: string, g: Grid<string>, pt: Coord): Coord {
+  let [x, y] = pt;
+  for (let i = 0; i < literal.length; i++) {
+    const c = literal[i]
+    if (c === 'N') {
+      g.set([x, y - 1], '-');
+      y -= 2;
+    } else if (c === 'S') {
+      g.set([x, y + 1], '-');
+      y += 2;
+    } else if (c === 'E') {
+      g.set([x + 1, y], '|');
+      x += 2;
+    } else if (c === 'W') {
+      g.set([x - 1, y], '|');
+      x -= 2;
+    } else {
+      throw new Error('Invalid direction ' + c);
+    }
+  }
+  return [x, y];
+}
+
+function trace(regex: Regex, g: Grid<string>, pt: Coord): Coord[] {
+  switch (regex.type) {
+    case 'literal':
+      return [traceLiteral(regex.literal, g, pt)];
+    case 'optional-loop':
+      traceLiteral(regex.sequence, g, pt);
+      return [pt];
+    case 'concat': {
+      const {parts} = regex;
+      const points = trace(parts[0], g, pt);
+      if (parts.length === 1) {
+        return points;
+      } else {
+        const rest: Regex = {
+          type: 'concat',
+          parts: parts.slice(1),
+        };
+        return points.flatMap(p => trace(rest, g, p));
+      }
+    }
+    case 'choose':
+      return regex.choices.flatMap(choice => trace(choice, g, pt));
+    default:
+      assertUnreachable(regex);
+  }
+}
+
+function pad<T>(g: Grid<T>, c: T) {
+  const {x: [x1, x2], y: [y1, y2]} = g.boundingBox();
+  for (let x = x1 - 1; x <= x2 + 1; x++) {
+    g.set([x, y1 - 1], c);
+    g.set([x, y2 + 1], c);
+  }
+  for (let y = y1; y <= y2; y++) {
+    g.set([x1 - 1, y], c);
+    g.set([x2 + 1, y], c);
+  }
+}
+
+function printGrid(g: Grid<string>) {
+  console.log(g.format(v => v, ([x, y]) => {
+    const evenX = x % 2 === 0;
+    const evenY = y % 2 === 0;
+    if (evenX && evenY) {
+      return '.';
+    } else {
+      return '#';
+    }
+  }));
 }
 
 if (import.meta.main) {
@@ -206,7 +280,18 @@ if (import.meta.main) {
   // console.log('part 1');
   let regex = parseRegex(regexStr);
   regex = simplifyRegex(regex);
-  console.log(JSON.stringify(regex, null, 2));
+  // console.log(JSON.stringify(regex, null, 2));
+
+  const g = new Grid<string>();
+  g.set([0, 0], 'X');
+  trace(regex, g, [0, 0]);
+  // printGrid(g);
+  pad(g, '#');
+  // console.log('');
+  console.log(`^${regexStr}$\n`);
+  printGrid(g);
+
+
   // console.log("Num matches", numMatches(regex));
   // console.log('part 2');
 }

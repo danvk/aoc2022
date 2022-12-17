@@ -66,10 +66,11 @@ export class Grid<V> implements Iterable<[[number, number], V]> {
   }
 
   // TODO: make formatter optional if V=string
-  formatCells(format: (v: V, c: Coord) => string, blank=' '): string[][] {
+  formatCells(format: (v: V, c: Coord) => string, blank: string | ((c: Coord) => string) =' '): string[][] {
     const {x: [minX, maxX], y: [minY, maxY]} = this.boundingBox();
 
-    const txt = map2d(zeros(maxY - minY + 1, maxX - minX + 1), () => blank);
+    const blanker = typeof blank === 'string' ? () => blank : (_: unknown, i: number, j: number) => blank([minX + i, minY + j]);
+    const txt = map2d(zeros(maxY - minY + 1, maxX - minX + 1), blanker);
     for (const [c, v] of this.m) {
       const coord = str2coord(c);
       const [x, y] = coord;
@@ -78,7 +79,7 @@ export class Grid<V> implements Iterable<[[number, number], V]> {
     return txt;
   }
 
-  format(format: (v: V, c: Coord) => string, blank=' '): string {
+  format(format: (v: V, c: Coord) => string, blank: string | ((c: Coord) => string) =' '): string {
     return this.formatCells(format, blank).map(row => row.join('')).join('\n');
   }
 
