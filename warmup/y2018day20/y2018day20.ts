@@ -319,6 +319,11 @@ if (import.meta.main) {
     'doors'
   );
 
+  const part2 = distances.filter(
+    ([d, c]) => d % 1_000_000 >= 1_000 && g.get(c) === undefined
+  ).length;
+  console.log('part 2', part2);
+
   // console.log("Num matches", numMatches(regex));
   // console.log('part 2');
 }
