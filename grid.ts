@@ -1,7 +1,7 @@
 import { _ } from "./deps.ts";
-import { assert, coord2str, map2d, minmax, str2coord, tuple, zeros } from "./util.ts";
+import { assert, coord2str, map2d, str2coord, tuple, zeros } from "./util.ts";
 
-export type Coord = readonly [number, number];
+export type Coord = [number, number];
 
 /** A two dimensional grid, implemented as a sparse Map */
 export class Grid<V> implements Iterable<[[number, number], V]> {

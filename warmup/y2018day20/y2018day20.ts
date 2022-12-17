@@ -2,8 +2,9 @@
 // https://adventofcode.com/2018/day/20
 
 import { _ } from "../../deps.ts";
-import { Coord, Grid } from "../../grid.ts";
-import { assert, assertUnreachable, readLinesFromArgs } from "../../util.ts";
+import { flood } from "../../dijkstra.ts";
+import { Coord, Grid, neighbors4 } from "../../grid.ts";
+import { assert, assertUnreachable, coord2str, readLinesFromArgs, str2coord, tuple } from "../../util.ts";
 
 export function extractParen(txt: string) {
   assert(txt.startsWith("("));
@@ -296,6 +297,27 @@ if (import.meta.main) {
   // console.log('');
   // console.log(`^${regexStr}$\n`);
   printGrid(g);
+
+  const distances = flood(tuple(0, 0), p => {
+    const out: [Coord, number][] = [];
+    for (const n of neighbors4(p)) {
+      const c = g.get(n);
+      if (c === '#' || c === 'X') {
+        continue;
+      } else if (c === '|' || c === '-') {
+        out.push([n, 1_000_000 + 1]);
+      } else if (c === '.' || !c) {
+        out.push([n, 1_000_000]);
+      }
+    }
+    return out;
+  }, coord2str, str2coord);
+
+  console.log(
+    'Furthest room requires passing through',
+    _.max(distances.map(d => d[0]))! % 1_000_000,
+    'doors'
+  );
 
   // console.log("Num matches", numMatches(regex));
   // console.log('part 2');
