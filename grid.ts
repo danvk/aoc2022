@@ -1,13 +1,18 @@
 import { _ } from "./deps.ts";
-import { coord2str, map2d, minmax, str2coord, tuple, zeros } from "./util.ts";
+import { assert, coord2str, map2d, minmax, str2coord, tuple, zeros } from "./util.ts";
 
 export type Coord = readonly [number, number];
 
 /** A two dimensional grid, implemented as a sparse Map */
 export class Grid<V> implements Iterable<[[number, number], V]> {
   m: Map<string, V>;
+  xRange: [number, number] | null;
+  yRange: [number, number] | null;
+
   constructor() {
     this.m = new Map();
+    this.xRange = null;
+    this.yRange = null;
   }
 
   static fromLines(lines: readonly string[]): Grid<string> {
@@ -30,16 +35,34 @@ export class Grid<V> implements Iterable<[[number, number], V]> {
   }
 
   set(c: Coord, v: V) {
-    // TODO: track bounding box here
+    const [x, y] = c;
+    if (!this.xRange || !this.yRange) {
+      this.xRange = [x, x];
+      this.yRange = [y, y];
+    } else {
+      if (x < this.xRange[0]) {
+        this.xRange[0] = x;
+      } else if (x > this.xRange[1]) {
+        this.xRange[1] = x;
+      }
+      if (y < this.yRange[0]) {
+        this.yRange[0] = y;
+      } else if (y > this.yRange[1]) {
+        this.yRange[1] = y;
+      }
+    }
     return this.m.set(coord2str(c), v);
   }
 
   boundingBox(): {x: Coord, y: Coord} {
-    const coords = [...this.m.keys()].map(str2coord);
-    return {
-      x: minmax(coords.map(c => c[0])),
-      y: minmax(coords.map(c => c[1])),
-    };
+    assert(this.xRange);
+    assert(this.yRange);
+    return {x: [...this.xRange], y: [...this.yRange]};
+    // const coords = [...this.m.keys()].map(str2coord);
+    // return {
+    //   x: minmax(coords.map(c => c[0])),
+    //   y: minmax(coords.map(c => c[1])),
+    // };
   }
 
   // TODO: make formatter optional if V=string

@@ -112,7 +112,10 @@ if (import.meta.main) {
   console.log(g.format(v => v, '.'));
   console.log('');
   let jetI = 0;
-  for (let i = 0; i < 2022; i++) {
+  const heights = [];
+  // const n = 40_000;
+
+  for (let i = 0; i <= 5000; i++) {
     jetI = drop(g, i % shapes.length, jets, jetI);
     // console.log(i, ':');
     // console.log(g.format(v => v, '.'));
@@ -120,8 +123,50 @@ if (import.meta.main) {
     // if (jetI === -1) {
     //   break;
     // }
+    const {y: [minY]} = g.boundingBox();
+    // const allFull = _.range(7).every(x => !!g.get([x, minY]));
+    // console.log(i, -minY, allFull);
+    // if (allFull) {
+    //  console.log(i, -minY, jetI);
+    // }
+    heights.push(-minY);
+    if (i === 2021) {
+      console.log('part 1', -minY);
+    }
+    // if (i === n) {
+    //   console.log('direct', n, ' ->', -minY);
+    // }
   }
-  const {y: [minY]} = g.boundingBox();
-  console.log('part 1', -minY);
-  console.log('part 2');
+
+  const n = 1_000_000_000_000 - 1;
+  // 2022 -> 3168 / 3171
+
+  const cycles = Math.floor(n / 1700) - 1;
+  const rem = n % 1700;
+  console.log('part 2', 2642 * cycles + heights[1700 + rem]);
 }
+
+// Times when the top row is all full:
+//  1485  2318 8772
+//  3185  4960 8772    +1700, +2642
+//  4885  7602 8772    +1700, +2642
+//  6585 10244 8772
+//  8285 12886 8772
+//  9985 15528 8772
+// 11685 18170 8772
+// 13385 20812 8772
+// 15085 23454 8772
+// 16785 26096 8772
+// 18485 28738 8772
+// 20185 31380 8772
+// 21885 34022 8772
+// 23585 36664 8772
+// 25285 39306 8772
+// 26985 41948 8772
+// 28685 44590 8772
+// 30385 47232 8772
+// 32085 49874 8772
+// 33785 52516 8772
+// 35485 55158 8772
+// 37185 57800 8772
+// 38885 60442 8772
