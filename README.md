@@ -2,6 +2,18 @@
 
 ## Daily Notes
 
+### Day 17 (9939 / 5946)
+
+Today was much easier than yesterday. I did today's while watching the World Cup third place match and baking bread, so I was a bit distracted. My only trouble in part 1 was mistyping the coordinates for the square -- I had two of the coordinates identical which took a while to debug.
+
+For part 2 I printed out the heights at the first few thousand times to look for periodicity. Then I realized I had no idea how to look for that (side note: how would you do this?). But if the top row was ever all full, it would have to repeat. Maybe? It would depend on the position in the jet sequence. So I printed that out, too, and low and behold it was always the same (i=8772) when the top row was full. After some fiddliness and off-by-one errors, that gave me my answer.
+
+I took the opportunity to track the bounding box in my `Grid` class as you update the grid. This makes calling `boundingBox` instant rather than `O(# cells)`. For printing the height at every step, this made an enormous difference.
+
+- Start: 10:33:17
+- ⭐️: 11:37:55 (1h4m)
+- ⭐️⭐️: 12:21:20 (1h48m)
+
 ### Day 16 (6564 / 4162)
 
 This was by far the hardest puzzle for me so far this year. I'm quite glad I didn't start it at midnight as that would have made for a very late night.
