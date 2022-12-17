@@ -264,9 +264,7 @@ function fill(g: Grid<string>) {
     for (let y = y1; y <= y2; y++) {
       const evenX = x % 2 === 0;
       const evenY = y % 2 === 0;
-      if (evenX && evenY) {
-        // g.set([x, y], '.');
-      } else if (!g.get([x, y])) {
+      if ((!evenX || !evenY) && !g.get([x, y])) {
         g.set([x, y], '#');
       }
     }
