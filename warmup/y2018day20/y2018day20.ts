@@ -328,7 +328,25 @@ if (import.meta.main) {
   // console.log('part 2');
 }
 
+// Parsing the regex was fiddly. I assume there's a cleaner way to do this all in
+// one go using a stack.
+//
 // 4_838_127_116_046_323 strings would match the input regex!
 // There must either be repetitions or alternate routes that take you to the same place.
 // ... it's the latter.
 // After pruning choices that are equivalent, there are only 761 paths!
+// In retrospect, this was very clearly hinted at in the problem since it
+// specifically covered empty clauses acting as "optional loops".
+//
+// With the optional loops, tracing out the maze was straightforward.
+// The "for which the shortest path goes through the most doors" criterion was a
+// little tricky. I'd hoped to do flood fill with "number of doors" as the distance
+// function, but this wouldn't quite be right (the shortest path might not be the
+// path that goes through the fewest doors).
+// I was happy with the solution I came up with: use regular BFS/flood fill, but
+// with distance = 10^6 * manhattan distance + # of doors.
+// This should find shortest paths for any reasonable size maze, but also keep
+// track of the number of doors you go through along the way (and even use it as a
+// tie breaker!).
+//
+// Getting this approach right for part 1 made part 2 extremely easy.
