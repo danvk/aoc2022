@@ -258,16 +258,23 @@ function pad<T>(g: Grid<T>, c: T) {
   }
 }
 
-function printGrid(g: Grid<string>) {
-  console.log(g.format(v => v, ([x, y]) => {
-    const evenX = x % 2 === 0;
-    const evenY = y % 2 === 0;
-    if (evenX && evenY) {
-      return '.';
-    } else {
-      return '#';
+function fill(g: Grid<string>) {
+  const {x: [x1, x2], y: [y1, y2]} = g.boundingBox();
+  for (let x = x1; x <= x2; x++) {
+    for (let y = y1; y <= y2; y++) {
+      const evenX = x % 2 === 0;
+      const evenY = y % 2 === 0;
+      if (evenX && evenY) {
+        // g.set([x, y], '.');
+      } else if (!g.get([x, y])) {
+        g.set([x, y], '#');
+      }
     }
-  }));
+  }
+}
+
+function printGrid(g: Grid<string>) {
+  console.log(g.format(v => v, '.'));
 }
 
 if (import.meta.main) {
@@ -286,11 +293,11 @@ if (import.meta.main) {
   g.set([0, 0], 'X');
   trace(regex, g, [0, 0]);
   // printGrid(g);
+  fill(g);
   pad(g, '#');
   // console.log('');
-  console.log(`^${regexStr}$\n`);
+  // console.log(`^${regexStr}$\n`);
   printGrid(g);
-
 
   // console.log("Num matches", numMatches(regex));
   // console.log('part 2');
