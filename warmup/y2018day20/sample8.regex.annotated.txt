@@ -1,0 +1,33 @@
+^
+WSSEESWWWNW(
+  S
+  |
+  NENNEEEENN(
+    ESSSSW(
+      NWSW
+      |
+      SSEN
+    )
+    |
+    WSWWN(
+      E
+      |
+      WWS(
+        E
+        |
+        SS
+      )
+    )
+  )
+)$
+
+WWSWWSESSSWNWWNE = 4W2S
+WWWWEWWWE = WWWWW = 4W
+SSSSNN = SS = 2S
+
+input:
+top level: literal + (complex | literal)
+
+NWWNNENENESE = 4N2E i.e. exactly opposite
+NNNNNS = NNNN = 4N
+WWEEEE = EE = 2E
