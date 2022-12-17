@@ -30,6 +30,7 @@ export class Grid<V> implements Iterable<[[number, number], V]> {
   }
 
   set(c: Coord, v: V) {
+    // TODO: track bounding box here
     return this.m.set(coord2str(c), v);
   }
 
