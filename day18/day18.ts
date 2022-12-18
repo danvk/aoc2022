@@ -80,8 +80,7 @@ if (import.meta.main) {
   console.log(possiblyInside);
   const definitelyOutside = new Set(definitelyOutsideList.map(ser));
 
-  const distance = (xyz: [number, number, number]) => {
-    const out = [];
+  const interiorNeighbors = function *(xyz: [number, number, number]) {
     for (const n of neighbors6(xyz)) {
       const s = ser(n);
       if (lookup.has(s)) {
@@ -90,10 +89,9 @@ if (import.meta.main) {
       if (definitelyOutside.has(s)) {
         throw new InfiniteFloodException();
       } else {
-        out.push(tuple(n, 1));
+        yield tuple(n, 1);
       }
     }
-    return out;
   };
 
   for (const seed of possiblyInside) {
@@ -103,7 +101,7 @@ if (import.meta.main) {
     }
     // Flood fill with a max diameter; throw if we hit a cell that's open to the outside.
     try {
-      const ds = flood(seed, distance, ser, deser, diam + 1);
+      const ds = flood(seed, interiorNeighbors, ser, deser, diam + 1);
       for (const [, n] of ds) {
         knownInterior.add(ser(n));
       }

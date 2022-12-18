@@ -14,7 +14,7 @@ import { tuple } from "./util.ts";
 export function dijkstra<N>(
   start: N,
   end: N,
-  neighbors: (n: N) => [N, number][],
+  neighbors: (n: N) => Iterable<[N, number]>,
   serialize: (n: N) => string,
   deserialize: (txt: string) => N,
 ): [number, N[]] | null {
@@ -68,7 +68,7 @@ export function dijkstra<N>(
 /** Flood fill from a starting node */
 export function flood<N>(
   start: N,
-  neighbors: (n: N) => [N, number][],
+  neighbors: (n: N) => Iterable<[N, number]>,
   serialize: (n: N) => string,
   deserialize: (txt: string) => N,
   maxDistance?: number,

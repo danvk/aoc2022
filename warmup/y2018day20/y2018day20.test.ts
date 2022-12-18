@@ -50,6 +50,6 @@ Deno.test('splitOnParens', () => {
 });
 
 Deno.test('parseRegex', () => {
-  assertEquals(parseRegex('ABC'), {type: 'literal', literal: 'ABC'});
-  assertEquals(parseRegex(''), {type: 'literal', literal: ''});
+  assertEquals(parseRegex('ABC'), {type: 'literal', literal: 'ENN', delta: [1, -2]});
+  assertEquals(parseRegex(''), {type: 'literal', literal: '', delta: [0, 0]});
 });
