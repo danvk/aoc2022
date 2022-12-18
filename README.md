@@ -2,6 +2,25 @@
 
 ## Daily Notes
 
+### Day 18 (11204 / 8025)
+
+A surprisingly easy one -- maybe Erik is giving us the weekend off?
+
+Part 1 was very straightforward. I'm curious what my seven minutes would have earned me had I done it at midnight!
+
+For part 2 I figured I'd use my flood fill function in three dimensions to fill in the interior. I filtered out surfaces from part 1 that were obviously on the outside by looking at whether I could go `diameter` cells in any of the six directions without hitting anything. This left exactly one candidate for the sample and 1627 for my input. I tried guessing `part1 - 1627` for part 2, but I guess the shape was more complex.
+
+The two tricks for flood fill were to:
+
+1. Throw an exception if I ever got to the exterior (early out). This wasn't a capability that I realized my flood fill code had until today!
+2. Add newly-discovered interior / exterior points to working sets to more aggressively prune future searches.
+
+All in all this runs in 173ms!
+
+- Start: 06:56:20
+- ⭐️: 07:03:22 (7m2s)
+- ⭐️⭐️: 07:33:43 (37m13s)
+
 ### Day 17 (9939 / 5946)
 
 Today was much easier than yesterday. I did today's while watching the World Cup third place match and baking bread, so I was a bit distracted. My only trouble in part 1 was mistyping the coordinates for the square -- I had two of the coordinates identical which took a while to debug.
