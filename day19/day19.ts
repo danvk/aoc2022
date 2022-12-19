@@ -54,49 +54,16 @@ export interface State {
   resources: Record<RobotType, number>;
 }
 
-// some patterns:
-// - clay and ore robots only ever require ore
-// - clay robots can require more _or_ less ore than ore robots
-// - obsidian robots require ore and clay; always more clay than ore.
-// - geode robots require ore and obsidian; always much more obsidian than ore.
-// - greedy strategy would be to always build the most expensive robot, but I assume that doesn't work.
-// - in the example input, it's impossible to get even one geode before t=19
-
-
 function canBuild(blueprint: Blueprint, s: State, robot: RobotType): boolean {
   const res = s.resources;
   const req = blueprint.robots[robot].cost;
-  // console.log(types, res, req);
   return types.every(t => res[t] >= (req[t] ?? 0));
-}
-
-export function canProduceAGeode(blueprint: Blueprint, state: State) {
-  if (state.time < 21) {
-    return true;
-  }
-
-  const maxObsidianT23 = state.resources.obsidian + 2*state.robots.obsidian + 1;
-  return maxObsidianT23 >= blueprint.robots.geode.cost.obsidian;
 }
 
 function* step(blueprint: Blueprint, state: State): Generator<State> {
   // can build exactly one type of robot per turn, or none.
-  // const okTypes = types.filter((t, i) => {
-  //   if (i + 1 < types.length && state.resources[types[i+1]] > 0) {
-  //     return false;
-  //   }
-  //   return true;
-  // });
   const buildable = types.filter(type => canBuild(blueprint, state, type));
-  // console.log(buildable);
   const choices = [...buildable, null];
-  // if (buildable[0] === 'geode' || buildable[0] === 'obsidian') {
-  //   // Build geodes and obsidian greedily
-  //   // console.log('greedy!');
-  //   choices = [buildable[0]];
-  // } else {
-  //
-  // }
 
   for (const buildType of choices) {
     const nextState: State = _.cloneDeep(state);
@@ -116,40 +83,6 @@ function* step(blueprint: Blueprint, state: State): Generator<State> {
     yield nextState;
   }
 }
-
-/*
-function* stepGreedy(blueprint: Blueprint, state: State): Generator<State> {
-  const buildable = _.reverse(types).filter(type => canBuild(blueprint, state, type));
-  // console.log(buildable);
-
-  let choices;
-  if (buildable[0] === 'geode' || buildable[0] === 'obsidian') {
-    // Build geodes and obsidian greedily
-    console.log('greedy!');
-    choices = [buildable[0]];
-  } else {
-    choices = [...buildable, null];
-  }
-  for (const buildType of choices) {
-    const nextState: State = _.cloneDeep(state);
-    // mine NOW, after we've decided what's buildable.
-    for (const robot of types) {
-      nextState.resources[robot] += nextState.robots[robot];
-    }
-    if (buildType) {
-      const resources = nextState.resources;
-      const cost = blueprint.robots[buildType].cost;
-      for (const [resType, amount] of Object.entries(cost)) {
-        resources[resType as RobotType] -= amount;
-      }
-      nextState.robots[buildType]++;  // will produce next turn.
-    }
-    nextState.time++;
-    yield nextState;
-    break;
-  }
-}
-*/
 
 export function resourceScore(s: State) {
   const r = s.resources;
@@ -216,15 +149,3 @@ if (import.meta.main) {
   }
   console.log('part 2', _.reduce(geodes, (a, b) => a * b, 1), geodes);
 }
-
-// I blow the stack after t=19 on the sample input.
-// need some way to prune unproductive states.
-// does it ever make sense to not build a robot when you can?
-//   ... absolutely; you'll never get a geode if you don't save up.
-
-// what's an upper bound on the number of geodes you'll produce?
-// - assume ore is irrelevant
-// -
-
-// Feels vaguely like https://adventofcode.com/2019/day/14 but I don't think it's exactly the same.
-// How many ore/clay does it take for a geode?

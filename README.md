@@ -14,6 +14,8 @@ So I got my stars but I'm not sure why my code works! Maybe there's some greedy 
 - ⭐️: 17:16:36 (8h55m)
 - ⭐️⭐️: 17:27:53 (9h06m)
 
+Vaguely reminiscent of https://adventofcode.com/2019/day/14.
+
 ### Day 18 (11204 / 8025)
 
 A surprisingly easy one -- maybe Erik is giving us the weekend off?
