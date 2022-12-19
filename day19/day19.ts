@@ -193,14 +193,15 @@ if (import.meta.main) {
 
   const CAP = 1_000_000;
   let tally = 0;
-  for (const blueprint of blueprints) {
+  const geodes = [];
+  for (const blueprint of blueprints.slice(0, 3)) {
     console.log(blueprint);
     console.log(init);
     let states = [init];
     let numGeodes = 0;
-    for (let t = init.time + 1; t < 25; t++) {
+    for (let t = init.time + 1; t < 32 + 1; t++) {
       const nexts = states.flatMap(
-        state => [...step(blueprint, state)].filter(s => canProduceAGeode(blueprint, s))
+        state => [...step(blueprint, state)]
       );
       // if (t < 25) {
       // nexts
@@ -221,10 +222,11 @@ if (import.meta.main) {
     }
     console.log('input', blueprint.id, 'geodes', numGeodes, '->', blueprint.id * numGeodes);
     tally += blueprint.id * numGeodes;
+    geodes.push(numGeodes);
   }
 
   console.log('part 1', tally);  // 2123 = too low  2193 = correct
-  console.log('part 2');
+  console.log('part 2', geodes);
 }
 
 // I blow the stack after t=19 on the sample input.
