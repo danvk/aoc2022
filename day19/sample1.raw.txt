@@ -26,3 +26,10 @@ What's the most geodes you could produce from this?
 - In the example, you build an obsidian robot and then go back to building a clay robot.
   But what if you didn't do this? i.e. never backtrack to a lower class robot?
   This might give a more realistic lower bound.
+
+Input:
+Blueprint 1:
+  Each ore robot costs 2 ore.
+  Each clay robot costs 4 ore.
+  Each obsidian robot costs 4 ore and 15 clay.
+  Each geode robot costs 2 ore and 20 obsidian.

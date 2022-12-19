@@ -48,7 +48,7 @@ function parseBlueprint(line: string): Blueprint {
   return blueprint;
 }
 
-interface State {
+export interface State {
   time: number;
   robots: Record<RobotType, number>;
   resources: Record<RobotType, number>;
@@ -142,6 +142,17 @@ function* stepGreedy(blueprint: Blueprint, state: State): Generator<State> {
 }
 */
 
+export function resourceScore(s: State) {
+  const r = s.resources;
+  return ((r.geode * 1000 + r.obsidian) * 1000 + r.clay) * 1000 + r.ore;
+}
+
+export function resourceAndRobotsScore(s: State) {
+  const r = s.resources;
+  const r2 = s.robots;
+  return (((r.geode + r2.geode) * 1000 + (r.obsidian + r2.obsidian)) * 1000 + (r.clay + r2.clay)) * 1000 + (r.ore + r2.ore);
+}
+
 if (import.meta.main) {
   const lines = await readLinesFromArgs();
   const blueprints = lines.map(parseBlueprint);
@@ -164,35 +175,40 @@ if (import.meta.main) {
       geode: 0,
     },
   };
+  // const init: State = {
+  //  time: 22,
+  //  robots: { ore: 4, clay: 7, obsidian: 4, geode: 0 },
+  //  resources: { ore: 24, clay: 23, obsidian: 21, geode: 0 }
+  // };
 
-  console.log(init);
-  let states = [init];
-  const blueprint = blueprints[0];
-  for (let t = 1; t < 25; t++) {
-    const nexts = states.flatMap(state => [...step(blueprint, state)]);
-    // if (t < 25) {
-    // nexts
-    // } else {
-    // nexts = states.flatMap(state => [...stepGreedy(blueprint, state)]);
-    // }
-    console.log('t=', t, 'num states=', nexts.length);
-    // console.log(nexts);
-    // states = nexts;
-    states = _.sortBy(
-      nexts, s => {
-        const r = s.resources;
-        return ((r.geode * 1000 + r.obsidian) * 1000 + r.clay) * 1000 + r.ore;
-      }
-    ).toReversed().slice(0, 1_000_000);
-    // console.log(states[0]);
-    // states = nexts;
-    console.log(_.maxBy(states, s => {
-      const r = s.resources;
-      return ((r.geode * 1000 + r.obsidian) * 1000 + r.clay) * 1000 + r.ore;
-    }));
+  let tally = 0;
+  for (const blueprint of blueprints) {
+    console.log(blueprint);
+    console.log(init);
+    let states = [init];
+    let numGeodes = 0;
+    for (let t = init.time + 1; t < 25; t++) {
+      const nexts = states.flatMap(state => [...step(blueprint, state)]);
+      // if (t < 25) {
+      // nexts
+      // } else {
+      // nexts = states.flatMap(state => [...stepGreedy(blueprint, state)]);
+      // }
+      console.log('t=', t, 'num states=', nexts.length);
+      // console.log(nexts);
+      // states = nexts;
+      states = _.sortBy(nexts, resourceAndRobotsScore).toReversed().slice(0, 1_000_000);
+      // console.log(states[0]);
+      // states = nexts;
+      const best = _.maxBy(states, resourceScore)!;
+      console.log(best);
+      numGeodes = best.resources.geode;
+    }
+    console.log('input', blueprint.id, 'geodes', numGeodes);
+    tally += blueprint.id * numGeodes;
   }
 
-  console.log('part 1', lines.length);
+  console.log('part 1', tally);
   console.log('part 2');
 }
 
