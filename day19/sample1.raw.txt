@@ -9,3 +9,20 @@ Blueprint 2:
   Each clay robot costs 3 ore.
   Each obsidian robot costs 3 ore and 8 clay.
   Each geode robot costs 3 ore and 12 obsidian.
+
+bp1:
+- geode requires 2 ore + 7 obsidian
+- geode requires 2 ore + 7 * (3 ore + 14 clay)
+- geode requires (2 + 21) ore + 98 clay
+- geode requires 2 + 21 + 164 ore
+
+What's the most geodes you could produce from this?
+{
+  time: 19,
+  robots: { ore: 1, clay: 9, obsidian: 0, geode: 0 },
+  resources: { ore: 1, clay: 72, obsidian: 0, geode: 0 }
+}
+
+- In the example, you build an obsidian robot and then go back to building a clay robot.
+  But what if you didn't do this? i.e. never backtrack to a lower class robot?
+  This might give a more realistic lower bound.

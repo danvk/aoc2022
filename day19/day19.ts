@@ -2,7 +2,7 @@
 // https://adventofcode.com/2022/day/19
 
 import { _ } from "../deps.ts";
-import { assert, readInts, readLinesFromArgs, tuple } from "../util.ts";
+import { assert, readInts, readLinesFromArgs } from "../util.ts";
 
 const types: RobotType[] = ['ore', 'clay', 'obsidian', 'geode'];
 type RobotType = 'ore' | 'clay' | 'obsidian' | 'geode';
@@ -60,6 +60,8 @@ interface State {
 // - obsidian robots require ore and clay; always more clay than ore.
 // - geode robots require ore and obsidian; always much more obsidian than ore.
 // - greedy strategy would be to always build the most expensive robot, but I assume that doesn't work.
+// - in the example input, it's impossible to get even one geode before t=19
+
 
 function canBuild(blueprint: Blueprint, s: State, robot: RobotType): boolean {
   const res = s.resources;
@@ -70,10 +72,24 @@ function canBuild(blueprint: Blueprint, s: State, robot: RobotType): boolean {
 
 function* step(blueprint: Blueprint, state: State): Generator<State> {
   // can build exactly one type of robot per turn, or none.
-  const buildable = types.filter(type => canBuild(blueprint, state, type));
+  const okTypes = types.filter((t, i) => {
+    if (i + 1 < types.length && state.resources[types[i+1]] > 0) {
+      return false;
+    }
+    return true;
+  });
+  const buildable = okTypes.filter(type => canBuild(blueprint, state, type));
   // console.log(buildable);
+  const choices = [...buildable, null];
+  // if (buildable[0] === 'geode' || buildable[0] === 'obsidian') {
+  //   // Build geodes and obsidian greedily
+  //   // console.log('greedy!');
+  //   choices = [buildable[0]];
+  // } else {
+  //
+  // }
 
-  for (const buildType of [...buildable, null]) {
+  for (const buildType of choices) {
     const nextState: State = _.cloneDeep(state);
     // mine NOW, after we've decided what's buildable.
     for (const robot of types) {
@@ -91,6 +107,40 @@ function* step(blueprint: Blueprint, state: State): Generator<State> {
     yield nextState;
   }
 }
+
+/*
+function* stepGreedy(blueprint: Blueprint, state: State): Generator<State> {
+  const buildable = _.reverse(types).filter(type => canBuild(blueprint, state, type));
+  // console.log(buildable);
+
+  let choices;
+  if (buildable[0] === 'geode' || buildable[0] === 'obsidian') {
+    // Build geodes and obsidian greedily
+    console.log('greedy!');
+    choices = [buildable[0]];
+  } else {
+    choices = [...buildable, null];
+  }
+  for (const buildType of choices) {
+    const nextState: State = _.cloneDeep(state);
+    // mine NOW, after we've decided what's buildable.
+    for (const robot of types) {
+      nextState.resources[robot] += nextState.robots[robot];
+    }
+    if (buildType) {
+      const resources = nextState.resources;
+      const cost = blueprint.robots[buildType].cost;
+      for (const [resType, amount] of Object.entries(cost)) {
+        resources[resType as RobotType] -= amount;
+      }
+      nextState.robots[buildType]++;  // will produce next turn.
+    }
+    nextState.time++;
+    yield nextState;
+    break;
+  }
+}
+*/
 
 if (import.meta.main) {
   const lines = await readLinesFromArgs();
@@ -118,13 +168,42 @@ if (import.meta.main) {
   console.log(init);
   let states = [init];
   const blueprint = blueprints[0];
-  for (let t = 1; t < 4; t++) {
+  for (let t = 1; t < 25; t++) {
     const nexts = states.flatMap(state => [...step(blueprint, state)]);
+    // if (t < 25) {
+    // nexts
+    // } else {
+    // nexts = states.flatMap(state => [...stepGreedy(blueprint, state)]);
+    // }
     console.log('t=', t, 'num states=', nexts.length);
-    console.log(nexts);
-    states = nexts;
+    // console.log(nexts);
+    // states = nexts;
+    states = _.sortBy(
+      nexts, s => {
+        const r = s.resources;
+        return ((r.geode * 1000 + r.obsidian) * 1000 + r.clay) * 1000 + r.ore;
+      }
+    ).toReversed().slice(0, 1_000_000);
+    // console.log(states[0]);
+    // states = nexts;
+    console.log(_.maxBy(states, s => {
+      const r = s.resources;
+      return ((r.geode * 1000 + r.obsidian) * 1000 + r.clay) * 1000 + r.ore;
+    }));
   }
 
   console.log('part 1', lines.length);
   console.log('part 2');
 }
+
+// I blow the stack after t=19 on the sample input.
+// need some way to prune unproductive states.
+// does it ever make sense to not build a robot when you can?
+//   ... absolutely; you'll never get a geode if you don't save up.
+
+// what's an upper bound on the number of geodes you'll produce?
+// - assume ore is irrelevant
+// -
+
+// Feels vaguely like https://adventofcode.com/2019/day/14 but I don't think it's exactly the same.
+// How many ore/clay does it take for a geode?
