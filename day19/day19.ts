@@ -1,7 +1,6 @@
 #!/usr/bin/env -S deno run --allow-read --allow-write
 // https://adventofcode.com/2022/day/19
 
-import { blue } from "https://deno.land/std@0.166.0/fmt/colors.ts";
 import { _ } from "../deps.ts";
 import { assert, readInts, readLinesFromArgs } from "../util.ts";
 
@@ -163,13 +162,8 @@ export function resourceAndRobotsScore(s: State) {
   return (((r.geode + r2.geode) * 1000 + (r.obsidian + r2.obsidian)) * 1000 + (r.clay + r2.clay)) * 1000 + (r.ore + r2.ore);
 }
 
-if (import.meta.main) {
-  const lines = await readLinesFromArgs();
-  const blueprints = lines.map(parseBlueprint);
-  for (const blueprint of blueprints) {
-    console.log(JSON.stringify(blueprint));
-  }
-
+const CAP = 10_000;
+function maxGeodes(blueprint: Blueprint, maxT: number) {
   const init: State = {
     time: 0,
     robots: {
@@ -185,48 +179,42 @@ if (import.meta.main) {
       geode: 0,
     },
   };
-  // const init: State = {
-  //  time: 22,
-  //  robots: { ore: 4, clay: 7, obsidian: 4, geode: 0 },
-  //  resources: { ore: 24, clay: 23, obsidian: 21, geode: 0 }
-  // };
-
-  const CAP = 1_000_000;
-  let tally = 0;
-  const geodes = [];
-  for (const blueprint of blueprints.slice(0, 3)) {
-    console.log(blueprint);
-    console.log(init);
-    let states = [init];
-    let numGeodes = 0;
-    for (let t = init.time + 1; t < 32 + 1; t++) {
-      const nexts = states.flatMap(
-        state => [...step(blueprint, state)]
-      );
-      // if (t < 25) {
-      // nexts
-      // } else {
-      // nexts = states.flatMap(state => [...stepGreedy(blueprint, state)]);
-      // }
-      console.log('t=', t, 'num states=', nexts.length, nexts.length > CAP ? 'hit cap!' : '');
-      // console.log(nexts);
-      // states = nexts;
-      states = _.sortBy(nexts, resourceAndRobotsScore).toReversed().slice(0, CAP);
-      // console.log(states[0]);
-      // states = nexts;
-      const best = _.maxBy(states, resourceScore)!;
-      if (t >= 24) {
-        console.log(best);
-      }
-      numGeodes = best.resources.geode;
+  let states = [init];
+  let numGeodes = 0;
+  for (let t = init.time + 1; t < maxT + 1; t++) {
+    const nexts = states.flatMap(
+      state => [...step(blueprint, state)]
+    );
+    console.log('t=', t, 'num states=', nexts.length, nexts.length > CAP ? 'hit cap!' : '');
+    states = _.sortBy(nexts, resourceAndRobotsScore).toReversed().slice(0, CAP);
+    const best = _.maxBy(states, resourceScore)!;
+    if (t >= maxT) {
+      console.log(best);
     }
+    numGeodes = best.resources.geode;
+  }
+  return numGeodes;
+}
+
+if (import.meta.main) {
+  const lines = await readLinesFromArgs();
+  const blueprints = lines.map(parseBlueprint);
+
+  // 1M works, 100k works, 10k works, 1k does not.
+  let tally = 0;
+  for (const blueprint of blueprints) {
+    const numGeodes = maxGeodes(blueprint, 24);
     console.log('input', blueprint.id, 'geodes', numGeodes, '->', blueprint.id * numGeodes);
     tally += blueprint.id * numGeodes;
+  }
+  console.log('part 1', tally);  // 2123 = too low  2193 = correct
+
+  const geodes = [];
+  for (const blueprint of blueprints.slice(0, 3)) {
+    const numGeodes = maxGeodes(blueprint, 32);
     geodes.push(numGeodes);
   }
-
-  console.log('part 1', tally);  // 2123 = too low  2193 = correct
-  console.log('part 2', geodes);
+  console.log('part 2', _.reduce(geodes, (a, b) => a * b, 1), geodes);
 }
 
 // I blow the stack after t=19 on the sample input.

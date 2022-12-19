@@ -2,6 +2,18 @@
 
 ## Daily Notes
 
+### Day 19 (7649 / 6570)
+
+Hardest problem yet! I implemented a BFS and quickly blew the stack after t=19 on the sample input. First instinct was to do various forms of greedy searching as I got closer to the end time to reduce the number of active states, but I couldn't get this to work. I tried pruning the list of states to the most promising ones, but convinced myself that this didn't work. After looking at more example states, I realized that I needed two different ranking functions -- one for pruning which considered the number of robots of each type and one for counting the geodes which didn't. This is important because you sometimes need credit for producing a robot before it produces any resources.
+
+I kicked this off with a filter to the top million states at each time. While this was running I tried pruning based on the max possible geodes you could produce near the max time (could you ever produce a geode?) but had trouble getting this to work. While I was hacking away at it my solution that pruned to the top million finished and gave me the correct answer. It worked without change for part two as well. I was able to reduce the state size from 1M to 10k and still get the right answer, but 1k was too small.
+
+So I got my stars but I'm not sure why my code works! Maybe there's some greedy structure to the problem?
+
+- Start: 08:21:17
+- ⭐️: 17:16:36 (8h55m)
+- ⭐️⭐️: 17:27:53 (9h06m)
+
 ### Day 18 (11204 / 8025)
 
 A surprisingly easy one -- maybe Erik is giving us the weekend off?
