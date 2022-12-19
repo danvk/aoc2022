@@ -33,3 +33,30 @@ Blueprint 1:
   Each clay robot costs 4 ore.
   Each obsidian robot costs 4 ore and 15 clay.
   Each geode robot costs 2 ore and 20 obsidian.
+
+- We tend to only ever produce geode robots in the last few minutes.
+
+Blueprint 28:
+- Each ore robot costs 4 ore.
+- Each clay robot costs 4 ore.
+- Each obsidian robot costs 4 ore and 17 clay.
+- Each geode robot costs 4 ore and 20 obsidian.
+
+Don't get any geodes because 20 obsidian is just too high.
+{
+  time: 22,
+  robots: { ore: 3, clay: 7, obsidian: 2, geode: 0 },
+  resources: { ore: 9, clay: 21, obsidian: 7, geode: 0 }
+}
+t= 23 num states= 3706600
+{
+  time: 23,
+  robots: { ore: 3, clay: 8, obsidian: 2, geode: 0 },
+  resources: { ore: 8, clay: 29, obsidian: 9, geode: 0 }
+}
+t= 24 num states= 3340146
+{
+  time: 24,
+  robots: { ore: 4, clay: 10, obsidian: 3, geode: 0 },
+  resources: { ore: 8, clay: 29, obsidian: 12, geode: 0 }
+}

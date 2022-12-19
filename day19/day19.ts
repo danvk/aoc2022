@@ -1,6 +1,7 @@
 #!/usr/bin/env -S deno run --allow-read --allow-write
 // https://adventofcode.com/2022/day/19
 
+import { blue } from "https://deno.land/std@0.166.0/fmt/colors.ts";
 import { _ } from "../deps.ts";
 import { assert, readInts, readLinesFromArgs } from "../util.ts";
 
@@ -72,13 +73,13 @@ function canBuild(blueprint: Blueprint, s: State, robot: RobotType): boolean {
 
 function* step(blueprint: Blueprint, state: State): Generator<State> {
   // can build exactly one type of robot per turn, or none.
-  const okTypes = types.filter((t, i) => {
-    if (i + 1 < types.length && state.resources[types[i+1]] > 0) {
-      return false;
-    }
-    return true;
-  });
-  const buildable = okTypes.filter(type => canBuild(blueprint, state, type));
+  // const okTypes = types.filter((t, i) => {
+  //   if (i + 1 < types.length && state.resources[types[i+1]] > 0) {
+  //     return false;
+  //   }
+  //   return true;
+  // });
+  const buildable = types.filter(type => canBuild(blueprint, state, type));
   // console.log(buildable);
   const choices = [...buildable, null];
   // if (buildable[0] === 'geode' || buildable[0] === 'obsidian') {
@@ -201,14 +202,16 @@ if (import.meta.main) {
       // console.log(states[0]);
       // states = nexts;
       const best = _.maxBy(states, resourceScore)!;
-      console.log(best);
+      if (t >= 24) {
+        console.log(best);
+      }
       numGeodes = best.resources.geode;
     }
-    console.log('input', blueprint.id, 'geodes', numGeodes);
+    console.log('input', blueprint.id, 'geodes', numGeodes, '->', blueprint.id * numGeodes);
     tally += blueprint.id * numGeodes;
   }
 
-  console.log('part 1', tally);
+  console.log('part 1', tally);  // 2123 = too low
   console.log('part 2');
 }
 
