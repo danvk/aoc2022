@@ -294,3 +294,10 @@ When they announced deno.land, I was briefly bummed that someone else had alread
 I'm interested in Deno as "a new way to TypeScript" and curious to what extent it feels different than Node. My sense is that they've converged a bit over the past few years since Node now includes more web-compatible APIs like `fetch`.
 
 I'm also curious to use JS / TS for more numerical, performance-sensitive work. My sense is that it's not as nice as Python for this sort of thing, but it will be a new domain for me to use a familiar language. Plus, I haven't been writing much TypeScript (or code in general) the past few months, and I'd like to get back into it!
+
+## Deno thoughts
+
+- The low config dream really is true.
+- I like that the linter is on by default, as is strict mode.
+- The editor integration needs some work.
+- Mostly it doesn't feel that different.
