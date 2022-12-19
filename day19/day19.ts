@@ -71,6 +71,15 @@ function canBuild(blueprint: Blueprint, s: State, robot: RobotType): boolean {
   return types.every(t => res[t] >= (req[t] ?? 0));
 }
 
+export function canProduceAGeode(blueprint: Blueprint, state: State) {
+  if (state.time < 21) {
+    return true;
+  }
+
+  const maxObsidianT23 = state.resources.obsidian + 2*state.robots.obsidian + 1;
+  return maxObsidianT23 >= blueprint.robots.geode.cost.obsidian;
+}
+
 function* step(blueprint: Blueprint, state: State): Generator<State> {
   // can build exactly one type of robot per turn, or none.
   // const okTypes = types.filter((t, i) => {
@@ -182,6 +191,7 @@ if (import.meta.main) {
   //  resources: { ore: 24, clay: 23, obsidian: 21, geode: 0 }
   // };
 
+  const CAP = 1_000_000;
   let tally = 0;
   for (const blueprint of blueprints) {
     console.log(blueprint);
@@ -189,16 +199,18 @@ if (import.meta.main) {
     let states = [init];
     let numGeodes = 0;
     for (let t = init.time + 1; t < 25; t++) {
-      const nexts = states.flatMap(state => [...step(blueprint, state)]);
+      const nexts = states.flatMap(
+        state => [...step(blueprint, state)].filter(s => canProduceAGeode(blueprint, s))
+      );
       // if (t < 25) {
       // nexts
       // } else {
       // nexts = states.flatMap(state => [...stepGreedy(blueprint, state)]);
       // }
-      console.log('t=', t, 'num states=', nexts.length);
+      console.log('t=', t, 'num states=', nexts.length, nexts.length > CAP ? 'hit cap!' : '');
       // console.log(nexts);
       // states = nexts;
-      states = _.sortBy(nexts, resourceAndRobotsScore).toReversed().slice(0, 1_000_000);
+      states = _.sortBy(nexts, resourceAndRobotsScore).toReversed().slice(0, CAP);
       // console.log(states[0]);
       // states = nexts;
       const best = _.maxBy(states, resourceScore)!;
@@ -211,7 +223,7 @@ if (import.meta.main) {
     tally += blueprint.id * numGeodes;
   }
 
-  console.log('part 1', tally);  // 2123 = too low
+  console.log('part 1', tally);  // 2123 = too low  2193 = correct
   console.log('part 2');
 }
 

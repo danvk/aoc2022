@@ -60,3 +60,16 @@ t= 24 num states= 3340146
   robots: { ore: 4, clay: 10, obsidian: 3, geode: 0 },
   resources: { ore: 8, clay: 29, obsidian: 12, geode: 0 }
 }
+
+Only hit the cap at t=20.
+Can you prune paths that will never produce a geode at that point?
+
+- If you have enough to produce a geode robot now (t=20), you get a geode at t=21
+
+- t=21 Produce obsidian robot
+- t=22 Produce one extra obsidian, what you build here is irrelevant
+- t=23 need to build a geode robot NOW
+- t=24 produce a geode
+
+So at t=21, you can have at most
+(resources.obsidian + 2*robots.obsidian + 1) obsidian at t=23
