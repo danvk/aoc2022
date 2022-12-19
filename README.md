@@ -17,6 +17,13 @@ The two tricks for flood fill were to:
 
 All in all this runs in 173ms!
 
+Afterwards I updated my Dijkstra/Flood Fill neighbor funtion from
+
+    -  neighbors: (n: N) => [N, number][],
+    +  neighbors: (n: N) => Iterable<[N, number]>,
+
+This requires no code changes (either in the `neighbors` functions or in the implementation) but does let me pass in a generator, which is quite convenient. Most of my previous implementations invovled building an array and returning it.
+
 - Start: 06:56:20
 - ⭐️: 07:03:22 (7m2s)
 - ⭐️⭐️: 07:33:43 (37m13s)
