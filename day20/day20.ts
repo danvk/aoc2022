@@ -96,6 +96,17 @@ export function shiftRight(b: Node) {
 }
 
 export function shift(n: Node, amount: number) {
+  if (amount > 0) {
+    while (amount--) {
+      shiftRight(n);
+    }
+  } else if (amount < 0) {
+    while (amount++) {
+      shiftLeft(n);
+    }
+  }
+
+/*
   let next = n.next;
   if (amount > 0) {
     for (let i = 0; i < amount; i++) {
@@ -133,6 +144,7 @@ export function shift(n: Node, amount: number) {
   n.next = next;       // 2.next = 2
   next.prev = n;      // 2.prev = 2
   n.prev.next = n;  // 2.next = 2
+  */
 }
 
 export function shiftArray(xs: number[], num: number, amount: number): number[] {
@@ -172,23 +184,19 @@ if (import.meta.main) {
   Deno.writeTextFileSync('/tmp/before.txt', before.map(String).join('\n'));
   console.log(_.sum(rawNums));
   // let i = 0;
-  let nums = [...rawNums];
-  for (const num of rawNums) {
-    nums = shiftArray(nums, num, num);
+  // let nums = [...rawNums];
+  // for (const num of rawNums) {
+    // nums = shiftArray(nums, num, num);
     // console.log(nums.join(', '));
-  }
-  // for (const n of nodes) {
-  //   let num = n.num;
-  //   while (num < 0) {
-  //     num += nodes.length;
-  //   }
-  //   num = num % nodes.length;
-  //   shift(n, n.num);
-  //   // printList(nodes[i]);
-  //   // assert(_.sum(serializeList(nodes[i])) === -659378);
-  //   i++;
-  //   // Deno.writeTextFileSync(`/tmp/step${i}.txt`, after.map(String).join('\n'));
   // }
+  for (const n of nodes) {
+    // let num = n.num;
+    shift(n, n.num);
+    // printList(nodes[i]);
+    // assert(_.sum(serializeList(nodes[i])) === -659378);
+    // i++;
+    // Deno.writeTextFileSync(`/tmp/step${i}.txt`, after.map(String).join('\n'));
+  }
   // shift(nodes[0], 0);
   // shift(nodes[0], nodes.length);
   // shift(nodes[0], 2 * nodes.length);
@@ -198,14 +206,14 @@ if (import.meta.main) {
   // Deno.writeTextFileSync('/tmp/after.txt', after.map(String).join('\n'));
   // assert(_.isEqual(before, after));
 
-  // const zero = nodes.find(n => n.num === 0)!;
-  // const n1000 = nAfter(zero, 1000).num;
-  // const n2000 = nAfter(zero, 2000).num;
-  // const n3000 = nAfter(zero, 3000).num;
-  const i = nums.indexOf(0);
-  const n1000 = nums[(i + 1000) % nums.length];
-  const n2000 = nums[(i + 2000) % nums.length];
-  const n3000 = nums[(i + 3000) % nums.length];
+  const zero = nodes.find(n => n.num === 0)!;
+  const n1000 = nAfter(zero, 1000).num;
+  const n2000 = nAfter(zero, 2000).num;
+  const n3000 = nAfter(zero, 3000).num;
+  // const i = nums.indexOf(0);
+  // const n1000 = nums[(i + 1000) % nums.length];
+  // const n2000 = nums[(i + 2000) % nums.length];
+  // const n3000 = nums[(i + 3000) % nums.length];
   console.log(n1000, n2000, n3000);
 
   // printList(nums[0]);
