@@ -2,7 +2,7 @@
 // https://adventofcode.com/2018/day/9
 
 import { _ } from "../../deps.ts";
-import { assert, safeParseInt, zeros } from "../../util.ts";
+import { safeParseInt, zeros } from "../../util.ts";
 
 interface Marble {
   num: number;
