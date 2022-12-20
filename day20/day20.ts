@@ -177,8 +177,6 @@ export function shiftArray(xs: number[], num: number, amount: number): number[] 
 if (import.meta.main) {
   const lines = await readLinesFromArgs();
   const rawNums = lines.map(safeParseInt);
-  console.log(rawNums);
-  console.log(rawNums.slice(-10));
   const nodes = makeNodes(rawNums);
   const before = serializeList(nodes[0]);
   Deno.writeTextFileSync('/tmp/before.txt', before.map(String).join('\n'));
@@ -191,7 +189,11 @@ if (import.meta.main) {
   // }
   for (const n of nodes) {
     // let num = n.num;
-    shift(n, n.num);
+    let amount = n.num;
+    // if (amount > 0) {
+    amount = amount % (rawNums.length - 1);
+    //}
+    shift(n, amount);
     // printList(nodes[i]);
     // assert(_.sum(serializeList(nodes[i])) === -659378);
     // i++;
