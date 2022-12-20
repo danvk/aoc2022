@@ -105,6 +105,8 @@ export function shift(n: Node, amount: number) {
 if (import.meta.main) {
   const lines = await readLinesFromArgs();
   const rawNums = lines.map(safeParseInt);
+  console.log(rawNums);
+  console.log(rawNums.slice(-10));
   const nodes = makeNodes(rawNums);
   const before = serializeList(nodes[0]);
   Deno.writeTextFileSync('/tmp/before.txt', before.map(String).join('\n'));
