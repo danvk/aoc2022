@@ -45,6 +45,23 @@ export function printList(head: Node) {
   console.log(serializeList(head).map(String).join(', '));
 }
 
+function lengthOfList(head: Node) {
+  let len = 0;
+  let n = head;
+  do {
+    len++;
+    n = n.next
+  } while (n !== head);
+  return len;
+}
+
+function nAfter(n: Node, num: number) {
+  for (let i = 0; i < num; i++) {
+    n = n.next;
+  }
+  return n;
+}
+
 export function shift(n: Node, amount: number) {
   let next = n.next;
   if (amount > 0) {
@@ -57,6 +74,10 @@ export function shift(n: Node, amount: number) {
     }
   }
 
+  if (n === next) {
+    return;
+  }
+
   // 1, 2, -3, 3, -2, 0, 4
   // A B C D
 
@@ -64,7 +85,7 @@ export function shift(n: Node, amount: number) {
   const oldPrev = n.prev;  // A
   const oldNext = n.next;  // C
 
-  //                    4      1            2        -3
+  //                    4      1            2        1
   // console.log(oldPrev.num, n.num, oldNext.num, next.num);
 
   // remove n from the list
@@ -82,18 +103,32 @@ if (import.meta.main) {
   const lines = await readLinesFromArgs();
   const rawNums = lines.map(safeParseInt);
   const nodes = makeNodes(rawNums);
-  printList(nodes[0]);
-  for (const node of nodes) {
-    console.log(node.num, 'prev=', node.prev.num, 'next=', node.next.num);
-  }
-  shift(nodes[0], nodes[0].num);
+  const before = serializeList(nodes[0]);
+  // for (const n of nodes) {
+  //   shift(n, n.num);
+  // }
+  shift(nodes[0], 0);
+  shift(nodes[0], nodes.length);
+  shift(nodes[0], 2 * nodes.length);
+  shift(nodes[0], -nodes.length);
+  shift(nodes[0], -2 * nodes.length);
 
-  for (const node of nodes) {
-    console.log(node.num, 'prev=', node.prev.num, 'next=', node.next.num);
-  }
-  printList(nodes[0]);
+  const after = serializeList(nodes[0]);
+  assert(_.isEqual(before, after));
+
+  const zero = nodes.find(n => n.num === 0)!;
+  const n1000 = nAfter(zero, 1000).num;
+  const n2000 = nAfter(zero, 2000).num;
+  const n3000 = nAfter(zero, 3000).num;
+  console.log(n1000, n2000, n3000);
 
   // printList(nums[0]);
-  // console.log('part 1', nums[0]);
+  console.log('part 1', n1000 + n2000 + n3000);
+
+  const lens = _.countBy(nodes.map(lengthOfList));
+  console.log(lens);
+
+  // -2893 = wrong
+  // -9516 = wrong
   // console.log('part 2');
 }
