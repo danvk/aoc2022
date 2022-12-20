@@ -176,7 +176,7 @@ export function shiftArray(xs: number[], num: number, amount: number): number[] 
 
 if (import.meta.main) {
   const lines = await readLinesFromArgs();
-  const rawNums = lines.map(safeParseInt);
+  const rawNums = lines.map(safeParseInt).map(x => x * 811589153);
   const nodes = makeNodes(rawNums);
   const before = serializeList(nodes[0]);
   Deno.writeTextFileSync('/tmp/before.txt', before.map(String).join('\n'));
@@ -187,17 +187,19 @@ if (import.meta.main) {
     // nums = shiftArray(nums, num, num);
     // console.log(nums.join(', '));
   // }
-  for (const n of nodes) {
-    // let num = n.num;
-    let amount = n.num;
-    // if (amount > 0) {
-    amount = amount % (rawNums.length - 1);
-    //}
-    shift(n, amount);
-    // printList(nodes[i]);
-    // assert(_.sum(serializeList(nodes[i])) === -659378);
-    // i++;
-    // Deno.writeTextFileSync(`/tmp/step${i}.txt`, after.map(String).join('\n'));
+  for (let i = 0; i < 10; i++) {
+    for (const n of nodes) {
+      // let num = n.num;
+      let amount = n.num ;
+      // if (amount > 0) {
+      amount = amount % (rawNums.length - 1);
+      //}
+      shift(n, amount);
+      // printList(nodes[i]);
+      // assert(_.sum(serializeList(nodes[i])) === -659378);
+      // i++;
+      // Deno.writeTextFileSync(`/tmp/step${i}.txt`, after.map(String).join('\n'));
+    }
   }
   // shift(nodes[0], 0);
   // shift(nodes[0], nodes.length);
