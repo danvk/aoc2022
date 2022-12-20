@@ -15,7 +15,8 @@ Deno.test("shift example", () => {
     [1, -3, 2, 3, -2, 0, 4]
   );
 
-  shift(nodes[2], -3);
+  // shift(nodes[2], -3);
+  shift(nodes[2], -10);
   assertEquals(
     serializeList(nodes.find(n => n.num === 1)!),
     [1, 2, 3, -2, -3, 0, 4]
@@ -35,6 +36,12 @@ Deno.test("shift to same place", () => {
     serializeList(nodes[0]),
     [1, 2, -3, 3, -2, 0, 4]
   );
+
+  shift(nodes[0], 14);
+  assertEquals(
+    serializeList(nodes[0]),
+    [1, 2, -3, 3, -2, 0, 4]
+  );
 });
 
 Deno.test('shift backward to same place', () => {
@@ -46,4 +53,24 @@ Deno.test('shift backward to same place', () => {
     serializeList(nodes.find(n => n.num === 1)!),
     [1, 2, -3, 3, -2, 0, 4]
   );
+
+  shift(nodes[0], -14);
+  assertEquals(
+    serializeList(nodes.find(n => n.num === 1)!),
+    [1, 2, -3, 3, -2, 0, 4]
+  );
+});
+
+Deno.test('more examples', () => {
+  let before = [4, 5, 6, 1, 7, 8, 9];
+  let after = [4, 5, 6, 7, 1, 8, 9];
+  let nodes = makeNodes(before);
+  shift(nodes[3], 1);
+  assertEquals(serializeList(nodes[0]), after);
+
+  before = [4, -2, 5, 6, 7, 8, 9];
+  after = [4, 5, 6, 7, 8, -2, 9];
+  nodes = makeNodes(before);
+  shift(nodes[1], -2);
+  assertEquals(serializeList(nodes[0]), after);
 });

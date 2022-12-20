@@ -81,22 +81,25 @@ export function shift(n: Node, amount: number) {
   // 1, 2, -3, 3, -2, 0, 4
   // A B C D
 
+  // n = 2
+  // next = 2
+
   // next is n's new next.
-  const oldPrev = n.prev;  // A
-  const oldNext = n.next;  // C
+  const oldPrev = n.prev;  // oldPrev=1
+  const oldNext = n.next;  // oldNext=-3
 
   //                    4      1            2        1
   // console.log(oldPrev.num, n.num, oldNext.num, next.num);
 
   // remove n from the list
-  oldPrev.next = oldNext;  // A.next = C
-  oldNext.prev = oldPrev;  // C.prev = A
+  oldPrev.next = oldNext;  // 1.next = -3
+  oldNext.prev = oldPrev;  // -3.prev = 1
 
   // add it back in the new spot
-  n.prev = next.prev;
-  n.next = next;           // D
-  next.prev = n;      // C
-  n.prev.next = n;
+  n.prev = next.prev;  // 2.prev = 1
+  n.next = next;       // 2.next = 2
+  next.prev = n;      // 2.prev = 2
+  n.prev.next = n;  // 2.next = 2
 }
 
 if (import.meta.main) {
@@ -104,17 +107,28 @@ if (import.meta.main) {
   const rawNums = lines.map(safeParseInt);
   const nodes = makeNodes(rawNums);
   const before = serializeList(nodes[0]);
-  // for (const n of nodes) {
-  //   shift(n, n.num);
-  // }
-  shift(nodes[0], 0);
-  shift(nodes[0], nodes.length);
-  shift(nodes[0], 2 * nodes.length);
-  shift(nodes[0], -nodes.length);
-  shift(nodes[0], -2 * nodes.length);
+  Deno.writeTextFileSync('/tmp/before.txt', before.map(String).join('\n'));
+  console.log(_.sum(rawNums));
+  // let i = 0;
+  for (const n of nodes) {
+    let num = n.num;
+    while (num < 0) {
+      num += nodes.length;
+    }
+    num = num % nodes.length;
+    shift(n, n.num);
+    // i++;
+    // const after = serializeList(nodes[i]);
+    // Deno.writeTextFileSync(`/tmp/step${i}.txt`, after.map(String).join('\n'));
+  }
+  // shift(nodes[0], 0);
+  // shift(nodes[0], nodes.length);
+  // shift(nodes[0], 2 * nodes.length);
+  // shift(nodes[0], -nodes.length);
+  // shift(nodes[0], -2 * nodes.length);
 
-  const after = serializeList(nodes[0]);
-  assert(_.isEqual(before, after));
+  // Deno.writeTextFileSync('/tmp/after.txt', after.map(String).join('\n'));
+  // assert(_.isEqual(before, after));
 
   const zero = nodes.find(n => n.num === 0)!;
   const n1000 = nAfter(zero, 1000).num;
@@ -130,5 +144,6 @@ if (import.meta.main) {
 
   // -2893 = wrong
   // -9516 = wrong
+  // 1786 = too low
   // console.log('part 2');
 }
