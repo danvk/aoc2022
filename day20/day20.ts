@@ -10,7 +10,7 @@ interface Node {
   next: Node;
 }
 
-function makeNodes(nums: number[]): Node[] {
+export function makeNodes(nums: number[]): Node[] {
   assert(nums.length);
   const nodes: Node[] = [];
   nodes[0] = {
@@ -31,20 +31,30 @@ function makeNodes(nums: number[]): Node[] {
   return nodes;
 }
 
-function printList(head: Node) {
+export function serializeList(head: Node) {
   const nums = [];
   let t = head;
   do {
     nums.push(t.num);
     t = t.next;
   } while (t !== head);
-  console.log(nums.map(String).join(', '));
+  return nums;
 }
 
-function shift(n: Node, amount: number) {
+export function printList(head: Node) {
+  console.log(serializeList(head).map(String).join(', '));
+}
+
+export function shift(n: Node, amount: number) {
   let next = n.next;
-  for (let i = 0; i < amount; i++) {
-    next = next.next;
+  if (amount > 0) {
+    for (let i = 0; i < amount; i++) {
+      next = next.next;
+    }
+  } else if (amount < 0) {
+    for (let i = 0; i >= amount; i--) {
+      next = next.prev;
+    }
   }
 
   // 1, 2, -3, 3, -2, 0, 4
