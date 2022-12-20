@@ -111,7 +111,7 @@ if (import.meta.main) {
   const before = serializeList(nodes[0]);
   Deno.writeTextFileSync('/tmp/before.txt', before.map(String).join('\n'));
   console.log(_.sum(rawNums));
-  // let i = 0;
+  let i = 0;
   for (const n of nodes) {
     let num = n.num;
     while (num < 0) {
@@ -119,8 +119,9 @@ if (import.meta.main) {
     }
     num = num % nodes.length;
     shift(n, n.num);
-    // i++;
-    // const after = serializeList(nodes[i]);
+    // printList(nodes[i]);
+    // assert(_.sum(serializeList(nodes[i])) === -659378);
+    i++;
     // Deno.writeTextFileSync(`/tmp/step${i}.txt`, after.map(String).join('\n'));
   }
   // shift(nodes[0], 0);
