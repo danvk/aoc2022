@@ -62,6 +62,39 @@ function nAfter(n: Node, num: number) {
   return n;
 }
 
+export function shiftLeft(c: Node) {
+  // A B C D
+  //     |
+  // A C B D
+
+  const b = c.prev;
+  const d = c.next;
+  const a = c.prev.prev;
+
+  a.next = c;
+  c.prev = a;
+  c.next = b;
+  b.prev = c;
+  b.next = d;
+  d.prev = b;
+}
+
+export function shiftRight(b: Node) {
+  // A B C D
+  //   |
+  // A C B D
+
+  const a = b.prev;
+  const c = b.next;
+  const d = c.next;
+  a.next = c;
+  c.prev = a;
+  c.next = b;
+  b.prev = c;
+  b.next = d;
+  d.prev = b;
+}
+
 export function shift(n: Node, amount: number) {
   let next = n.next;
   if (amount > 0) {
@@ -102,6 +135,33 @@ export function shift(n: Node, amount: number) {
   n.prev.next = n;  // 2.next = 2
 }
 
+export function shiftArray(xs: number[], num: number, amount: number): number[] {
+  const origAmount = amount;
+  while (amount <= -xs.length) {
+    amount += xs.length;  // ???
+  }
+  if (amount < 0) {
+    amount += xs.length - 1;
+  }
+  amount = amount % xs.length;
+  if (amount === 0) {
+    return [...xs];
+  }
+  assert(amount > 0, `Bad on ${origAmount}`);
+  const i = xs.indexOf(num);
+  assert(i >= 0);
+  const j = (i + amount) % xs.length;
+  const newBefore = xs[j];
+  xs.splice(i, 1);
+  // console.log(xs);
+  const k = xs.indexOf(newBefore);
+  const pre = xs.slice(0, k + 1);
+  const post = xs.slice(k + 1);
+  // console.log(pre);
+  // console.log(post);
+  return [...pre, num, ...post];
+}
+
 if (import.meta.main) {
   const lines = await readLinesFromArgs();
   const rawNums = lines.map(safeParseInt);
@@ -111,19 +171,24 @@ if (import.meta.main) {
   const before = serializeList(nodes[0]);
   Deno.writeTextFileSync('/tmp/before.txt', before.map(String).join('\n'));
   console.log(_.sum(rawNums));
-  let i = 0;
-  for (const n of nodes) {
-    let num = n.num;
-    while (num < 0) {
-      num += nodes.length;
-    }
-    num = num % nodes.length;
-    shift(n, n.num);
-    // printList(nodes[i]);
-    // assert(_.sum(serializeList(nodes[i])) === -659378);
-    i++;
-    // Deno.writeTextFileSync(`/tmp/step${i}.txt`, after.map(String).join('\n'));
+  // let i = 0;
+  let nums = [...rawNums];
+  for (const num of rawNums) {
+    nums = shiftArray(nums, num, num);
+    // console.log(nums.join(', '));
   }
+  // for (const n of nodes) {
+  //   let num = n.num;
+  //   while (num < 0) {
+  //     num += nodes.length;
+  //   }
+  //   num = num % nodes.length;
+  //   shift(n, n.num);
+  //   // printList(nodes[i]);
+  //   // assert(_.sum(serializeList(nodes[i])) === -659378);
+  //   i++;
+  //   // Deno.writeTextFileSync(`/tmp/step${i}.txt`, after.map(String).join('\n'));
+  // }
   // shift(nodes[0], 0);
   // shift(nodes[0], nodes.length);
   // shift(nodes[0], 2 * nodes.length);
@@ -133,10 +198,14 @@ if (import.meta.main) {
   // Deno.writeTextFileSync('/tmp/after.txt', after.map(String).join('\n'));
   // assert(_.isEqual(before, after));
 
-  const zero = nodes.find(n => n.num === 0)!;
-  const n1000 = nAfter(zero, 1000).num;
-  const n2000 = nAfter(zero, 2000).num;
-  const n3000 = nAfter(zero, 3000).num;
+  // const zero = nodes.find(n => n.num === 0)!;
+  // const n1000 = nAfter(zero, 1000).num;
+  // const n2000 = nAfter(zero, 2000).num;
+  // const n3000 = nAfter(zero, 3000).num;
+  const i = nums.indexOf(0);
+  const n1000 = nums[(i + 1000) % nums.length];
+  const n2000 = nums[(i + 2000) % nums.length];
+  const n3000 = nums[(i + 3000) % nums.length];
   console.log(n1000, n2000, n3000);
 
   // printList(nums[0]);
@@ -148,5 +217,6 @@ if (import.meta.main) {
   // -2893 = wrong
   // -9516 = wrong
   // 1786 = too low
+  // -11966 = wrong
   // console.log('part 2');
 }
