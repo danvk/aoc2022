@@ -26,6 +26,7 @@ export function dijkstra<N>(
   // TODO: pick a better structure here.
   let fringe = [tuple(0, start)];
   const parent = new Map<string, string>();
+  let steps = 0;
   while (true) {
     fringe = _.sortBy(fringe, ([d, _c]) => d);
     const next = fringe.shift();
@@ -48,6 +49,9 @@ export function dijkstra<N>(
         fringe.push([d, m]);
         parent.set(ms, ns);
       }
+    }
+    if (steps++ % 10_000 === 0) {
+      console.log(steps, fringe.length);
     }
   }
 

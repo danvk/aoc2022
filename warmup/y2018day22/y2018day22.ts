@@ -9,6 +9,9 @@ import { assert, readInts, readLinesFromArgs, str2coord } from "../../util.ts";
 // 20183 is prime.
 const P = 20183;
 
+let maxX = 0;
+let maxY = 0;
+
 function fillGrid(erosion: Grid<number>, g: Grid<Terrain>, c: Coord, depth: number): Terrain {
   const existing = g.get(c);
   if (existing) {
@@ -29,6 +32,14 @@ function fillGrid(erosion: Grid<number>, g: Grid<Terrain>, c: Coord, depth: numb
     assert(a, `For ${x},${y} Missing ${x-1},${y}`);
     assert(b, `For ${x},${y} Missing ${x},${y-1}`);
     v = (a * b + depth) % P;
+    if (x > maxX) {
+      maxX = x;
+      console.log('new max x', maxX);
+    }
+    if (y > maxY) {
+      maxY = y;
+      console.log('new max y', maxY);
+    }
   }
 
   const m = v % 3;
