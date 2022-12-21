@@ -2,13 +2,19 @@
 // https://adventofcode.com/2018/day/22
 
 import { _ } from "../../deps.ts";
+import { dijkstra } from "../../dijkstra.ts";
 import { Coord, Grid, neighbors4 } from "../../grid.ts";
-import { assert, readInts, readLinesFromArgs, tuple } from "../../util.ts";
+import { assert, readInts, readLinesFromArgs, str2coord } from "../../util.ts";
 
 // 20183 is prime.
 const P = 20183;
 
-function fillGrid(erosion: Grid<number>, g: Grid<Terrain>, c: Coord, depth: number) {
+function fillGrid(erosion: Grid<number>, g: Grid<Terrain>, c: Coord, depth: number): Terrain {
+  const existing = g.get(c);
+  if (existing) {
+    return existing;
+  }
+
   const [x, y] = c;
   let v;
   if (x === 0) {
@@ -16,10 +22,12 @@ function fillGrid(erosion: Grid<number>, g: Grid<Terrain>, c: Coord, depth: numb
   } else if (y === 0) {
     v = (x * 16807 + depth) % P;
   } else {
-    const a = erosion.get([x - 1, y]);
-    const b = erosion.get([x, y - 1]);
-    assert(a)
-    assert(b);
+    fillGrid(erosion, g, [x - 1, y], depth);
+    fillGrid(erosion, g, [x, y - 1], depth);
+    const a = erosion.get([x-1, y]);
+    const b = erosion.get([x, y-1]);
+    assert(a, `For ${x},${y} Missing ${x-1},${y}`);
+    assert(b, `For ${x},${y} Missing ${x},${y-1}`);
     v = (a * b + depth) % P;
   }
 
@@ -69,6 +77,19 @@ function riskLevel(c: string) {
 type Tool = 'torch' | 'gear';
 type State = [Coord, Tool|null];
 
+function serState(s: State): string {
+  const [[x, y], tool] = s;
+  return `${x},${y};${tool}`;
+}
+
+function deserState(txt: string): State {
+  const [coord, tool] = txt.split(';');
+  return [
+    str2coord(coord),
+    tool === 'null' ? null : tool === 'torch' ? 'torch' : 'gear',
+  ];
+}
+
 const ALLOWED_TOOLS: Record<Terrain, (Tool|null)[]> = {
   // In rocky regions, you can use the climbing gear or the torch.
   //    You cannot use neither (you'll likely slip and fall).
@@ -107,17 +128,33 @@ if (import.meta.main) {
       if (x < 0 || y < 0) continue;
       let rn = g.get(n);
       if (!rn) {
-        rn = fillGrid(erosion, g, n, depth);
+        rn = fillGrid(erosion, g, n, depth);  // lazily expand grid
+      }
+      const nextTools = ALLOWED_TOOLS[rn];
+      if (nextTools.includes(tool)) {
+        yield [[n, tool], 1];
       }
     }
   }
 
   const init: State = [[0, 0], 'torch'];
   const final: State = [target, 'torch'];
+  assert(_.isEqual(init, deserState(serState(init))));
+  assert(_.isEqual(final, deserState(serState(final))));
+
+  const result = dijkstra(
+    init,
+    final,
+    neighbors,
+    serState,
+    deserState,
+  );
+  assert(result);
+  const [d, _path] = result;
 
   // 9705=too high
   // 9659
 
   // console.log('part 1', depth, target);
-  // console.log('part 2');
+  console.log('part 2', d);
 }
