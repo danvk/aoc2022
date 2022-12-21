@@ -43,6 +43,8 @@ Overall spent 1h45m on this, but I feel like it really should have been closer t
 - ⭐️: 08:22:27 (1h39m)
 - ⭐️⭐️: 08:26:21 (1h43m)
 
+I fixed my original implementation later (062fd7852252ec9b35a9c1fefbfd6caf009e9435). The issue isn't just the modulus -- you really do have to remove the element from the list before shifting. Several of the test cases that I'd written were just wrong because of this.
+
 ### Day 19 (7649 / 6570)
 
 Hardest problem yet! I implemented a BFS and quickly blew the stack after t=19 on the sample input. First instinct was to do various forms of greedy searching as I got closer to the end time to reduce the number of active states, but I couldn't get this to work. I tried pruning the list of states to the most promising ones, but convinced myself that this didn't work. After looking at more example states, I realized that I needed two different ranking functions -- one for pruning which considered the number of robots of each type and one for counting the geodes which didn't. This is important because you sometimes need credit for producing a robot before it produces any resources.
