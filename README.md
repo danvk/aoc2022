@@ -2,6 +2,18 @@
 
 ## Daily Notes
 
+### Day 21 (11694 / 8776)
+
+An easy one. We flew to Costa Rica yesterday and gained an hour, so the puzzle was posted at 11pm rather than midnight. If I'd known it would be an easy one, I would have just done it last night!
+
+Some minor bugs on part 1 but otherwise straightforward. For part 2 I evaluated the equations to the extent I could without `humn`. This eliminated most of the equations. I ran through to the final comparison on `root` with a few values of `humn` and observed that one side of the comparison was constant while the other was decreasing linearly with `humn`. I fit a line to this and solved for the solution, but for whatever reason this didn't work. I was close, though, so I did binary search by hand to get a narrow-ish range and then did a linear search for the solution.
+
+- Start: 07:31:31 (06:31:31 local time)
+- ⭐️: 07:46:48 (15m)
+- ⭐️⭐️: 08:16:18 (45m)
+
+Update: Linear interpolation doesn't work due to floating point issues. By getting a really long baseline (humn=0 and humn=1 trillion) you can mostly eliminate this. The value I get is within epsilon.
+
 ### Day 20 (7780 / 6961)
 
 This was extremely frustrating! The problem is so simple and yet I kept getting the wrong answer. I had the right answer on the sample input, so there wasn't much to go on. I wound up implementing the mixing algorithm three different ways before I got the right answer.

@@ -2,7 +2,7 @@
 // https://adventofcode.com/2022/day/21
 
 import { _ } from "../deps.ts";
-import { readLinesFromArgs, safeParseInt } from "../util.ts";
+import { assert, readLinesFromArgs, safeParseInt } from "../util.ts";
 
 interface Literal {
   op: 'literal';
@@ -36,10 +36,6 @@ function produce(m: Map<string,number>, rules: _.Dictionary<Rule>) {
     } else {
       const left = m.get(rule.left);
       const right = m.get(rule.right);
-      // if (name === 'ptdq') {
-      //   console.log(rule);
-      //   console.log(left, right);
-      // }
       if (left !== undefined && right !== undefined) {
         let v;
         if (rule.op === '+') {
@@ -66,47 +62,95 @@ function produce(m: Map<string,number>, rules: _.Dictionary<Rule>) {
   return producedAny;
 }
 
+function getRootComparisonStep(m: Map<string,number>, rules: _.Dictionary<Rule>): [number, number] | null {
+  for (const [name, rule] of Object.entries(rules)) {
+    if (m.has(name)) continue;
+
+    if (rule.op === 'literal') {
+      m.set(name, rule.num);
+    } else {
+      const left = m.get(rule.left);
+      const right = m.get(rule.right);
+      if (left !== undefined && right !== undefined) {
+        let v;
+        if (rule.op === '+') {
+          v = left + right;
+        } else if (rule.op === '-') {
+          v = left - right;
+        } else if (rule.op === '*') {
+          v = left * right;
+        } else if (rule.op === '/') {
+          v = left / right;
+        } else if (rule.op === '=') {
+          // console.log(name, left, '==', right, '?', '∆=', left - right);
+          m.set(name, left === right ? 1 : 0);
+          return [left, right];
+        } else {
+          throw new Error('Unknown op ' + rule.op);
+        }
+        m.set(name, v);
+      }
+    }
+  }
+  return null;
+}
+
+function getRootComparison(initM: Map<string, number>, humn: number, rules: _.Dictionary<Rule>): [number, number] {
+  const thisM = new Map(initM);
+  thisM.set('humn', humn);
+  while (true) {
+    const x = getRootComparisonStep(thisM, rules);
+    if (x) {
+      return x;
+    }
+  }
+}
+
+function evaluate(rules: _.Dictionary<Rule>): Map<string, number> {
+  const m = new Map<string, number>();
+  while (true) {
+    if (!produce(m, rules)) {
+     break;
+    }
+  }
+  return m;
+}
+
 if (import.meta.main) {
   const lines = await readLinesFromArgs();
   const rules = _.fromPairs(lines.map(parseRule));
-  // console.log(rules);
+  const part1 = evaluate(rules);
+  console.log('part 1', part1.get('root'));
+
   rules['root'].op = '=';
   delete rules['humn'];
-  const m = new Map<string, number>();
-  while (!m.has('root')) {
-   if (!produce(m, rules)) {
-    break;
-   }
-    // console.log(m);
-  }
-  console.log('part 1', m.get('root'));
+  const m = evaluate(rules);
 
-  console.log(m);
+  // console.log(m);
   // Can produce 2518 / 2586 numbers without humn.
   console.log(m.size, _.size(rules));
 
-  let humn = 3221245824250;
-  while (true) {
-    const thisM = new Map(m);
-    thisM.set('humn', humn);
-    while (!thisM.has('root')) {
-      if (!produce(thisM, rules)) {
-        break;
-      }
-      // console.log(thisM);
+  const B = 1_000_000_000_000;
+  const [zL, zR] = getRootComparison(m, 0, rules);
+  const [bL, bR] = getRootComparison(m, B, rules);
+  assert(zR === bR);
+
+  // const left = zL + (bL - zL) / B * n;
+  // zR = zL + (bL - zL) / B * n
+  // (zR - zL) = (bL - zL) / B * n
+  // B * (zR - zL) / (bL - zL) = n
+  const n = B * (zR - zL) / (bL - zL);
+  console.log('n=', n);
+
+  for (const humn of [0, 1_000_000_000, 2_000_000_000, n, Math.floor(n), Math.ceil(n)]) {
+    const [left, right] = getRootComparison(m, humn, rules);
+    console.log(humn, left, right, right - left);
+    if (left === right) {
+      console.log('part 2', humn);
     }
-    console.log(humn, thisM.get('root'));
-    if (thisM.get('root')) {
-      break;
-    }
-    humn++;
-    if (humn > 3221245824500) {
-      break;
-    }
-    // break;
   }
 
-  console.log('part 2', humn);
+  // console.log('part 2', humn);
 }
 
 // 1566 = 59078404932615.1
