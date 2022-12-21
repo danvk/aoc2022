@@ -1,6 +1,15 @@
 #!/usr/bin/env -S deno run --allow-read --allow-write
 // https://adventofcode.com/2018/day/19
 
+// Part 1 involved some disassembling and seeing what the first value was that could make
+// the program halt.
+// Part 2 involved _fully_ disassembling the program and converting it to TypeScript.
+// Then I printed values that would cause the program to halt as I first saw them.
+// Eventually this stopped printing so I had my answer.
+// I'm not sure what the program is doing -- some kind of hash?
+// Each value of E is just a function of the previous E, so once it repeats
+// you can stop searching: you have the full list of halting values.
+
 import { _ } from "../../deps.ts";
 import { assert, assertUnreachable, readInts, readLinesFromArgs, safeParseInt } from "../../util.ts";
 
