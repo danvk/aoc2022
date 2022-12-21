@@ -46,8 +46,7 @@ function makeGrid(depth: number, target: Coord): Grid<string> {
   }
 
   return erosion.mapValues(v => {
-    const erosion = (v + depth) % P;
-    const m = erosion % 3;
+    const m = v % 3;
     return m === 0 ? '.' : m === 1 ? '=' : '|';
   });
 }
@@ -69,12 +68,13 @@ if (import.meta.main) {
   assert(lines.length === 2);
   const [depth] = readInts(lines[0], {expect: 1});
   const target = readInts(lines[1], {expect: 2}) as Coord;
-  const g = makeGrid(depth, [15, 15]);
+  const g = makeGrid(depth, target);
   console.log(g.format(v => v));
 
   console.log('part 1', _.sum([...g.mapValues(riskLevel)].map(([, v]) => v)));
 
   // 9705=too high
+  // 9659
 
   // console.log('part 1', depth, target);
   // console.log('part 2');
