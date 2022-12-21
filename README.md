@@ -2,6 +2,47 @@
 
 ## Daily Notes
 
+### Day 20 (7780 / 6961)
+
+This was extremely frustrating! The problem is so simple and yet I kept getting the wrong answer. I had the right answer on the sample input, so there wasn't much to go on. I wound up implementing the mixing algorithm three different ways before I got the right answer.
+
+My initial instinct to use a circular linked list was fine, though I think an array would have worked here, too. Implementing circular linked lists is always annoying since your mistakes lead to infinite loops rather than obvious errors. After some bug bashing, I was able to reproduce the example sequence and answer… but I had the wrong answer on my input!
+
+I thought I might have a bug where a number gets rotated forward or backwards exactly N times (where N=length of list). So I tested that, got the wrong answer, and fixed the bug. But still the wrong answer on my input!
+
+I tried a few more tests but couldn't find the issue. I tried reimplementing part 1 with an array but got the _same_ wrong answer as before.
+
+Finally I implemented the move forward/backward in terms of very simple primitives: shift one left and shift one right. I found a good trick for implementing this correctly: write out the relevant part of the list as "A B C D" and use those as your variable names:
+
+```ts
+export function shiftLeft(c: Node) {
+  // A B C D
+  //     |
+  // A C B D
+
+  const b = c.prev;
+  const d = c.next;
+  const a = c.prev.prev;
+
+  a.next = c;
+  c.prev = a;
+  c.next = b;
+  b.prev = c;
+  b.next = d;
+  d.prev = b;
+}
+```
+
+To make this work in part 2, I needed to shift by the number mod the list length. This gave me the wrong answer. I'd noticed while implementing the array solution that I needed to mod negative shifts by `(n-1)` rather than `n`. Doing this gave me the right answer. Thinking through it later, I realized that it's `n-1` because you remove the number from the list before you shift it, so the list has length `n-1` for purposes of the shifting.
+
+Note to self: before doing AoC next year, have a (circular) linked list implementation handy! There's always one problem that uses it.
+
+Overall spent 1h45m on this, but I feel like it really should have been closer to 45m.
+
+- Start: 06:43:36
+- ⭐️: 08:22:27 (1h39m)
+- ⭐️⭐️: 08:26:21 (1h43m)
+
 ### Day 19 (7649 / 6570)
 
 Hardest problem yet! I implemented a BFS and quickly blew the stack after t=19 on the sample input. First instinct was to do various forms of greedy searching as I got closer to the end time to reduce the number of active states, but I couldn't get this to work. I tried pruning the list of states to the most promising ones, but convinced myself that this didn't work. After looking at more example states, I realized that I needed two different ranking functions -- one for pruning which considered the number of robots of each type and one for counting the geodes which didn't. This is important because you sometimes need credit for producing a robot before it produces any resources.
