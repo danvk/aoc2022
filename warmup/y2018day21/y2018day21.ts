@@ -83,6 +83,8 @@ export function runOp(
   return out;
 }
 
+const es: number[] = [];
+
 function runProgram(
   ip: number,
   instructions: readonly Instruction[],
@@ -92,14 +94,21 @@ function runProgram(
   while (true) {
     const n = registers[ip];
     if (n < 0 || n >= instructions.length) {
-      return registers;
+      return [...registers, count];
     }
     const instruction = instructions[n];
     const preRegisters = registers;
+    // if (n === 28) {
+    //   es.push(registers[4]);
+    //   // console.log(count, n < 10 ? `0${n}` : n, instruction, registers);
+    // }
     registers = runOp(instruction, registers);
     console.log(count, n < 10 ? `0${n}` : n, instruction, preRegisters, '->', registers);
     registers[ip]++;
     count++;
+    // if (count > 1_000_000_000) {
+    //   return registers;
+    // }
   }
 }
 
@@ -111,8 +120,14 @@ if (import.meta.main) {
   console.log(ipNum);
   console.log(program);
   // let registers = [0, 0, 0, 0, 0, 0];
-  let registers = [16128384, 0, 0, 0, 0, 0];
+  let registers = [4231, 0, 0, 0, 0, 0];
   registers = runProgram(ipNum, program, registers);
-
   console.log(registers);
+
+  console.log(es);
+  console.log(_.min(es));
 }
+
+// 57388
+// 10300
+//  4231
