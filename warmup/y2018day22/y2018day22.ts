@@ -1,6 +1,9 @@
 #!/usr/bin/env -S deno run --allow-read --allow-write
 // https://adventofcode.com/2018/day/22
 
+// I really like this problem! A creative / unusual use of Dijkstra
+// where the state isn't just a coordinate but a (coord, tool) pair.
+
 import { _ } from "../../deps.ts";
 import { dijkstra } from "../../dijkstra.ts";
 import { Coord, Grid, neighbors4 } from "../../grid.ts";
@@ -169,3 +172,6 @@ if (import.meta.main) {
   // console.log('part 1', depth, target);
   console.log('part 2', d);
 }
+
+// part 2 1043
+// ./warmup/y2018day22/y2018day22.ts ./warmup/y2018day22/input.txt  269.28s user 2.35s system 100% cpu 4:29.17 total
