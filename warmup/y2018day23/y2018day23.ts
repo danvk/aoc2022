@@ -4,6 +4,8 @@
 import { _ } from "../../deps.ts";
 import { readLinesFromArgs } from "../../util.ts";
 
+start
+
 if (import.meta.main) {
   const lines = await readLinesFromArgs();
   console.log('part 1', lines.length);
