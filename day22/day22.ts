@@ -175,7 +175,7 @@ function findFace(c: Coord, n: number): 1 | 2 | 3 | 4 | 5 | 6 {
   throw new Error(`bad face ${c}`);
 }
 
-function move1(g: Grid<string>, index: GridIndex, state: State): State | null {
+function move1(g: Grid<string>, state: State): State | null {
   const {facing} = state;
   const [dx, dy] = dirs[facing];
   let [x, y] = state.pos;
@@ -185,18 +185,11 @@ function move1(g: Grid<string>, index: GridIndex, state: State): State | null {
   } else if (c === '#') {
     return null;  // blocked
   } else if (c === undefined) {
-    if (facing === 'up') {
-      y = index.y[x][1];
-    } else if (facing === 'down') {
-      y = index.y[x][0];
-    } else if (facing === 'left') {
-      x = index.x[y][1];
-    } else if (facing === 'right') {
-      x = index.x[y][0];
-    }
+    const nextState = transitionSample(state);
+    const [x, y] = nextState.pos;
     c = g.get([x, y]);
     if (c === '.') {
-      return {pos: [x, y], facing};
+      return nextState;
     } else if (c === '#') {
       return null;  // blocked
     } else {
@@ -209,14 +202,14 @@ function move1(g: Grid<string>, index: GridIndex, state: State): State | null {
 
 const path = new Grid<string>();
 
-function action(state: State, grid: Grid<string>, index: GridIndex, move: number | 'L' | 'R'): State {
+function action(state: State, grid: Grid<string>, move: number | 'L' | 'R'): State {
   if (move === 'L') {
     return turn(state, 'left');
   } else if (move === 'R') {
     return turn(state, 'right');
   } else {
     for (let i = 0; i < move; i++) {
-      const nextState = move1(grid, index, state);
+      const nextState = move1(grid, state);
       if (nextState) {
         path.set(nextState.pos, sym[nextState.facing]);
         state = nextState;
@@ -268,7 +261,7 @@ if (import.meta.main) {
 
   console.log(state);
   for (const act of acts) {
-    state = action(state, g, edges, act);
+    state = action(state, g, act);
   }
   console.log('final state', state);
 
