@@ -77,6 +77,27 @@ function* edges(b: Nanobot): Generator<Coord> {
   }
 }
 
+function botsInRange(bots: readonly Nanobot[], c: Coord): number {
+  let n = 0;
+  for (const bot of bots) {
+    if (distance(bot.pos, c) <= bot.r) {
+      n++;
+    }
+  }
+  return n;
+}
+
+const DELTAS: Coord[] = [
+  [0, 0, 0],
+  [1, 0, 0],
+  [0, 1, 0],
+  [0, 0, 1],
+  [1, 1, 0],
+  [0, 1, 1],
+  [1, 0, 1],
+  [1, 1, 1],
+];
+
 if (import.meta.main) {
   const lines = await readLinesFromArgs();
   const bots = lines.map(parseNanobot);
@@ -90,14 +111,70 @@ if (import.meta.main) {
   console.log('y range=', minmax(bots.map(b => b.pos[1])));
   console.log('z range=', minmax(bots.map(b => b.pos[2])));
 
-  const botsInRange = (c: Coord) => bots.filter(b => distance(b.pos, c) <= b.r).length;
+  // const botsInRange = (c: Coord) => bots.filter(b => distance(b.pos, c) <= b.r).length;
   const coords: Coord[] = [
     ...bots.map(b => b.pos),
     ...bots.flatMap(corners),
   ];
-  const ds = _.sortBy(coords.map(c => tuple(botsInRange(c), c)), c => -c[0]);
+  const ds = _.sortBy(coords.map(c => tuple(botsInRange(bots, c), c)), c => -c[0]);
   console.log(ds.slice(0, 5));
-  const botsLowerBound = ds[0];  // 873
+  let lowerBound = ds[0][0];  // 873
+
+  // > Math.log2(235_151_681)
+  // 27.809016404548867
+  let scale = 2 << 28;
+  // When positions and radii are scaled down by scale, this is
+  // the set of coordinates with >= lowerBound bots in range.
+  let candidates: Coord[] = [
+    [0, 0, 0],
+    [-1, 0, 0],
+    [0, -1, 0],
+    [0, 0, -1],
+    [-1, -1, 0],
+    [0, -1, -1],
+    [-1, 0, -1],
+    [-1, -1, -1],
+  ];
+  // box [x, y, z] is from:
+  // [
+  //   x*scale .. (x+1)*scale - 1,
+  //   y*scale .. (y+1)*scale - 1,
+  //   z*scale .. (z+1)*scale - 1,
+  // ]
+  // At each iteration:
+  // - divide each cell in eight
+  // - calculate the new number of bots in range
+  // - filter out cells with fewer than the lower bound.
+  // - calculate the true value at the center of each cell and possibly update the lower bound.
+  // When we're down to scale=1, hopefully there are only a few left.
+
+  while (scale > 0) {
+    const scaledBots: Nanobot[] = bots.map(({r, pos: [x, y, z]}) => ({
+      pos: [Math.floor(x / scale), Math.floor(y / scale), Math.floor(z / scale)],
+      r: Math.ceil(r / scale),
+    }));
+
+    const keepers = candidates.filter(c => botsInRange(scaledBots, c) >= lowerBound);
+    console.log('scale=', scale, 'keeping', keepers.length, '/', candidates.length);
+
+    // TODO: update lower bound
+
+    if (scale > 1) {
+      candidates = keepers.flatMap(([x, y, z]) => {
+        const out = [];
+        // split in 8
+        for (const [dx, dy, dz] of DELTAS) {
+          out.push(tuple(2*x+dx, 2*y+dy, 2*z+dz));
+        }
+        return out;
+      });
+    } else {
+      candidates = keepers;
+    }
+    scale = scale >> 1;
+  }
+
+  console.log(candidates);
 
   /*
   for (const [i, b] of bots.entries()) {
@@ -113,7 +190,7 @@ if (import.meta.main) {
   */
 
   // 873 is a lower bound on the most bots in range
-  console.log(botsLowerBound);
+  console.log(lowerBound);
 }
 
 // There are 1,000 bots.
