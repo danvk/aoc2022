@@ -1,8 +1,8 @@
-#!/usr/bin/env -S deno run --allow-read --allow-write
+#!/usr/bin/env -S deno run --allow-read --allow-write --v8-flags=--max-old-space-size=16000
 // https://adventofcode.com/2018/day/23
 
 import { _ } from "../../deps.ts";
-import { minmax, readInts, readLinesFromArgs, tuple } from "../../util.ts";
+import { assert, minmax, readInts, readLinesFromArgs, tuple } from "../../util.ts";
 
 type Coord = [number, number, number];
 interface Nanobot {
@@ -98,6 +98,34 @@ const DELTAS: Coord[] = [
   [1, 1, 1],
 ];
 
+function maxWithArg<T>(xs: Iterable<T>, fn: (x: T, i: number) => number): [number, T] {
+  let max: [number, T] | null = null;
+  let i = 0;
+  for (const x of xs) {
+    const v = fn(x, i);
+    if (!max || v > max[0]) {
+      max = [v, x];
+    }
+    i++;
+  }
+  assert(max, `Cannot call maxWithArg with empty list`);
+  return max;
+}
+
+function minWithArg<T>(xs: Iterable<T>, fn: (x: T, i: number) => number): [number, T] {
+  let max: [number, T] | null = null;
+  let i = 0;
+  for (const x of xs) {
+    const v = fn(x, i);
+    if (!max || v < max[0]) {
+      max = [v, x];
+    }
+    i++;
+  }
+  assert(max, `Cannot call maxWithArg with empty list`);
+  return max;
+}
+
 if (import.meta.main) {
   const lines = await readLinesFromArgs();
   const bots = lines.map(parseNanobot);
@@ -111,6 +139,10 @@ if (import.meta.main) {
   console.log('y range=', minmax(bots.map(b => b.pos[1])));
   console.log('z range=', minmax(bots.map(b => b.pos[2])));
 
+  console.log('902?', botsInRange(bots, [ 18091136, 52427648, 58925440 ]));
+  console.log('929?', botsInRange(bots, [ 18090912, 52427488, 58925792 ]));
+  console.log('937?', botsInRange(bots, [ 18090902, 52427514, 58925762 ]));
+
   // const botsInRange = (c: Coord) => bots.filter(b => distance(b.pos, c) <= b.r).length;
   const coords: Coord[] = [
     ...bots.map(b => b.pos),
@@ -118,7 +150,10 @@ if (import.meta.main) {
   ];
   const ds = _.sortBy(coords.map(c => tuple(botsInRange(bots, c), c)), c => -c[0]);
   console.log(ds.slice(0, 5));
-  let lowerBound = ds[0][0];  // 873
+  let lowerBound = 905;  // ds[0][0];  // 873
+  // 879 [ 1134, 3227, 3539 ]
+  // 902 [ 70668, 204795, 230177 ]
+  // 929 [ 282670, 819179, 920715 ]
 
   // > Math.log2(235_151_681)
   // 27.809016404548867
@@ -149,32 +184,63 @@ if (import.meta.main) {
   // When we're down to scale=1, hopefully there are only a few left.
 
   while (scale > 0) {
-    const scaledBots: Nanobot[] = bots.map(({r, pos: [x, y, z]}) => ({
-      pos: [Math.floor(x / scale), Math.floor(y / scale), Math.floor(z / scale)],
-      r: Math.ceil(r / scale),
+    // const scaledBots: Nanobot[] = bots.map(({r, pos: [x, y, z]}) => ({
+    //   pos: [Math.floor(x / scale), Math.floor(y / scale), Math.floor(z / scale)],
+    //   r: Math.ceil(r / scale),
+    // }));
+
+    const keepers = candidates;  // .filter(c => botsInRange(scaledBots, c) >= lowerBound);
+
+    const [sampledRealCount, bestThisGen] = maxWithArg(keepers, (([x, y, z]) => {
+      const c = tuple((x + 0.5) * scale, (y+0.5)*scale, (z+0.5)*scale);
+      return botsInRange(bots, c);
     }));
 
-    const keepers = candidates.filter(c => botsInRange(scaledBots, c) >= lowerBound);
-    console.log('scale=', scale, 'keeping', keepers.length, '/', candidates.length);
+    const volume = keepers.length * Math.pow(scale, 3);
+    console.log('scale=', scale, 'keeping', keepers.length, '/', candidates.length, 'real count=', sampledRealCount, bestThisGen, 'volume=', volume);
 
-    // TODO: update lower bound
+    if (sampledRealCount > lowerBound) {
+      lowerBound = sampledRealCount;
+      const [x, y, z] = bestThisGen;
+      const c = tuple((x + 0.5) * scale, (y+0.5)*scale, (z+0.5)*scale);
+      console.log(c, 'raises lower limit to', lowerBound);
+    }
 
     if (scale > 1) {
-      candidates = keepers.flatMap(([x, y, z]) => {
-        const out = [];
+      scale = scale >> 1;
+      const nextBots: Nanobot[] = bots.map(({r, pos: [x, y, z]}) => ({
+        pos: [Math.floor(x / scale), Math.floor(y / scale), Math.floor(z / scale)],
+        r: Math.ceil(r / scale),
+      }));
+      // console.log('r range=', minmax(nextBots.map(b => b.r)));
+      // console.log('x range=', minmax(nextBots.map(b => b.pos[0])));
+      // console.log('y range=', minmax(nextBots.map(b => b.pos[1])));
+      // console.log('z range=', minmax(nextBots.map(b => b.pos[2])));
+
+      candidates = [];
+      for (const [x, y, z] of keepers) {
         // split in 8
         for (const [dx, dy, dz] of DELTAS) {
-          out.push(tuple(2*x+dx, 2*y+dy, 2*z+dz));
+          const c = tuple(2*x+dx, 2*y+dy, 2*z+dz);
+          if (botsInRange(nextBots, c) >= lowerBound) {
+            candidates.push(c);
+          }
         }
-        return out;
-      });
+      }
     } else {
       candidates = keepers;
+      scale = scale >> 1;
     }
-    scale = scale >> 1;
   }
 
-  console.log(candidates);
+  const inters = candidates.map(c => botsInRange(bots, c));
+  const mostIntersections = _.max(inters)!;
+  candidates = candidates.filter((_, i) => inters[i] === mostIntersections);
+  console.log(candidates.length, '-way tie at', mostIntersections);
+
+  const origin = tuple(0, 0, 0);
+  const best = minWithArg(candidates, c => distance(c, origin));
+  console.log('Closest to origin:', best);
 
   /*
   for (const [i, b] of bots.entries()) {
