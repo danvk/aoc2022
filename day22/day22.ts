@@ -3,7 +3,7 @@
 
 import { _ } from "../deps.ts";
 import { Coord, Grid } from "../grid.ts";
-import { assert, chunkLines, readLinesFromArgs, safeParseInt } from "../util.ts";
+import { assert, chunkLines, readLinesFromArgs, safeParseInt, tuple } from "../util.ts";
 
 // Stolen from y2018day13
 type Dir = 'up' | 'left' | 'down' | 'right';
@@ -46,32 +46,48 @@ interface State {
   facing: Dir;
 }
 
-const sampleTransitions = {
-  '1L': [2, 'L', 'flip'],
-  '1U': [3, 'L', 'L=T'],
-  '1D': [6, 'B', 'flip'],
-  '2U': [6, 'R', 'L=B'],
-  '2L': [1, 'L', 'flip'],
+// const sampleTransitions = {
+//   '1L': [2, 'L', 'flip'],
+//   '1U': [3, 'L', 'L=T'],
+//   '1D': [6, 'B', 'flip'],
+//   '2U': [6, 'R', 'L=B'],
+//   '2L': [1, 'L', 'flip'],
+//   '2R': [5, 'R', 'flip'],
+//   '3L': [1, 'T', 'B=R'],
+//   '3R': [5, 'T', 'B=L'],
+//   '4D': [6, 'L', 'L=B'],
+//   '5U': [3, 'R', 'L=B'],
+//   '5R': [2, 'R', 'flip'],
+//   '6L': [4, 'B', 'B=L'],
+//   '6R': [2, 'T', 'B=L'],
+//   '6D': [1, 'B', 'flip'],
+// };
+const inputTransitions = {
+  '1L': [4, 'L', 'flip'],
+  '1U': [6, 'L', 'L=T'],
+  '2U': [6, 'B', 'none'],
   '2R': [5, 'R', 'flip'],
-  '3L': [1, 'T', 'B=R'],
-  '3R': [5, 'T', 'B=L'],
-  '4D': [6, 'L', 'L=B'],
-  '5U': [3, 'R', 'L=B'],
+  '2D': [3, 'R', 'L=T'],
+  '3L': [4, 'T', 'B=R'],
+  '3R': [2, 'B', 'B=R'],
+  '4L': [1, 'L', 'flip'],
+  '4U': [3, 'L', 'L=T'],
   '5R': [2, 'R', 'flip'],
-  '6L': [4, 'B', 'B=L'],
-  '6R': [2, 'T', 'B=L'],
-  '6D': [1, 'B', 'flip'],
-};
+  '5D': [6, 'R', 'L=T'],
+  '6L': [1, 'T', 'B=R'],
+  '6R': [5, 'B', 'B=R'],
+  '6D': [2, 'T', 'none'],
+}
 
-const sampleFaces = [
-  null,
-  {x: [0, 4-1], y: [2*4, 3*4-1]},
-  {x: [4, 2*4-1], y: [0, 4-1]},
-  {x: [4, 2*4-1], y: [4, 2*4-1]},
-  {x: [4, 2*4-1], y: [2*4, 3*4-1]},
-  {x: [2*4, 3*4-1], y: [2*4, 3*4-1]},
-  {x: [2*4, 3*4-1], y: [3*4, 4*4-1]},
-];
+// const sampleFaces = [
+//   null,
+//   {x: [0, 4-1], y: [2*4, 3*4-1]},
+//   {x: [4, 2*4-1], y: [0, 4-1]},
+//   {x: [4, 2*4-1], y: [4, 2*4-1]},
+//   {x: [4, 2*4-1], y: [2*4, 3*4-1]},
+//   {x: [2*4, 3*4-1], y: [2*4, 3*4-1]},
+//   {x: [2*4, 3*4-1], y: [3*4, 4*4-1]},
+// ];
 const inputFaces = [
   null,
   {x: [50, 2*50-1], y: [0, 50-1]},
@@ -85,26 +101,35 @@ const inputFaces = [
 function transitionSample(state: State): State {
   const c = state.pos;
   const dir = state.facing;
-  const face = findFace(c, 4);
+  const face = findFace(c, 50);
   const d = dir === 'left' ? 'L' : dir === 'right' ? 'R' : dir === 'up' ? 'U' : 'D';
-  const code = (sampleTransitions as any)[`${face}${d}`];
+  // const code = (sampleTransitions as any)[`${face}${d}`];
+  const code = (inputTransitions as any)[`${face}${d}`];
   assert(code, `face: ${face} dir: ${dir} missing`);
-  const [newFace, newSide, action] = code as [number, 'L' | 'R' | 'B' | 'T', 'flip' | 'L=T' | 'L=B' | 'B=L' | 'B=R'];
+  const [newFace, newSide, action] = code as [number, 'L' | 'R' | 'B' | 'T', 'flip' | 'L=T' | 'L=B' | 'B=L' | 'B=R' | 'none'];
+  console.log('Transition from', face, d, '->', newFace, newSide, action);
 
-  const fxy = sampleFaces[face]!;
-  const nfxy = sampleFaces[newFace]!;
+  // const fxy = sampleFaces[face]!;
+  // const nfxy = sampleFaces[newFace]!;
+  const fxy = inputFaces[face]!;
+  const nfxy = inputFaces[newFace]!;
   const [x, y] = c;
   const fx = x - fxy.x[0];
   const fy = y - fxy.y[0];
   let nx, ny;
   if (newSide === 'L' || newSide === 'R') {
     nx = newSide === 'L' ? nfxy.x[0] : nfxy.x[1];
+    console.log(fxy);
+    console.log(fx, fy);
+    console.log(nfxy);
     if (action === 'flip') {
       ny = nfxy.y[1] - fy;
     } else if (action === 'L=T') {
       ny = nfxy.y[0] + fx;
     } else if (action === 'L=B') {
       ny = nfxy.y[1] - fx;
+    } else if (action === 'none') {
+      ny = nfxy.y[0] + fy;
     } else {
       throw new Error('surprise action ' + action);
     }
@@ -116,6 +141,8 @@ function transitionSample(state: State): State {
       nx = nfxy.x[0] + fy;
     } else if (action === 'B=L') {
       nx = nfxy.x[1] - fy;
+    } else if (action === 'none') {
+      nx = nfxy.x[0] + fx;
     } else {
       throw new Error('surprise action ' + action);
     }
@@ -164,7 +191,8 @@ function turn(state: State, dir: 'left' | 'right'): State {
 // which face are we on?
 function findFace(c: Coord, n: number): 1 | 2 | 3 | 4 | 5 | 6 {
   const [x, y] = c;
-  const faces = n === 4 ? sampleFaces : inputFaces;
+  // const faces = n === 4 ? sampleFaces : inputFaces;
+  const faces = inputFaces;
   for (const [i, face] of faces.entries()) {
     if (!face) continue;
     const {x: [minX, maxX], y: [minY, maxY]} = face;
@@ -178,22 +206,23 @@ function findFace(c: Coord, n: number): 1 | 2 | 3 | 4 | 5 | 6 {
 function move1(g: Grid<string>, state: State): State | null {
   const {facing} = state;
   const [dx, dy] = dirs[facing];
-  let [x, y] = state.pos;
-  let c = g.get([x + dx, y + dy]);
+  const [x, y] = state.pos;
+  const d = tuple(x + dx, y + dy);
+  const c = g.get(d);
   if (c === '.') {
-    return {pos: [x + dx, y + dy], facing};
+    return {pos: d, facing};
   } else if (c === '#') {
     return null;  // blocked
   } else if (c === undefined) {
     const nextState = transitionSample(state);
     const [x, y] = nextState.pos;
-    c = g.get([x, y]);
-    if (c === '.') {
+    const c2 = g.get([x, y]);
+    if (c2 === '.') {
       return nextState;
-    } else if (c === '#') {
+    } else if (c2 === '#') {
       return null;  // blocked
     } else {
-      throw new Error(`Bad move at ${state}`);
+      throw new Error(`Bad move at ${state.pos} ${state.facing} -> ${d} / ${c} -> ${nextState.pos} / ${nextState.facing}`);
     }
   } else {
     throw new Error(`Bad cell ${c}`);

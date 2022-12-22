@@ -84,4 +84,4 @@ _3_
 - 5 down -> 6 right (left->top)
 - 6 left -> 1 top (top->left)
 - 6 right -> 5 bottom (top->left)
-- 6 down -> 2 top (left->left)
+- 6 down -> 2 top (left->left?)
