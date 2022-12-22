@@ -1,6 +1,24 @@
 #!/usr/bin/env -S deno run --allow-read --allow-write --v8-flags=--max-old-space-size=16000
 // https://adventofcode.com/2018/day/23
 
+// I really liked this one!
+// Once I came up with the idea of starting the grid very coarse and
+// making it increasingly fine, I was very excited about implementing it.
+// I was a bit disappointed that my first version blew my stack.
+// This was the critical sequence after that:
+// - Increase Deno's memory limit
+// - Filter as you expand the list 8x (not after)
+// - Ditch `.flatMap` in favor of a for loop
+// - Raise the lower bound a bit (I went from 870 -> 900)
+//
+// My program reported a real result of 929 at some point during this.
+// I tried plugging in an initial lower bound of 920 but got a crash since
+// all cells were filtered out. This indicates that there's a bug in my code.
+// But running with an initial threshold of 905 worked and produced the correct
+// answer. So I'm not sure what's going on with that.
+//
+// How would I parallelize this in Deno?
+
 import { _ } from "../../deps.ts";
 import { assert, minmax, readInts, readLinesFromArgs, tuple } from "../../util.ts";
 
@@ -151,6 +169,7 @@ if (import.meta.main) {
   const ds = _.sortBy(coords.map(c => tuple(botsInRange(bots, c), c)), c => -c[0]);
   console.log(ds.slice(0, 5));
   let lowerBound = 905;  // ds[0][0];  // 873
+  // ^^ Using a larger value here (like 920) crashes, which seems like a bug!
   // 879 [ 1134, 3227, 3539 ]
   // 902 [ 70668, 204795, 230177 ]
   // 929 [ 282670, 819179, 920715 ]
@@ -222,11 +241,13 @@ if (import.meta.main) {
         // split in 8
         for (const [dx, dy, dz] of DELTAS) {
           const c = tuple(2*x+dx, 2*y+dy, 2*z+dz);
+          // I wish there were an easy way to parallelize this!
           if (botsInRange(nextBots, c) >= lowerBound) {
             candidates.push(c);
           }
         }
       }
+      console.log('Keeping', candidates.length, '/', 8 * keepers.length);
     } else {
       candidates = keepers;
       scale = scale >> 1;
@@ -236,27 +257,12 @@ if (import.meta.main) {
   const inters = candidates.map(c => botsInRange(bots, c));
   const mostIntersections = _.max(inters)!;
   candidates = candidates.filter((_, i) => inters[i] === mostIntersections);
+  // 672 -way tie at 939
   console.log(candidates.length, '-way tie at', mostIntersections);
 
   const origin = tuple(0, 0, 0);
   const best = minWithArg(candidates, c => distance(c, origin));
-  console.log('Closest to origin:', best);
-
-  /*
-  for (const [i, b] of bots.entries()) {
-    console.log(i, b);
-    for (const c of edges(b)) {
-      const n = botsInRange(c);
-      if (n > botsLowerBound[0]) {
-        botsLowerBound = [n, c];
-        console.log(botsLowerBound);
-      }
-    }
-  }
-  */
-
-  // 873 is a lower bound on the most bots in range
-  console.log(lowerBound);
+  console.log('part 2:', best);
 }
 
 // There are 1,000 bots.

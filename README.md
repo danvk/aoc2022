@@ -380,3 +380,8 @@ I'm also curious to use JS / TS for more numerical, performance-sensitive work. 
 - I like that the linter is on by default, as is strict mode.
 - The editor integration needs some work.
 - Mostly it doesn't feel that different.
+- JS thoughts
+  - Map/Set will be nicer with tuples
+  - The object/dict thing is really the original sin of JS
+  - Iterables/generators are quite nice.
+    When you write `T[]`, could you write `Iterable<T>`?
