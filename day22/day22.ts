@@ -272,7 +272,7 @@ if (import.meta.main) {
   }
   console.log('final state', state);
 
-  console.log(path.format(v => v));
+  // console.log(path.format(v => v));
   console.log(g.format((v, c) => path.get(c) ?? v));
 
   const row = state.pos[isTranspose ? 0 : 1] + 1;
