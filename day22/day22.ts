@@ -82,21 +82,52 @@ const inputFaces = [
   {x: [0, 50-1], y: [3*50, 4*50-1]},
 ];
 
-function transitionSample(c: Coord, dir: Dir): [Coord, Dir] {
+function transitionSample(state: State): State {
+  const c = state.pos;
+  const dir = state.facing;
   const face = findFace(c, 4);
   const d = dir === 'left' ? 'L' : dir === 'right' ? 'R' : dir === 'up' ? 'U' : 'D';
   const code = (sampleTransitions as any)[`${face}${d}`];
   assert(code, `face: ${face} dir: ${dir} missing`);
   const [newFace, newSide, action] = code as [number, 'L' | 'R' | 'B' | 'T', 'flip' | 'L=T' | 'L=B' | 'B=L' | 'B=R'];
 
+  const fxy = sampleFaces[face]!;
+  const nfxy = sampleFaces[newFace]!;
   const [x, y] = c;
-  const n = 4;
-  if (face === 1) {
-    if (dir === 'left') {
-      // going off the left side of face 1, need to wind up on the left side of face 2
-      const fy = y - 2 * n;
+  const fx = x - fxy.x[0];
+  const fy = y - fxy.y[0];
+  let nx, ny;
+  if (newSide === 'L' || newSide === 'R') {
+    nx = newSide === 'L' ? nfxy.x[0] : nfxy.x[1];
+    if (action === 'flip') {
+      ny = nfxy.y[1] - fy;
+    } else if (action === 'L=T') {
+      ny = nfxy.y[0] + fx;
+    } else if (action === 'L=B') {
+      ny = nfxy.y[1] - fx;
+    } else {
+      throw new Error('surprise action ' + action);
     }
+  } else if (newSide === 'T' || newSide === 'B') {
+    ny = newSide === 'T' ? nfxy.y[0] : nfxy.y[1];
+    if (action === 'flip') {
+      nx = nfxy.x[1] - fx;
+    } else if (action === 'B=R') {
+      nx = nfxy.x[0] + fy;
+    } else if (action === 'B=L') {
+      nx = nfxy.x[1] - fy;
+    } else {
+      throw new Error('surprise action ' + action);
+    }
+  } else {
+    throw new Error('bad side ' + newSide);
   }
+
+  const facing: Dir = newSide === 'L' ? 'right' : newSide === 'R' ? 'left' : newSide === 'T' ? 'down' : 'up';
+  return {
+    pos: [nx, ny],
+    facing,
+  };
 }
 
 function findEdges(g: Grid<string>) {
