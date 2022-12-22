@@ -27,6 +27,14 @@ const sym: Record<Dir, string> = {
   'down': 'v',
 };
 
+// Facing is 0 for right (>), 1 for down (v), 2 for left (<), and 3 for up (^)
+const dirValues: Record<Dir, number> = {
+  'right': 0,
+  'down': 1,
+  'left': 2,
+  'up': 3,
+};
+
 interface State {
   pos: Coord;
   facing: Dir;
@@ -54,17 +62,91 @@ function findEdges(g: Grid<string>) {
   return {x: xs, y: ys};
 }
 
+type GridIndex = ReturnType<typeof findEdges>;
+
+function turn(state: State, dir: 'left' | 'right'): State {
+  if (dir === 'left') {
+    return {pos: state.pos, facing: ccw[state.facing]};
+  }
+  return {pos: state.pos, facing: clockwise[state.facing]};
+}
+
+function move1(g: Grid<string>, index: GridIndex, state: State): State | null {
+  const {facing} = state;
+  const [dx, dy] = dirs[facing];
+  let [x, y] = state.pos;
+  let c = g.get([x + dx, y + dy]);
+  if (c === '.') {
+    return {pos: [x + dx, y + dy], facing};
+  } else if (c === '#') {
+    return null;  // blocked
+  } else if (c === undefined) {
+    if (facing === 'up') {
+      y = index.y[x][1];
+    } else if (facing === 'down') {
+      y = index.y[x][0];
+    } else if (facing === 'left') {
+      x = index.x[y][1];
+    } else if (facing === 'right') {
+      x = index.x[y][0];
+    }
+    c = g.get([x, y]);
+    if (c === '.') {
+      return {pos: [x, y], facing};
+    } else if (c === '#') {
+      return null;  // blocked
+    } else {
+      throw new Error(`Bad move at ${state}`);
+    }
+  } else {
+    throw new Error(`Bad cell ${c}`);
+  }
+}
+
+function action(state: State, grid: Grid<string>, index: GridIndex, move: number | 'L' | 'R'): State {
+  if (move === 'L') {
+    return turn(state, 'left');
+  } else if (move === 'R') {
+    return turn(state, 'right');
+  } else {
+    for (let i = 0; i < move; i++) {
+      const nextState = move1(grid, index, state);
+      if (nextState) {
+        state = nextState;
+      } else {
+        return state;
+      }
+    }
+    return state;
+  }
+}
+
 if (import.meta.main) {
   const lines = await readLinesFromArgs();
   const [mazeStr, dirStr] = chunkLines(lines);
   const g = Grid.fromLines(mazeStr);
   const dirsStr = [...dirStr[0].matchAll(/(\d+|[LR])/g)].map(([, x]) => x);
-  const dirs = dirsStr.map(v => v === 'L' || v === 'R' ? v : safeParseInt(v));
+  const acts = dirsStr.map(v => v === 'L' || v === 'R' ? v : safeParseInt(v));
 
-  console.log(dirs);
+  console.log(acts);
   console.log(g.format(v => v));
   const edges = findEdges(g);
-  // console.log(edges);
+
+  let state: State = {
+    pos: [edges.x[0][0], 0],
+    facing: 'right',
+  };
+  console.log(state);
+  for (const act of acts) {
+    console.log('performing', act);
+    state = action(state, g, edges, act);
+    console.log(state);
+  }
+
+  const row = state.pos[1] + 1;
+  const col = state.pos[0] + 1;
+  const facing = dirValues[state.facing];
+  console.log('final state', row, col, facing, 1000*row + 4 * col + facing);
 
   console.log('part 1', lines.length);
   console.log('part 2');
