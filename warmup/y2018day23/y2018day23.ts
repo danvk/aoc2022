@@ -17,6 +17,12 @@
 // But running with an initial threshold of 905 worked and produced the correct
 // answer. So I'm not sure what's going on with that.
 //
+// Going from scale=128->64 took the longest time. At that point the lower
+// bound increased and the search space shrank dramatically (362013 -> 112 cells).
+// Maybe I could speed this up by using the new bound earlier in the search.
+//
+// I'm glad there was only a 672-way tie and not, say, a billion-way tie.
+//
 // How would I parallelize this in Deno?
 
 import { _ } from "../../deps.ts";
