@@ -207,6 +207,8 @@ function move1(g: Grid<string>, index: GridIndex, state: State): State | null {
   }
 }
 
+const path = new Grid<string>();
+
 function action(state: State, grid: Grid<string>, index: GridIndex, move: number | 'L' | 'R'): State {
   if (move === 'L') {
     return turn(state, 'left');
@@ -216,6 +218,7 @@ function action(state: State, grid: Grid<string>, index: GridIndex, move: number
     for (let i = 0; i < move; i++) {
       const nextState = move1(grid, index, state);
       if (nextState) {
+        path.set(nextState.pos, sym[nextState.facing]);
         state = nextState;
       } else {
         return state;
@@ -268,6 +271,9 @@ if (import.meta.main) {
     state = action(state, g, edges, act);
   }
   console.log('final state', state);
+
+  console.log(path.format(v => v));
+  console.log(g.format((v, c) => path.get(c) ?? v));
 
   const row = state.pos[isTranspose ? 0 : 1] + 1;
   const col = state.pos[isTranspose ? 1 : 0] + 1;
