@@ -46,6 +46,59 @@ interface State {
   facing: Dir;
 }
 
+const sampleTransitions = {
+  '1L': [2, 'L', 'flip'],
+  '1U': [3, 'L', 'L=T'],
+  '1D': [6, 'B', 'flip'],
+  '2U': [6, 'R', 'L=B'],
+  '2L': [1, 'L', 'flip'],
+  '2R': [5, 'R', 'flip'],
+  '3L': [1, 'T', 'B=R'],
+  '3R': [5, 'T', 'B=L'],
+  '4D': [6, 'L', 'L=B'],
+  '5U': [3, 'R', 'L=B'],
+  '5R': [2, 'R', 'flip'],
+  '6L': [4, 'B', 'B=L'],
+  '6R': [2, 'T', 'B=L'],
+  '6D': [1, 'B', 'flip'],
+};
+
+const sampleFaces = [
+  null,
+  {x: [0, 4-1], y: [2*4, 3*4-1]},
+  {x: [4, 2*4-1], y: [0, 4-1]},
+  {x: [4, 2*4-1], y: [4, 2*4-1]},
+  {x: [4, 2*4-1], y: [2*4, 3*4-1]},
+  {x: [2*4, 3*4-1], y: [2*4, 3*4-1]},
+  {x: [2*4, 3*4-1], y: [3*4, 4*4-1]},
+];
+const inputFaces = [
+  null,
+  {x: [50, 2*50-1], y: [0, 50-1]},
+  {x: [2*50, 3*50-1], y: [0, 50-1]},
+  {x: [50, 2*50-1], y: [50, 2*50-1]},
+  {x: [0, 50-1], y: [2*50, 3*50-1]},
+  {x: [50, 2*50-1], y: [2*50, 3*50-1]},
+  {x: [0, 50-1], y: [3*50, 4*50-1]},
+];
+
+function transitionSample(c: Coord, dir: Dir): [Coord, Dir] {
+  const face = findFace(c, 4);
+  const d = dir === 'left' ? 'L' : dir === 'right' ? 'R' : dir === 'up' ? 'U' : 'D';
+  const code = (sampleTransitions as any)[`${face}${d}`];
+  assert(code, `face: ${face} dir: ${dir} missing`);
+  const [newFace, newSide, action] = code as [number, 'L' | 'R' | 'B' | 'T', 'flip' | 'L=T' | 'L=B' | 'B=L' | 'B=R'];
+
+  const [x, y] = c;
+  const n = 4;
+  if (face === 1) {
+    if (dir === 'left') {
+      // going off the left side of face 1, need to wind up on the left side of face 2
+      const fy = y - 2 * n;
+    }
+  }
+}
+
 function findEdges(g: Grid<string>) {
   const xs: {[y: string]: [number, number]} = {};
   const ys: {[x: string]: [number, number]} = {};
@@ -80,39 +133,15 @@ function turn(state: State, dir: 'left' | 'right'): State {
 // which face are we on?
 function findFace(c: Coord, n: number): 1 | 2 | 3 | 4 | 5 | 6 {
   const [x, y] = c;
-  if (n === 4) {
-    if (x < n) {
-      return 1;
-    } else if (y < n) {
-      return 2;
-    } else if (y < 2 * n) {
-      return 3;
-    } else if (x >= 2 * n) {
-      if (y >= 3 * n) {
-        return 6;
-      } else {
-        return 5;
-      }
-    } else {
-      return 4;
+  const faces = n === 4 ? sampleFaces : inputFaces;
+  for (const [i, face] of faces.entries()) {
+    if (!face) continue;
+    const {x: [minX, maxX], y: [minY, maxY]} = face;
+    if (x >= minX && x <= maxX && y >= minY && y <= maxY) {
+      return i as 1 | 2 | 3 | 4 | 5 | 6;
     }
-  } else if (n === 50) {
-    if (x < n) {
-      if (y < 3 * n) {
-        return 4;
-      } else {
-        return 6;
-      }
-    } else if (x >= 2 * n) {
-      return 2;
-    } else if (y < n) {
-      return 1;
-    } else if (y < 2 * n) {
-      return 3;
-    }
-    return 5;
   }
-  throw new Error(`Surprise size ${n}`)
+  throw new Error(`bad face ${c}`);
 }
 
 function move1(g: Grid<string>, index: GridIndex, state: State): State | null {

@@ -37,7 +37,7 @@
 
 Transposed sample transitions:
 - 1 left -> 2 left (flip y, face right)
-- 1 top -> 3 left (right=bottom, face right)
+- 1 up -> 3 left (right=bottom, face right)
 - 1 down -> 6 bottom (flip x, face up)
 - 2 up -> 6 right (right=top, face left)
 - 2 left -> 1 left (flip y, face right)
@@ -73,7 +73,7 @@ _3_
 
 - 1 left -> 4 left (top->bottom)
 - 1 up -> 6 left (left->top)
-- 2 up -> 6 down (left->left?)
+- 2 up -> 6 bottom (left->left?)
 - 2 right -> 5 right (top->bottom)
 - 2 down -> 3 right (left->top)
 - 3 left -> 4 top (top->left)
