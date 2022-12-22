@@ -2,6 +2,16 @@
 
 ## Daily Notes
 
+### Day 22 (8786 / 4298)
+
+Part 1 was easy, part two was unbelievably annoying. In particular, I was annoyed that the sample had a completely different folding pattern than the input. I assumed they were just transpose of one another, so I wrote some code to transpose the sample input and solve that problem. But they're actually totally unrelated. I'd written out the face transitions for the transposed sample, so I was kinda stuck with my mistake.
+
+Visualizing how the cube folded up was hard, particularly since you needed to know how the coordinates lined up on the faces as they connected. If I'd had access to scissors, I would have folded up a cube. Apparently Tay did this! Instead I drew a janky one on paper. I was so, so relieved that I got the right answer the first time. This would have been even more of a PITA to debug than it was to implement.
+
+- Start: 09:23:55 (08:23:55 local time)
+- ⭐️: 09:59:31 (36m)
+- ⭐️⭐️: 12:08:04 (2h44m)
+
 ### Day 21 (11694 / 8776)
 
 An easy one. We flew to Costa Rica yesterday and gained an hour, so the puzzle was posted at 11pm rather than midnight. If I'd known it would be an easy one, I would have just done it last night!
