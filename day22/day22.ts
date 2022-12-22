@@ -255,7 +255,7 @@ if (import.meta.main) {
   const edges = findEdges(g);
 
   let state: State = {
-    pos: isTranspose ? [edges.x[0][0], 0] : [0, edges.y[0][0]],
+    pos: isTranspose ? [0, edges.y[0][0]] : [edges.x[0][0], 0],
     facing: isTranspose ? 'down' : 'right',
   };
 
