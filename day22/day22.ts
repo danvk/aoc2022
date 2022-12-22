@@ -3,7 +3,7 @@
 
 import { _ } from "../deps.ts";
 import { Coord, Grid } from "../grid.ts";
-import { chunkLines, readLinesFromArgs, safeParseInt } from "../util.ts";
+import { assert, chunkLines, readLinesFromArgs, safeParseInt } from "../util.ts";
 
 // Stolen from y2018day13
 type Dir = 'up' | 'left' | 'down' | 'right';
@@ -75,6 +75,44 @@ function turn(state: State, dir: 'left' | 'right'): State {
     return {pos: state.pos, facing: ccw[state.facing]};
   }
   return {pos: state.pos, facing: clockwise[state.facing]};
+}
+
+// which face are we on?
+function findFace(c: Coord, n: number): 1 | 2 | 3 | 4 | 5 | 6 {
+  const [x, y] = c;
+  if (n === 4) {
+    if (x < n) {
+      return 1;
+    } else if (y < n) {
+      return 2;
+    } else if (y < 2 * n) {
+      return 3;
+    } else if (x >= 2 * n) {
+      if (y >= 3 * n) {
+        return 6;
+      } else {
+        return 5;
+      }
+    } else {
+      return 4;
+    }
+  } else if (n === 50) {
+    if (x < n) {
+      if (y < 3 * n) {
+        return 4;
+      } else {
+        return 6;
+      }
+    } else if (x >= 2 * n) {
+      return 2;
+    } else if (y < n) {
+      return 1;
+    } else if (y < 2 * n) {
+      return 3;
+    }
+    return 5;
+  }
+  throw new Error(`Surprise size ${n}`)
 }
 
 function move1(g: Grid<string>, index: GridIndex, state: State): State | null {
@@ -157,6 +195,14 @@ if (import.meta.main) {
     pos: isTranspose ? [edges.x[0][0], 0] : [0, edges.y[0][0]],
     facing: isTranspose ? 'down' : 'right',
   };
+
+  const {x: [xMin, xMax], y: [yMin, yMax]} = g.boundingBox();
+  const n = (yMax - yMin + 1) / 4;
+  assert(n === Math.floor(n), `${n} not an int`);
+  assert ((xMax - xMin + 1) / 3 === n);
+  const faces = g.mapValues((_, c) => findFace(c, n));
+  console.log(faces.format(v => String(v)));
+
   console.log(state);
   for (const act of acts) {
     state = action(state, g, edges, act);

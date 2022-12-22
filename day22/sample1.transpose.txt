@@ -1,0 +1,87 @@
+    ....
+    ....
+    ..#.
+    #...
+    ....
+    ....
+    ....
+    ..#.
+..#..#......
+.#........#.
+.......#....
+#...#...#...
+        ....
+        .#..
+        ...#
+        ....
+
+10R5L5R10L4R5L5
+
+    2222
+    2222
+    2222
+    2222
+    3333
+    3333
+    3333
+    3333
+111144445555
+111144445555
+111144445555
+111144445555
+        6666
+        6666
+        6666
+        6666
+
+
+Transposed sample transitions:
+- 1 left -> 2 left (flip y, face right)
+- 1 top -> 3 left (right=bottom, face right)
+- 1 down -> 6 bottom (flip x, face up)
+- 2 up -> 6 right (right=top, face left)
+- 2 left -> 1 left (flip y, face right)
+- 2 right -> 5 right (flip y, face left)
+- 3 left -> 1 top (bottom=right, face down)
+- 3 right -> 5 top (bottom=left, face down)
+- 4 down -> 6 left (left=bottom, face right)
+- 5 up -> 3 right (left=bottom, face left)
+- 5 right -> 2 right (flip y, face left)
+- 6 left -> 4 bottom (bottom=left, face up)
+- 6 right -> 2 top (top=right, face down)
+- 6 down -> 1 bottom (flip x, face up)
+
+sample:
+
+__1_
+234_
+__56
+
+sample T:
+
+_2_
+_3_
+145
+__6
+
+input:
+
+_12
+_3_
+45_
+6__
+
+- 1 left -> 4 left (top->bottom)
+- 1 up -> 6 left (left->top)
+- 2 up -> 6 down (left->left?)
+- 2 right -> 5 right (top->bottom)
+- 2 down -> 3 right (left->top)
+- 3 left -> 4 top (top->left)
+- 3 right -> 2 bottom (top->left)
+- 4 left -> 1 left (top->bottom)
+- 4 up -> 3 left (left->top)
+- 5 right -> 2 right (top->bottom)
+- 5 down -> 6 right (left->top)
+- 6 left -> 1 top (top->left)
+- 6 right -> 5 bottom (top->left)
+- 6 down -> 2 top (left->left)
