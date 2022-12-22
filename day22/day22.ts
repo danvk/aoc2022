@@ -34,6 +34,12 @@ const dirValues: Record<Dir, number> = {
   'left': 2,
   'up': 3,
 };
+const transposeDir: Record<Dir, Dir> = {
+  'right': 'down',
+  'down': 'right',
+  'left': 'up',
+  'up': 'left',
+};
 
 interface State {
   pos: Coord;
@@ -124,30 +130,45 @@ function action(state: State, grid: Grid<string>, index: GridIndex, move: number
 if (import.meta.main) {
   const lines = await readLinesFromArgs();
   const [mazeStr, dirStr] = chunkLines(lines);
-  const g = Grid.fromLines(mazeStr);
+  let g = Grid.fromLines(mazeStr);
+  const {x: [minX, maxX], y: [minY, maxY]} = g.boundingBox();
+  let isTranspose = false;
+  if (maxX - minX > maxY - minY) {
+    isTranspose = true;
+    g = g.transpose();
+  }
   const dirsStr = [...dirStr[0].matchAll(/(\d+|[LR])/g)].map(([, x]) => x);
-  const acts = dirsStr.map(v => v === 'L' || v === 'R' ? v : safeParseInt(v));
+  const acts = dirsStr.map(v => v === 'L' ? (isTranspose ? 'R' : 'L') : v === 'R' ? (isTranspose ? 'L' : 'R') : safeParseInt(v));
 
   console.log(acts);
   console.log(g.format(v => v));
+
+  // one direction is 4, one direction is 3.
+
+  // box size=4x4, horizontal is the long side
+  // sample: { x: [ 0, 15 ], y: [ 0, 11 ] }
+
+  // box size=50x50, vertical is the long side
+  // input: { x: [ 0, 149 ], y: [ 0, 199 ] }
+
   const edges = findEdges(g);
 
   let state: State = {
-    pos: [edges.x[0][0], 0],
-    facing: 'right',
+    pos: isTranspose ? [edges.x[0][0], 0] : [0, edges.y[0][0]],
+    facing: isTranspose ? 'down' : 'right',
   };
   console.log(state);
   for (const act of acts) {
-    console.log('performing', act);
     state = action(state, g, edges, act);
-    console.log(state);
   }
+  console.log('final state', state);
 
-  const row = state.pos[1] + 1;
-  const col = state.pos[0] + 1;
-  const facing = dirValues[state.facing];
-  console.log('final state', row, col, facing, 1000*row + 4 * col + facing);
+  const row = state.pos[isTranspose ? 0 : 1] + 1;
+  const col = state.pos[isTranspose ? 1 : 0] + 1;
+  const facing = dirValues[isTranspose ? transposeDir[state.facing] : state.facing];
 
-  console.log('part 1', lines.length);
+  console.log(row, col, facing);
+
+  console.log('part 1', 1000*row + 4 * col + facing);
   console.log('part 2');
 }

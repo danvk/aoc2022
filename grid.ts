@@ -127,6 +127,14 @@ export class Grid<V> implements Iterable<[[number, number], V]> {
     // Why can't I do this? What's the difference between Iterable, Iterator and IterableIterator?
     // return itertools.map(this.m, (cStr, v) => tuple(str2coord(cStr), v));
   }
+
+  transpose(): Grid<V> {
+    const g = new Grid<V>();
+    for (const [[x, y], v] of this) {
+      g.set([y, x], v);
+    }
+    return g;
+  }
 }
 
 export function neighbors4(c: Coord): Coord[] {
