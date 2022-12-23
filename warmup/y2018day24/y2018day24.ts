@@ -47,16 +47,59 @@ function parseGroup(text: string, side: 'immune' | 'infection', num: number): Gr
   }
 }
 
+function effectivePower(g: Group) {
+  return g.damage * g.units;
+}
+
+function potentialDamage(attacker: Group, defender: Group) {
+  if (defender.immunities.has(attacker.damageType)) {
+    return 0;
+  }
+  const mult = defender.weaknesses.has(attacker.damageType) ? 2 : 1;
+  return mult * effectivePower(attacker);
+}
+
+function selectTargets(groups: Group[]): Map<string, number> {
+  const out = new Map<string, number>();
+  const taken = new Set<string>();  // "immune1" / "infection2"
+  const inOrder = _.sortBy(groups, [
+    g => -effectivePower(g),
+    g => -g.initiative
+  ]);
+  for (const g of inOrder) {
+    const other = g.side === 'immune' ? 'infection' : 'immune';
+    const targets = groups.filter(g => g.side === other && !taken.has(`${g.side}${g.num}`));
+    const target = _.sortBy(targets, [
+      target => -potentialDamage(g, target),
+      target => -effectivePower(target),
+      target => -target.initiative,
+    ]);
+    if (target.length > 0) {
+      const t = target[0];
+      out.set(`${g.side},${g.num}`, t.num);
+      taken.add(`${t.side}${t.num}`);
+      console.log(`${g.side} ${g.num} would attack ${t.side} ${t.num}`);
+    } else {
+      // don't attack
+    }
+  }
+  return out;
+}
+
 if (import.meta.main) {
   const lines = await readLinesFromArgs();
   const [immune, infection] = chunkLines(lines);
   assert(immune[0] === 'Immune System:');
   assert(infection[0] === 'Infection:');
   const groups = [
-    immune.slice(1).map((line, i) => parseGroup(line, 'immune', 1 + i)),
-    infection.slice(1).map((line, i) => parseGroup(line, 'infection', 1 + i)),
+    ...immune.slice(1).map((line, i) => parseGroup(line, 'immune', 1 + i)),
+    ...infection.slice(1).map((line, i) => parseGroup(line, 'infection', 1 + i)),
   ];
+
   console.log(groups);
+  console.log(selectTargets(groups));
+
+  // console.log(groups);
   console.log('part 1', lines.length);
   console.log('part 2');
 }
