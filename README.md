@@ -2,6 +2,16 @@
 
 ## Daily Notes
 
+### Day 23 (8080 / 7796)
+
+Easy day. My one screwup was writing `'E': [1, 0]` instead of `'E': [-1, 0]` in my directions dictionary. This took a while to track down. I should just have a canonical version of this instead of writing it out each time. I thought I had a bug printing the grid (I was seeing a lone `.` disconnected from the rest of the grid), but this mysteriously disappeared.
+
+Just 1.5 puzzles left!
+
+- Start: 09:20:00 (08:20ish local time; not exactly sure)
+- ⭐️: 10:01:37 (41m)
+- ⭐️⭐️: 10:06:53 (46m)
+
 ### Day 22 (8786 / 4298)
 
 Part 1 was easy, part two was unbelievably annoying. In particular, I was annoyed that the sample had a completely different folding pattern than the input. I assumed they were just transpose of one another, so I wrote some code to transpose the sample input and solve that problem. But they're actually totally unrelated. I'd written out the face transitions for the transposed sample, so I was kinda stuck with my mistake.
