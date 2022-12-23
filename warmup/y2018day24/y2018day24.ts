@@ -108,9 +108,10 @@ function fight(groups: Group[]): Group[] {
     const target = index[other][targetNum];
     const damage = potentialDamage(attacker, target);
     const kills = Math.min(target.units, Math.floor(damage / target.hitPoints));
-    if (DEBUG) {
-      console.log(`${side} ${num} attacks ${other} ${targetNum} killing ${kills} units.`);
-    }
+    // if (DEBUG) {
+    //   console.log(`${side} ${num} attacks ${other} ${targetNum} killing ${kills} units.`);
+    // }
+    // console.log(side === 'immune' ? 'Immune System' : 'Infection', `group ${attacker.num} attacks defending group ${targetNum}, killing ${kills} units`);
     target.units -= kills;
     if (target.units === 0) {
       if (DEBUG) {
@@ -143,8 +144,15 @@ function isDone(groups: Group[]): boolean {
   return immune === 0 || infection === 0;
 }
 
-function result(groups: Group[], amount: number): number {
-  groups = boost(_.cloneDeep(groups), amount);
+function result(lines: string[], amount: number): number {
+  const [immune, infection] = chunkLines(lines);
+  assert(immune[0] === 'Immune System:');
+  assert(infection[0] === 'Infection:');
+  let groups = [
+    ...immune.slice(1).map((line, i) => parseGroup(line, 'immune', 1 + i)),
+    ...infection.slice(1).map((line, i) => parseGroup(line, 'infection', 1 + i)),
+  ];
+  groups = boost(groups, amount);
 
   let i = 0;
   let lastPrint = null;
@@ -159,6 +167,16 @@ function result(groups: Group[], amount: number): number {
       }
       lastPrint = JSON.stringify(groups);
     }
+    /*
+    console.log('Immune System:');
+    for (const g of groups.filter(g => g.side === 'immune')) {
+      console.log(`Group ${g.num} contains ${g.units} units`);
+    }
+    console.log('Infection:');
+    for (const g of groups.filter(g => g.side === 'infection')) {
+      console.log(`Group ${g.num} contains ${g.units} units`);
+    }
+    */
     // console.log(groups);
     // console.log();
   }
@@ -192,27 +210,20 @@ function minPositive(
 
 if (import.meta.main) {
   const lines = await readLinesFromArgs();
-  const [immune, infection] = chunkLines(lines);
-  assert(immune[0] === 'Immune System:');
-  assert(infection[0] === 'Infection:');
-  const groups = [
-    ...immune.slice(1).map((line, i) => parseGroup(line, 'immune', 1 + i)),
-    ...infection.slice(1).map((line, i) => parseGroup(line, 'infection', 1 + i)),
-  ];
   // console.log(groups);
   // const terms = _.countBy(groups.flatMap(g => [g.damageType, ...g.weaknesses, ...g.immunities]));
   // console.log(terms);
 
-  console.log('part 1', result(groups, 0));
+  console.log('part 1', result(lines, 0));
 
   // console.log(result(groups, 1_000_000));
   // console.log('part 2', minPositive(amount => result(groups, amount), 0, 1_000_000));
 
   // 400 = stall
   // for (const b of [67, 68, 69, 70, 80, 90, 100, 150, 200, 300, 401, 500, 550, 600, 1000]) {
-  for (const b of _.range(0, 100)) {
-    console.log(b, result(groups, b));
-  }
+  // for (const b of _.range(0, 100)) {
+  //   console.log(b, result(groups, b));
+  // }
 
   // console.log(1570, result(groups, 1570));
   // console.log(67, result(groups, 67));
@@ -221,9 +232,9 @@ if (import.meta.main) {
   // 1290 = too high
   // 1291 = too high
   //  626 = too low
-  // for (let boost = 0; boost < 68; boost++) {
-  //   console.log(boost, result(groups, boost));
-  // }
+  for (let boost = 10; boost < 70; boost++) {
+    console.log(boost, result(lines, boost));
+  }
   // console.log(67, result(groups, 67));
   // console.log(69, result(groups, 69));
   // "A boost is an integer increase"
