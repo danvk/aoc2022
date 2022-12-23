@@ -1,6 +1,14 @@
 #!/usr/bin/env -S deno run --allow-read --allow-write
 // https://adventofcode.com/2018/day/25
 
+// This was fun -- I appreciated all the test cases.
+// I realized you couldn't just go point-by-point as I was writing my code,
+// but fortunately the merging logic wasn't too bad. Just need to remember to
+// iterate the arrays in reverse when modifying them, so that you don't change
+// the remaining indices.
+//
+// I was #3627 overall to finish AoC 2018!
+
 import { _ } from "../../deps.ts";
 import { readInts, readLinesFromArgs } from "../../util.ts";
 
