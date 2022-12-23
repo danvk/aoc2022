@@ -1,6 +1,11 @@
 #!/usr/bin/env -S deno run --allow-read --allow-write
 // https://adventofcode.com/2018/day/24
 
+// I'm confused why my original solution doesn't work for part 2.
+// Where in the text does it say you can only target a group that you'd do damage to?
+// Ah!
+// "If it cannot deal any defending groups damage, it does not choose a target."
+
 import { _ } from "../../deps.ts";
 import { assert, chunkLines, readInts, readLinesFromArgs } from "../../util.ts";
 
