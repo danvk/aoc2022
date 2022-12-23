@@ -59,8 +59,8 @@ function potentialDamage(attacker: Group, defender: Group) {
   return mult * effectivePower(attacker);
 }
 
-function selectTargets(groups: Group[]): Map<string, number> {
-  const out = new Map<string, number>();
+function selectTargets(groups: Group[]): Map<string, number | null> {
+  const out = new Map<string, number | null>();
   const taken = new Set<string>();  // "immune1" / "infection2"
   const inOrder = _.sortBy(groups, [
     g => -effectivePower(g),
@@ -80,10 +80,37 @@ function selectTargets(groups: Group[]): Map<string, number> {
       taken.add(`${t.side}${t.num}`);
       console.log(`${g.side} ${g.num} would attack ${t.side} ${t.num}`);
     } else {
-      // don't attack
+      out.set(`${g.side},${g.num}`, null);
     }
   }
   return out;
+}
+
+function fight(groups: Group[]): Group[] {
+  const index = {
+    immune: _.keyBy(groups.filter(g => g.side === 'immune'), 'num'),
+    infection: _.keyBy(groups.filter(g => g.side === 'infection'), 'num'),
+  };
+
+  // console.log(groups);
+  const targets = selectTargets(groups);
+  for (const attacker of _.sortBy(groups, g => -g.initiative)) {
+    const {side, num} = attacker;
+    const other = side === 'immune' ? 'infection' : 'immune';
+    const targetNum = targets.get(`${side},${num}`);
+    if (targetNum === null) continue;
+    assert(targetNum);
+    const target = index[other][targetNum];
+    const damage = potentialDamage(attacker, target);
+    const kills = Math.min(target.units, Math.floor(damage / target.hitPoints));
+    console.log(`${side} ${num} attacks ${other} ${targetNum} killing ${kills} units.`);
+    target.units -= kills;
+    if (target.units === 0) {
+      console.log(`${other} ${targetNum} is eliminated.`);
+      groups = _.without(groups, target);
+    }
+  }
+  return groups;
 }
 
 if (import.meta.main) {
@@ -91,15 +118,19 @@ if (import.meta.main) {
   const [immune, infection] = chunkLines(lines);
   assert(immune[0] === 'Immune System:');
   assert(infection[0] === 'Infection:');
-  const groups = [
+  let groups = [
     ...immune.slice(1).map((line, i) => parseGroup(line, 'immune', 1 + i)),
     ...infection.slice(1).map((line, i) => parseGroup(line, 'infection', 1 + i)),
   ];
 
-  console.log(groups);
-  console.log(selectTargets(groups));
+  let rounds = 1;
+  while (_.uniq(groups.map(g => g.side)).length === 2) {
+    console.log('Round', rounds++);
+    groups = fight(groups);
+    console.log('');
+  }
 
-  // console.log(groups);
-  console.log('part 1', lines.length);
+  console.log(groups);
+  console.log('part 1', _.sum(groups.map(g => g.units)));
   console.log('part 2');
 }
