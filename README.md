@@ -6,6 +6,10 @@
 
 Easy day. My one screwup was writing `'E': [1, 0]` instead of `'E': [-1, 0]` in my directions dictionary. This took a while to track down. I should just have a canonical version of this instead of writing it out each time. I thought I had a bug printing the grid (I was seeing a lone `.` disconnected from the rest of the grid), but this mysteriously disappeared.
 
+Having struggled with y2018day24 last night and eventually realizing it was a small detail I hadn't implemented, I was very careful to read all the rules today. I worried about the word "simultaneously" to describe the Elf movement, but it turned out to be irrelevant.
+
+Overall very happy for my `Grid` class!
+
 Just 1.5 puzzles left!
 
 - Start: 09:20:00 (08:20ish local time; not exactly sure)

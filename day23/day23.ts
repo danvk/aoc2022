@@ -2,22 +2,8 @@
 // https://adventofcode.com/2022/day/23
 
 import { _ } from "../deps.ts";
-import { Coord, Grid } from "../grid.ts";
+import { addCoord, Coord, DELTAS, Dir4, Dir8, Grid } from "../grid.ts";
 import { assert, coord2str, readLinesFromArgs } from "../util.ts";
-
-type Dir8 = "NW" | "N" | "NE" | "E" | "W" | "SW" | "S" | "SE";
-type Dir4 = 'N' | 'S' | 'E' | 'W';
-
-const DELTAS: Record<Dir8, Coord> = {
-  'NW': [-1, -1],
-  'N': [0, -1],
-  'NE': [1, -1],
-  'E': [1, 0],
-  'W': [-1, 0],
-  'SW': [-1, 1],
-  'S': [0, 1],
-  'SE': [1, 1],
-};
 
 const MOVES: [Dir8[], Dir4][] = [
   // If there is no Elf in the N, NE, or NW adjacent positions, the Elf proposes moving north one step.
@@ -28,11 +14,7 @@ const MOVES: [Dir8[], Dir4][] = [
   [['W', 'NW', 'SW'], 'W'],
   // If there is no Elf in the E, NE, or SE adjacent positions, the Elf proposes moving east one step.
   [['E', 'NE', 'SE'], 'E'],
-]
-
-function add([ax, ay]: Coord, [bx, by]: Coord): Coord {
-  return [ax + bx, ay + by];
-}
+];
 
 function shift<T>(xs: T[], amount: number): T[] {
   const n = xs.length;
@@ -46,7 +28,7 @@ function doRound(g: Grid<string>, turnNum: number): Grid<string> | null {
   for (const [c, elf] of g) {
     if (elf !== '#') continue;
     // console.log('Considering', c);
-    const neighbors = _.mapValues(DELTAS, d => g.get(add(c, d)) === '#' ? 1 : 0);
+    const neighbors = _.mapValues(DELTAS, d => g.get(addCoord(c, d)) === '#' ? 1 : 0);
     const numNeighbors = _.sum(Object.values(neighbors));
     if (numNeighbors === 0) {
       // If no other Elves are in one of those eight positions, the Elf does not do anything during this round.
@@ -54,7 +36,7 @@ function doRound(g: Grid<string>, turnNum: number): Grid<string> | null {
     }
     let proposal: Dir4 | null = null;
     for (const [ins, dir] of moves) {
-      const match = ins.every(d => g.get(add(c, DELTAS[d])) !== '#');
+      const match = ins.every(d => g.get(addCoord(c, DELTAS[d])) !== '#');
       if (match) {
         // console.log('  proposing moving', dir);
         proposal = dir;
@@ -64,7 +46,7 @@ function doRound(g: Grid<string>, turnNum: number): Grid<string> | null {
       }
     }
     if (proposal) {
-      proposals[coord2str(c)] = add(c, DELTAS[proposal]);
+      proposals[coord2str(c)] = addCoord(c, DELTAS[proposal]);
     }
   }
   const counts = _.countBy(Object.values(proposals).map(coord2str));
@@ -109,30 +91,8 @@ function numElves(g: Grid<string>): number {
   return n;
 }
 
-if (import.meta.main) {
-  const lines = await readLinesFromArgs();
-  let g = Grid.fromLines(lines);
-  console.log(g.format(v => v, '.'));
-  console.log(numElves(g));
-
-  let i;
-  for (i = 0; i < 2000; i++) {
-    console.log(i);
-    const nextG = doRound(g, i);
-    if (!nextG) {
-      break;
-    } else {
-      g = nextG;
-    }
-    // console.log(g.format(v => v, '.'));
-    // console.log(numElves(g));
-    // console.log('');
-  }
-  console.log('Stop after', 1 + i);
-  console.log(g.format(v => v, '.'));
-  console.log(numElves(g));
-
-  console.log(g.boundingBox());
+function part1(g: Grid<string>): number {
+  // console.log(g.boundingBox());
   const {x: [minX, maxX], y: [minY, maxY]} = g.boundingBox();
   let n = 0;
   for (let x = minX; x <= maxX; x++) {
@@ -142,7 +102,30 @@ if (import.meta.main) {
       }
     }
   }
+  return n;
+}
 
-  console.log('part 1', n);
-  // console.log('part 2');
+if (import.meta.main) {
+  const lines = await readLinesFromArgs();
+  let g = Grid.fromLines(lines);
+  console.log(g.format(v => v, '.'));
+  console.log(numElves(g));
+
+  let i;
+  for (i = 0; true; i++) {
+    // console.log(i);
+    const nextG = doRound(g, i);
+    if (i === 10) {
+      console.log('part 1', part1(g));
+    }
+    if (!nextG) {
+      break;
+    } else {
+      g = nextG;
+    }
+    // console.log(g.format(v => v, '.'));
+    // console.log(numElves(g));
+    // console.log('');
+  }
+  console.log('part 2', 1 + i);
 }

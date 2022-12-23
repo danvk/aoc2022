@@ -177,3 +177,21 @@ export function* range2d(topLeft: Coord, bottomRight: Coord): Generator<Coord> {
     }
   }
 }
+
+export type Dir4 = 'N' | 'S' | 'E' | 'W';
+export type Dir8 = Dir4 | "NW" | "NE" | "SW" | "SE";
+
+export const DELTAS: Record<Dir8, Coord> = {
+  'NW': [-1, -1],
+  'N': [0, -1],
+  'NE': [1, -1],
+  'E': [1, 0],
+  'W': [-1, 0],
+  'SW': [-1, 1],
+  'S': [0, 1],
+  'SE': [1, 1],
+};
+
+export function addCoord([ax, ay]: Coord, [bx, by]: Coord): Coord {
+  return [ax + bx, ay + by];
+}
