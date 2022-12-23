@@ -81,6 +81,7 @@ function selectTargets(groups: Group[]): Map<string, number | null> {
     //   t => -t.initiative,
     // ]);
     const target = _(targets)
+      .filter(t => potentialDamage(g, t) > 0)
       .sortBy(t => -t.initiative)
       .sortBy(t => -effectivePower(t))
       .sortBy(t => -potentialDamage(g, t))
@@ -241,7 +242,7 @@ if (import.meta.main) {
   // 1290 = too high
   // 1291 = too high
   //  626 = too low
-  for (let boost = 10; boost < 70; boost++) {
+  for (let boost = 10; boost < 100; boost++) {
     console.log(boost, result(lines, boost));
   }
   // console.log(67, result(groups, 67));
