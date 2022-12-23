@@ -39,7 +39,7 @@ function shift<T>(xs: T[], amount: number): T[] {
   return xs.map((_, i) => xs[(i + amount) % n]);
 }
 
-function doRound(g: Grid<string>, turnNum: number): Grid<string> {
+function doRound(g: Grid<string>, turnNum: number): Grid<string> | null {
   const moves = shift(MOVES, turnNum);
   // console.log(moves);
   const proposals: Record<string, Coord> = {}
@@ -73,6 +73,7 @@ function doRound(g: Grid<string>, turnNum: number): Grid<string> {
 
   // Simultaneously, each Elf moves to their proposed destination tile
   // if they were the only Elf to propose moving to that position.
+  let anyMoved = false;
   const nextGrid = new Grid<string>();
   for (const [c, elf] of g) {
     if (elf !== '#') continue;
@@ -88,6 +89,7 @@ function doRound(g: Grid<string>, turnNum: number): Grid<string> {
     if (count === 1) {
       // console.log('move', c, '->', nextC);
       nextGrid.set(nextC, '#');
+      anyMoved = true;
     } else {
       // If two or more Elves propose moving to the same position,
       // none of those Elves move.
@@ -96,7 +98,7 @@ function doRound(g: Grid<string>, turnNum: number): Grid<string> {
     }
   }
 
-  return nextGrid;
+  return anyMoved ? nextGrid : null;
 }
 
 function numElves(g: Grid<string>): number {
@@ -113,13 +115,22 @@ if (import.meta.main) {
   console.log(g.format(v => v, '.'));
   console.log(numElves(g));
 
-  for (let i = 0; i < 10; i++) {
-    // console.log(i);
-    g = doRound(g, i);
+  let i;
+  for (i = 0; i < 2000; i++) {
+    console.log(i);
+    const nextG = doRound(g, i);
+    if (!nextG) {
+      break;
+    } else {
+      g = nextG;
+    }
     // console.log(g.format(v => v, '.'));
     // console.log(numElves(g));
     // console.log('');
   }
+  console.log('Stop after', 1 + i);
+  console.log(g.format(v => v, '.'));
+  console.log(numElves(g));
 
   console.log(g.boundingBox());
   const {x: [minX, maxX], y: [minY, maxY]} = g.boundingBox();
