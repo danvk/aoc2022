@@ -79,7 +79,7 @@ export class Grid<V> implements Iterable<[[number, number], V]> {
     return txt;
   }
 
-  format(format: (v: V, c: Coord) => string, blank: string | ((c: Coord) => string) =' '): string {
+  format(format: (v: V, c: Coord) => string, blank: string | ((c: Coord) => string) = ' '): string {
     return this.formatCells(format, blank).map(row => row.join('')).join('\n');
   }
 
