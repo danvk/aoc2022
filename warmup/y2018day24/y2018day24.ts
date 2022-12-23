@@ -64,18 +64,27 @@ let DEBUG=false;
 function selectTargets(groups: Group[]): Map<string, number | null> {
   const out = new Map<string, number | null>();
   const targeted = new Set<string>();  // "immune1" / "infection2"
-  const inOrder = _.sortBy(groups, [
-    g => -effectivePower(g),
-    g => -g.initiative
-  ]);
+  const inOrder = _(groups)
+    .sortBy(g => -g.initiative)
+    .sortBy(g => -effectivePower(g))
+    .value();
+  // _.sortBy(groups, [
+  //   g => -effectivePower(g),
+  //   g => -g.initiative
+  // ]);
   for (const g of inOrder) {
     const other = g.side === 'immune' ? 'infection' : 'immune';
     const targets = groups.filter(g => g.side === other && !targeted.has(`${g.side}${g.num}`));
-    const target = _.sortBy(targets, [
-      t => -potentialDamage(g, t),
-      t => -effectivePower(t),
-      t => -t.initiative,
-    ]);
+    // const target = _.sortBy(targets, [
+    //   t => -potentialDamage(g, t),
+    //   t => -effectivePower(t),
+    //   t => -t.initiative,
+    // ]);
+    const target = _(targets)
+      .sortBy(t => -t.initiative)
+      .sortBy(t => -effectivePower(t))
+      .sortBy(t => -potentialDamage(g, t))
+      .value();
     if (target.length > 0) {
       const t = target[0];
       out.set(`${g.side},${g.num}`, t.num);
