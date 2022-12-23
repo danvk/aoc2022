@@ -5,6 +5,10 @@
 // Where in the text does it say you can only target a group that you'd do damage to?
 // Ah!
 // "If it cannot deal any defending groups damage, it does not choose a target."
+//
+// I didn't love this problem. There wasn't anything particulary clever
+// about it, and it had lots of instructions and was evidently quite error
+// prone.
 
 import { _ } from "../../deps.ts";
 import { assert, chunkLines, readInts, readLinesFromArgs } from "../../util.ts";

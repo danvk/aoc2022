@@ -8,7 +8,7 @@ Easy day. My one screwup was writing `'E': [1, 0]` instead of `'E': [-1, 0]` in 
 
 Having struggled with y2018day24 last night and eventually realizing it was a small detail I hadn't implemented, I was very careful to read all the rules today. I worried about the word "simultaneously" to describe the Elf movement, but it turned out to be irrelevant.
 
-Overall very happy for my `Grid` class!
+Overall very happy for my `Grid` class! Making a fresh grid each time turned out to be smart since I didn't need to invalidate the bounding box as elves moved for part 1. And talking with others, part 2 would use a lot of memory with a 2D array. Instead, I use memory proportional to the number of elves independent of grid size.
 
 Just 1.5 puzzles left!
 
