@@ -23,7 +23,11 @@ function gcd(a: number, b: number) {
   return a;
 }
 
-type State = [x: number, y: number, t: number];
+// Legs:
+const OUT = 0;
+const BACK = 1;
+const OUT_AGAIN = 2;
+type State = [x: number, y: number, t: number, leg: number];
 
 function ser([x, y, t]: State): string {
   return `${x},${y},${t}`;
@@ -62,19 +66,36 @@ if (import.meta.main) {
     [0, 1],
     [0, 0],
   ];
-  const init: State = [0, -1, 0];
-  const done = (s: State) => s[1] === h;
-  const neighbors = function* ([x, y, t]: State) {
+  const init: State = [0, -1, 0, OUT];
+  const done = (s: State) => (s[1] === h && s[3] === OUT_AGAIN);
+  const neighbors = function* ([x, y, t, leg]: State): Generator<[State, number]> {
     for (const [dx, dy] of DELTAS) {
       const nx = x + dx;
       const ny = y + dy;
       const nt = t + 1;
       // Is this the start or end square? (always valid)
-      if ((nx === 0 && ny === -1) || (nx === w - 1 && ny === h)) {
-        yield tuple(tuple(nx, ny, nt), 1);
+      if (nx === 0 && ny === -1) {
+        if (leg === BACK) {
+          console.log('OUT AGAIN');
+          yield tuple(tuple(nx, ny, nt, OUT_AGAIN), 1);
+        } else {
+          yield tuple(tuple(nx, ny, nt, leg), 1);
+        }
+      } else if (nx === w - 1 && ny === h) {
+        if (leg === OUT) {
+          // console.log('BACK');
+          yield tuple(tuple(nx, ny, nt, BACK), 1);
+        } else {
+          yield tuple(tuple(nx, ny, nt, leg), 1);
+        }
       }
+
       // Is this on the grid?
-      if (nx < 0 || ny < 0 || nx >= w || ny >= h) {
+      if (dx === 0 && dy === 0 && ((nx === 0 && ny === -1) || (nx === w - 1 && ny === h))) {
+        // staying here is OK.
+        yield tuple(tuple(nx, ny, nt, leg), 1);
+        continue;
+      } else if (nx < 0 || ny < 0 || nx >= w || ny >= h) {
         continue;
       }
       // Are there any blizzards at this coordinate?
@@ -94,7 +115,7 @@ if (import.meta.main) {
       }
 
       if (!isBliz) {
-        yield tuple(tuple(nx, ny, nt), 1);
+        yield tuple(tuple(nx, ny, nt, leg), 1);
       }
     }
   };
