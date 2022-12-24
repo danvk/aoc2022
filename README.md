@@ -2,6 +2,19 @@
 
 ## Daily Notes
 
+### Day 24 (6284 / 6073)
+
+Another nice application of Dijkstra. The blizzards initially make it seem like it will be time-dependent and that Dijkstra won't apply. But the blizzards cycle with period `600=lcm(width=120, height=25)`. So you can add `t % 600` to the state and Dijkstra works just great. For part 2, you just need to add the "leg" (out, back, out again) to the state.
+
+Things that tripped me up:
+
+- part 1: I initially had `x % period` and `y % period` for the blizzard positions. But it's actually more like `x % w` and `y % h`. Since those can be negative, it's specifically `((x % w) + w) % w`. Not sure if there's a name for this sort of modulus but I feel like it comes up a lot in AoC problems. I only figured out what was going on when I implemented a function to print the grid and the blizzards.
+- part 2: I was getting to the "back" state but never to the "out again" state. My logic looked just right. I eventually realized that I'd updated my state type and my neighbors function, but had forgotten to update my serialization/deserialization function. So "leg" was getting quietly dropped.
+
+- Start: 09:13:50 (08:13:50 local time)
+- ⭐️: 10:01:31 (48m)
+- ⭐️⭐️: 10:23:16 (1h10m)
+
 ### Day 23 (8080 / 7796)
 
 Easy day. My one screwup was writing `'E': [1, 0]` instead of `'E': [-1, 0]` in my directions dictionary. This took a while to track down. I should just have a canonical version of this instead of writing it out each time. I thought I had a bug printing the grid (I was seeing a lone `.` disconnected from the rest of the grid), but this mysteriously disappeared.
@@ -399,3 +412,8 @@ I'm also curious to use JS / TS for more numerical, performance-sensitive work. 
   - The object/dict thing is really the original sin of JS
   - Iterables/generators are quite nice.
     When you write `T[]`, could you write `Iterable<T>`?
+- AoC thoughts:
+  - No matrix math this year
+  - As before, very heavy on Dijkstra!
+  - Day 16 (valves), Day 19 (robot factories), Day 22 (cube) were the hardest
+  - But overall, pretty easy -- I think easier than 2018 which I did simultaneously.

@@ -1,7 +1,7 @@
 /** Generic implementation of Dijkstra */
 
 import { _ } from "./deps.ts";
-import { tuple } from "./util.ts";
+import { assert, tuple } from "./util.ts";
 
 /**
  * Find the shortest path from start to end.
@@ -18,6 +18,7 @@ export function dijkstra<N>(
   serialize: (n: N) => string,
   deserialize: (txt: string) => N,
 ): [number, N[]] | null {
+  assert(_.isEqual(start, deserialize(serialize(start))), 'Invalid ser/deser');
   const distance = new Map<string, number>();
   distance.set(serialize(start), 0);
   let endFn: (n: N) => boolean;
