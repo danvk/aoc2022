@@ -13,20 +13,27 @@ import { tuple } from "./util.ts";
  */
 export function dijkstra<N>(
   start: N,
-  end: N,
+  end: N | ((n: N) => boolean),
   neighbors: (n: N) => Iterable<[N, number]>,
   serialize: (n: N) => string,
   deserialize: (txt: string) => N,
 ): [number, N[]] | null {
   const distance = new Map<string, number>();
   distance.set(serialize(start), 0);
-  const endS = serialize(end);
+  let endFn: (n: N) => boolean;
+  if (typeof end === 'function') {
+    endFn = end as any;
+  } else {
+    const endS = serialize(end);
+    endFn = (n: N) => serialize(n) === endS;
+  }
 
   // TODO: change this to [distance, string]? Might reduce ser/deser.
   // TODO: pick a better structure here.
   let fringe = [tuple(0, start)];
   const parent = new Map<string, string>();
   let steps = 0;
+  let lastState;
   while (true) {
     fringe = _.sortBy(fringe, ([d, _c]) => d);
     const next = fringe.shift();
@@ -35,7 +42,8 @@ export function dijkstra<N>(
     }
     const [d0, n] = next;
     const ns = serialize(n);
-    if (ns === endS) {
+    if (endFn(n)) {
+      lastState = n;
       break;  // we're done!
     }
     for (const [m, dm] of neighbors(n)) {
@@ -56,7 +64,7 @@ export function dijkstra<N>(
   }
 
   const path = [];
-  let n = serialize(end);
+  let n = serialize(lastState);
   while (n) {
     path.push(deserialize(n));
     const p = parent.get(n);
@@ -66,7 +74,7 @@ export function dijkstra<N>(
     n = p;
   }
 
-  return tuple(distance.get(serialize(end))!, _.reverse(path));
+  return tuple(distance.get(serialize(lastState))!, _.reverse(path));
 }
 
 /** Flood fill from a starting node */
