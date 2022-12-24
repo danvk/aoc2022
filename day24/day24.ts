@@ -67,7 +67,8 @@ if (import.meta.main) {
     [0, 0],
   ];
   const init: State = [0, -1, 0, OUT];
-  const done = (s: State) => (s[1] === h && s[3] === OUT_AGAIN);
+  const done1 = (s: State) => (s[1] === h);
+  const done2 = (s: State) => (s[1] === h && s[3] === OUT_AGAIN);
   // const done = (s: State) => (s[1] === h);
   const neighbors = function* ([x, y, t, leg]: State): Generator<[State, number]> {
     for (const [dx, dy] of DELTAS) {
@@ -166,9 +167,19 @@ if (import.meta.main) {
     console.log(g.format(v => v, '.'));
   };
 
-  const [steps, path] = dijkstra(
+  const [steps1, path1] = dijkstra(
     init,
-    done,
+    done1,
+    neighbors,
+    ser,
+    deser,
+  )!;
+  console.log(path1);
+  console.log('part 1', steps1);  // 147=too low
+
+  const [steps2, path2] = dijkstra(
+    init,
+    done2,
     neighbors,
     ser,
     deser,
@@ -180,7 +191,6 @@ if (import.meta.main) {
   //   console.log('');
   // }
 
-  console.log('part 1', steps);  // 147=too low
-  console.log(path);
-  console.log('part 2');
+  console.log(path2);
+  console.log('part 2', steps2);
 }
