@@ -29,8 +29,8 @@ const BACK = 1;
 const OUT_AGAIN = 2;
 type State = [x: number, y: number, t: number, leg: number];
 
-function ser([x, y, t]: State): string {
-  return `${x},${y},${t}`;
+function ser([x, y, t, leg]: State): string {
+  return `${x},${y},${t},${leg}`;
 }
 function deser(txt: string): State {
   return txt.split(',').map(safeParseInt) as State;
@@ -68,6 +68,7 @@ if (import.meta.main) {
   ];
   const init: State = [0, -1, 0, OUT];
   const done = (s: State) => (s[1] === h && s[3] === OUT_AGAIN);
+  // const done = (s: State) => (s[1] === h);
   const neighbors = function* ([x, y, t, leg]: State): Generator<[State, number]> {
     for (const [dx, dy] of DELTAS) {
       const nx = x + dx;
@@ -76,7 +77,7 @@ if (import.meta.main) {
       // Is this the start or end square? (always valid)
       if (nx === 0 && ny === -1) {
         if (leg === BACK) {
-          console.log('OUT AGAIN');
+          // console.log('OUT AGAIN');
           yield tuple(tuple(nx, ny, nt, OUT_AGAIN), 1);
         } else {
           yield tuple(tuple(nx, ny, nt, leg), 1);
@@ -91,11 +92,7 @@ if (import.meta.main) {
       }
 
       // Is this on the grid?
-      if (dx === 0 && dy === 0 && ((nx === 0 && ny === -1) || (nx === w - 1 && ny === h))) {
-        // staying here is OK.
-        yield tuple(tuple(nx, ny, nt, leg), 1);
-        continue;
-      } else if (nx < 0 || ny < 0 || nx >= w || ny >= h) {
+      if (nx < 0 || ny < 0 || nx >= w || ny >= h) {
         continue;
       }
       // Are there any blizzards at this coordinate?
