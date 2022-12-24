@@ -52,8 +52,8 @@ if (import.meta.main) {
     }
   }
 
-  console.log('ew', ewBliz);
-  console.log('ns', nsBliz);
+  // console.log('ew', ewBliz);
+  // console.log('ns', nsBliz);
 
   const DELTAS: [number, number][] = [
     [-1, 0],
@@ -83,12 +83,12 @@ if (import.meta.main) {
       // console.log(nx, ny, nt);
       let isBliz = false;
       for (const [bxInit, bxD] of ewB) {
-        if ((bxInit + bxD * nt) % period === nx) {
+        if (((bxInit + bxD * nt) % w + w) % w === nx) {
           isBliz=true;
         }
       }
       for (const [byInit, byD] of nsB) {
-        if ((byInit + byD * nt) % period === ny) {
+        if (((byInit + byD * nt) % h + h) % h === ny) {
           isBliz=true;
         }
       }
@@ -104,7 +104,7 @@ if (import.meta.main) {
     const g = new Grid<string>();
     for (const [y, ewB] of ewBliz.entries()) {
       for (const [bxInit, bxD] of ewB) {
-        const x = (bxInit + bxD * t) % period;
+        const x = ((bxInit + bxD * t) % w + w) % w;
         const c = tuple(x, y);
         const old = g.get(c);
         if (!old) {
@@ -118,7 +118,7 @@ if (import.meta.main) {
     }
     for (const [x, nsB] of nsBliz.entries()) {
       for (const [byInit, byD] of nsB) {
-        const y = (byInit + byD * t) % period;
+        const y = ((byInit + byD * t) % h + h) % h;
         const c = tuple(x, y);
         const old = g.get(c);
         if (!old) {
@@ -156,11 +156,11 @@ if (import.meta.main) {
     deser,
   )!;
 
-  for (const s of path) {
-    console.log(s[2], ':');
-    printGrid(s);
-    console.log('');
-  }
+  // for (const s of path) {
+  //   console.log(s[2], ':');
+  //   printGrid(s);
+  //   console.log('');
+  // }
 
   console.log('part 1', steps);  // 147=too low
   console.log(path);
