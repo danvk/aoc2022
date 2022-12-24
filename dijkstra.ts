@@ -14,7 +14,7 @@ import { tuple } from "./util.ts";
 export function dijkstra<N>(
   start: N,
   end: N | ((n: N) => boolean),
-  neighbors: (n: N) => Iterable<[N, number]>,
+  neighbors: (n: N) => Iterable<readonly [N, number]>,
   serialize: (n: N) => string,
   deserialize: (txt: string) => N,
 ): [number, N[]] | null {

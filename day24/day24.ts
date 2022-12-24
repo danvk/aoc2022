@@ -9,8 +9,9 @@
 // So do Dijkstra with (x, y, t % lcm(w, h)) as the state.
 
 import { _ } from "../deps.ts";
+import { dijkstra } from "../dijkstra.ts";
 import { Grid } from "../grid.ts";
-import { readLinesFromArgs, tuple, zeros } from "../util.ts";
+import { readInts, readLinesFromArgs, safeParseInt, tuple, zeros } from "../util.ts";
 
 function gcd(a: number, b: number) {
   let temp;
@@ -20,6 +21,15 @@ function gcd(a: number, b: number) {
     b = temp;
   }
   return a;
+}
+
+type State = [x: number, y: number, t: number];
+
+function ser([x, y, t]: State): string {
+  return `${x},${y},${t}`;
+}
+function deser(txt: string): State {
+  return txt.split(',').map(safeParseInt) as State;
 }
 
 if (import.meta.main) {
@@ -45,6 +55,59 @@ if (import.meta.main) {
   console.log('ew', ewBliz);
   console.log('ns', nsBliz);
 
-  console.log('part 1', lines.length);
+  const DELTAS: [number, number][] = [
+    [-1, 0],
+    [1, 0],
+    [0, -1],
+    [0, 1],
+    [0, 0],
+  ];
+  const init: State = [0, -1, 0];
+  const done = (s: State) => s[1] === h;
+  const neighbors = function* ([x, y, t]: State) {
+    for (const [dx, dy] of DELTAS) {
+      const nx = x + dx;
+      const ny = y + dy;
+      const nt = t + 1;
+      // Is this the start or end square? (always valid)
+      if ((nx === 0 && ny === -1) || (nx === w - 1 && ny === h)) {
+        yield tuple(tuple(nx, ny, nt), 1);
+      }
+      // Is this on the grid?
+      if (nx < 0 || ny < 0 || nx >= w || ny >= h) {
+        continue;
+      }
+      // Are there any blizzards at this coordinate?
+      const ewB = ewBliz[ny];
+      const nsB = nsBliz[nx];
+      // console.log(nx, ny, nt);
+      let isBliz = false;
+      for (const [bxInit, bxD] of ewB) {
+        if ((bxInit + bxD * nt) % period === nx) {
+          isBliz=true;
+        }
+      }
+      for (const [byInit, byD] of nsB) {
+        if ((byInit + byD * nt) % period === ny) {
+          isBliz=true;
+        }
+      }
+
+      if (!isBliz) {
+        yield tuple(tuple(nx, ny, nt), 1);
+      }
+    }
+  };
+
+  const [steps, path] = dijkstra(
+    init,
+    done,
+    neighbors,
+    ser,
+    deser,
+  )!;
+
+  console.log('part 1', steps);
+  console.log(path);
   console.log('part 2');
 }
