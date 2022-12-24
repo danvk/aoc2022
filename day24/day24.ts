@@ -11,7 +11,7 @@
 import { _ } from "../deps.ts";
 import { dijkstra } from "../dijkstra.ts";
 import { Grid } from "../grid.ts";
-import { readInts, readLinesFromArgs, safeParseInt, tuple, zeros } from "../util.ts";
+import { assert, readLinesFromArgs, safeParseInt, tuple, zeros } from "../util.ts";
 
 function gcd(a: number, b: number) {
   let temp;
@@ -99,6 +99,55 @@ if (import.meta.main) {
     }
   };
 
+  const printGrid = (s: State) => {
+    const t = s[2];
+    const g = new Grid<string>();
+    for (const [y, ewB] of ewBliz.entries()) {
+      for (const [bxInit, bxD] of ewB) {
+        const x = (bxInit + bxD * t) % period;
+        const c = tuple(x, y);
+        const old = g.get(c);
+        if (!old) {
+          g.set(c, bxD < 0 ? '<' : '>');
+        } else if (isNaN(Number(old))) {
+          g.set(c, '2');
+        } else {
+          g.set(c, String(1 + Number(old)));
+        }
+      }
+    }
+    for (const [x, nsB] of nsBliz.entries()) {
+      for (const [byInit, byD] of nsB) {
+        const y = (byInit + byD * t) % period;
+        const c = tuple(x, y);
+        const old = g.get(c);
+        if (!old) {
+          g.set(c, byD < 0 ? '^' : 'v');
+        } else if (isNaN(Number(old))) {
+          g.set(c, '2');
+        } else {
+          g.set(c, String(1 + Number(old)));
+        }
+      }
+    }
+
+    for (let x = -1; x <= w; x++) {
+      g.set([x, -1], '#');
+      g.set([x, h], '#');
+    }
+    for (let y = -1; y <= h; y++) {
+      g.set([-1, y], '#');
+      g.set([w, y], '#');
+    }
+    g.set([0, -1], '.');
+    g.set([w-1, h], '.');
+
+    const e = tuple(s[0], s[1]);
+    assert(!g.get(e) || g.get(e) === '.', `Found ${g.get(e)} at ${e}`);
+    g.set(e, 'E');
+    console.log(g.format(v => v, '.'));
+  };
+
   const [steps, path] = dijkstra(
     init,
     done,
@@ -107,7 +156,13 @@ if (import.meta.main) {
     deser,
   )!;
 
-  console.log('part 1', steps);
+  for (const s of path) {
+    console.log(s[2], ':');
+    printGrid(s);
+    console.log('');
+  }
+
+  console.log('part 1', steps);  // 147=too low
   console.log(path);
   console.log('part 2');
 }
