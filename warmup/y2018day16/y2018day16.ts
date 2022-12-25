@@ -112,7 +112,7 @@ function read(lines: readonly string[]) {
     assert(chunk[0].startsWith('Before'));
     assert(chunk[2].startsWith('After'));
     return {
-      instruction: readInts(chunk[1], {expect: 4}) as any,
+      instruction: readInts(chunk[1], {expect: 4}),
       before: readInts(chunk[0], {expect: 4}),
       after: readInts(chunk[2], {expect: 4}),
     }

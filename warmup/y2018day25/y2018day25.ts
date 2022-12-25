@@ -20,7 +20,7 @@ function d(a: Point, b: Point) {
 
 if (import.meta.main) {
   const lines = await readLinesFromArgs();
-  const points = lines.map(line => readInts(line, {expect: 4})) as Point[];
+  const points = lines.map(line => readInts(line, {expect: 4}));
 
   const constellations: Point[][] = [[points[0]]];
   for (const pt of points.slice(1)) {

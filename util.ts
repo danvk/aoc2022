@@ -190,7 +190,7 @@ export function transpose<T>(grid: T[][]) {
 }
 
 /** Extract all (possibly negative) integers from a string. */
-export function readInts(txt: string, options?: {expect: number}): number[] {
+export function readInts<N extends number = number>(txt: string, options?: {expect: N}): NTuple<number, N> {
   const matches = txt.matchAll(/(-?\d+)/g);
   const nums = [...matches].map(m => safeParseInt(m[1]));
   if (options) {
@@ -198,7 +198,7 @@ export function readInts(txt: string, options?: {expect: number}): number[] {
       throw new Error(`Got ${nums.length} nums, expected ${options.expect}: '${txt}'`);
     }
   }
-  return nums;
+  return nums as any;
 }
 
 export function isNonNullish<T>(x: T): x is Exclude<T, null | undefined> {
@@ -219,3 +219,6 @@ export function* powerset<T>(xs: readonly T[]): Generator<T[]> {
     }
   }
 }
+
+type NTupleHelp<T, Acc extends T[], N extends number> = N extends Acc['length'] ? Acc : NTupleHelp<T, [...Acc, T], N>;
+export type NTuple<T, N extends number> = number extends N ? T[] : NTupleHelp<T, [], N>;

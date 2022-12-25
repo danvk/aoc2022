@@ -36,7 +36,7 @@ interface Nanobot {
 
 function parseNanobot(line: string): Nanobot {
   const [a, b] = line.split(', ');
-  const pos = readInts(a, {expect: 3}) as Coord;
+  const pos = readInts(a, {expect: 3});
   const [r] = readInts(b, {expect: 1});
   return {pos, r};
 }

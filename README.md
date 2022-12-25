@@ -412,8 +412,11 @@ I'm also curious to use JS / TS for more numerical, performance-sensitive work. 
   - The object/dict thing is really the original sin of JS
   - Iterables/generators are quite nice.
     When you write `T[]`, could you write `Iterable<T>`?
+  - No operator overloading means no DSLs -- can't implement `operator+` for `Coord`, for example.
+  - My `Grid` class was a godsend, but the constant serialization/deserialization makes it pretty annoying to work with (and presumably slower than necessary).
 - AoC thoughts:
   - No matrix math this year
   - As before, very heavy on Dijkstra!
   - Day 16 (valves), Day 19 (robot factories), Day 22 (cube) were the hardest
+  - A thing I learned about this year was Beam search.
   - But overall, pretty easy -- I think easier than 2018 which I did simultaneously.

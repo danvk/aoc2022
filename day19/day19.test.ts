@@ -1,5 +1,4 @@
-import { assertEquals } from '../deps.ts';
-import { assert } from '../util.ts';
+import { assert } from '../deps.ts';
 import {State, resourceScore} from './day19.ts';
 
 Deno.test("stateScore", () => {

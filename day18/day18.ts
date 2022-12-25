@@ -6,7 +6,7 @@ import { flood } from "../dijkstra.ts";
 import { minmax, readInts, readLinesFromArgs, tuple } from "../util.ts";
 
 const ser = (([x, y, z]: [number, number, number]) => `${x},${y},${z}`);
-const deser = (xyz: string) => readInts(xyz, {expect: 3}) as [number, number, number];
+const deser = (xyz: string) => readInts(xyz, {expect: 3});
 
 function neighbors6([x, y, z]: [number, number, number]): [number, number, number][] {
   return [
@@ -73,7 +73,7 @@ if (import.meta.main) {
     return false;
   };
 
-  const interiorCandidates = [...interiorCandidatesStr].map(line => readInts(line, {expect: 3})) as [number, number, number][];
+  const interiorCandidates = [...interiorCandidatesStr].map(line => readInts(line, {expect: 3}));
   console.log('interior candidates', interiorCandidates.length);
   const [definitelyOutsideList, possiblyInside] = _.partition(interiorCandidates, ([x, y, z]) => isClearlyOutside(x, y, z));
   console.log('num to check', possiblyInside.length);  // 548 for input

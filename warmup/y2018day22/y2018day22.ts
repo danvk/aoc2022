@@ -120,7 +120,7 @@ if (import.meta.main) {
   const lines = await readLinesFromArgs();
   assert(lines.length === 2);
   const [depth] = readInts(lines[0], {expect: 1});
-  const target = readInts(lines[1], {expect: 2}) as Coord;
+  const target = readInts(lines[1], {expect: 2});
   const [erosion, g] = initGrid(depth, target);
   console.log(g.format(v => v));
 
