@@ -112,7 +112,10 @@ export function intersect<T>(a: Set<T>, b: Set<T>): Set<T> {
 }
 
 /** Return a 1- or 2-dimensional array of zeros */
-export function zeros<A extends [number] | []>(n: number, ...rest: A): (A extends [] ? number[] : number[][]) {
+export function zeros<A extends [number] | []>(
+  n: number,
+  ...rest: A
+): A extends [] ? number[] : number[][] {
   if (rest.length > 0) {
     const m = rest[0]!;
     // deno-lint-ignore no-explicit-any
@@ -124,7 +127,7 @@ export function zeros<A extends [number] | []>(n: number, ...rest: A): (A extend
 
 export function map2d<U, V>(
   xs: readonly U[][],
-  fn: (x: U, i: number, j: number) => V,
+  fn: (x: U, i: number, j: number) => V
 ): V[][] {
   return xs.map((row, i) => row.map((val, j) => fn(val, i, j)));
 }
@@ -138,11 +141,11 @@ export function safeParseInt(txt: string): number {
 }
 
 export function coord2str([x, y]: readonly [number, number]): string {
-  return `${x},${y}`
+  return `${x},${y}`;
 }
 
 export function str2coord(coord: string): [number, number] {
-  const comma = coord.indexOf(',');
+  const comma = coord.indexOf(",");
   if (comma === -1) {
     throw new Error(`"${coord}" is not a valid coordinate`);
   }
@@ -155,7 +158,8 @@ export function str2coord(coord: string): [number, number] {
 /** Simultaneously calculate the min and max of a sequence */
 export function minmax(xs: readonly number[]): [number, number] {
   assert(xs.length > 0);
-  let min = xs[0], max = xs[0];
+  let min = xs[0],
+    max = xs[0];
   for (let i = 1; i < xs.length; i++) {
     const x = xs[i];
     if (x < min) {
@@ -168,12 +172,21 @@ export function minmax(xs: readonly number[]): [number, number] {
 }
 
 /** Sort by something, preserving the original indices in a tuple with the values */
-export function sortWithIndex<T>(xs: readonly T[], sortBy: (x: T, index: number) => string|number): [T, number][] {
-  return _.sortBy(xs.map((x, i) => tuple(x, i)), ([x, i]) => sortBy(x, i));
+export function sortWithIndex<T>(
+  xs: readonly T[],
+  sortBy: (x: T, index: number) => string | number
+): [T, number][] {
+  return _.sortBy(
+    xs.map((x, i) => tuple(x, i)),
+    ([x, i]) => sortBy(x, i)
+  );
 }
 
 /** Make an object using a list of keys and a function. */
-export function makeObject<K extends string, T>(keys: readonly K[], fn: (k: string, i: number) => T): Record<K, T> {
+export function makeObject<K extends string, T>(
+  keys: readonly K[],
+  fn: (k: string, i: number) => T
+): Record<K, T> {
   return _.fromPairs(keys.map((k, i) => [k, fn(k, i)])) as Record<K, T>;
 }
 
@@ -190,12 +203,17 @@ export function transpose<T>(grid: T[][]) {
 }
 
 /** Extract all (possibly negative) integers from a string. */
-export function readInts<N extends number = number>(txt: string, options?: {expect: N}): NTuple<number, N> {
+export function readInts<N extends number = number>(
+  txt: string,
+  options?: { expect: N }
+): NTuple<number, N> {
   const matches = txt.matchAll(/(-?\d+)/g);
-  const nums = [...matches].map(m => safeParseInt(m[1]));
+  const nums = [...matches].map((m) => safeParseInt(m[1]));
   if (options) {
     if (nums.length !== options.expect) {
-      throw new Error(`Got ${nums.length} nums, expected ${options.expect}: '${txt}'`);
+      throw new Error(
+        `Got ${nums.length} nums, expected ${options.expect}: '${txt}'`
+      );
     }
   }
   return nums as any;
@@ -220,5 +238,9 @@ export function* powerset<T>(xs: readonly T[]): Generator<T[]> {
   }
 }
 
-type NTupleHelp<T, Acc extends T[], N extends number> = N extends Acc['length'] ? Acc : NTupleHelp<T, [...Acc, T], N>;
-export type NTuple<T, N extends number> = number extends N ? T[] : NTupleHelp<T, [], N>;
+type NTupleHelp<T, Acc extends T[], N extends number> = N extends Acc["length"]
+  ? Acc
+  : NTupleHelp<T, [...Acc, T], N>;
+export type NTuple<T, N extends number> = number extends N
+  ? T[]
+  : NTupleHelp<T, [], N>;
