@@ -2,6 +2,14 @@
 
 ## Daily Notes
 
+### Day 25 (7159 / 5127)
+
+I wanted to stay up until midnight (11pm local time) but once it got to around 10:05pm I just couldn't keep my eyes open. So not a great overall finish! Today's problem was fine, just a little fiddly. I'm curious if there's a good way to get the solution with just a `snafuToNum` function and binary search, but implementing `numToSnafu` was easy enough.
+
+- Start 06:11:45 (05:11:45 local time)
+- ⭐️: 06:29:15 (17m30s)
+- ⭐️⭐️: 06:29:19 (17m34s)
+
 ### Day 24 (6284 / 6073)
 
 Another nice application of Dijkstra. The blizzards initially make it seem like it will be time-dependent and that Dijkstra won't apply. But the blizzards cycle with period `600=lcm(width=120, height=25)`. So you can add `t % 600` to the state and Dijkstra works just great. For part 2, you just need to add the "leg" (out, back, out again) to the state.
