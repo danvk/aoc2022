@@ -409,12 +409,14 @@ I'm interested in Deno as "a new way to TypeScript" and curious to what extent i
 
 I'm also curious to use JS / TS for more numerical, performance-sensitive work. My sense is that it's not as nice as Python for this sort of thing, but it will be a new domain for me to use a familiar language. Plus, I haven't been writing much TypeScript (or code in general) the past few months, and I'd like to get back into it!
 
-## Deno thoughts
+## Overview
 
-- The low config dream really is true.
-- I like that the linter is on by default, as is strict mode.
-- The editor integration needs some work.
-- Mostly it doesn't feel that different.
+- Deno
+  - The low config dream really is true.
+  - I like that the linter is on by default, as is strict mode.
+  - The editor integration needs some work.
+  - Mostly it doesn't feel that different, which I think they would say is a win.
+  - As a follow-up, I'd like to try using a service worker to get some parallelism.
 - JS thoughts
   - Map/Set will be nicer with tuples
   - The object/dict thing is really the original sin of JS
@@ -424,7 +426,7 @@ I'm also curious to use JS / TS for more numerical, performance-sensitive work. 
   - My `Grid` class was a godsend, but the constant serialization/deserialization makes it pretty annoying to work with (and presumably slower than necessary).
 - AoC thoughts:
   - No matrix math this year
-  - As before, very heavy on Dijkstra!
+  - As before, very heavy on Dijkstra / BFS! I enjoyed some of the creative takes on Dijkstra like day 24.
   - Day 16 (valves), Day 19 (robot factories), Day 22 (cube) were the hardest
   - A thing I learned about this year was Beam search.
   - But overall, pretty easy -- I think easier than 2018 which I did simultaneously.
