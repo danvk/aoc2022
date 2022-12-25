@@ -35,6 +35,19 @@ export function snafuToNum(snafu: string): number {
   return num;
 }
 
+export function numToSnafu(num: number): string {
+  const digits = [];
+  while (num) {
+    let d = num % 5;
+    if (d === 3) d = -2;
+    if (d === 4) d = -1;
+    digits.push(REV[d]);
+    num -= d;
+    num /= 5;
+  }
+  return _.reverse(digits).join('');
+}
+
 // 34978907874317
 
 // 11 % 5 = 1
@@ -47,20 +60,6 @@ export function snafuToNum(snafu: string): number {
 
 // 11
 // 1
-
-export function numToSnafu(num: number): string {
-  let scale = 1;
-  const digits = [];
-  while (num) {
-    let d = num % 5;
-    if (d === 3) d = -2;
-    if (d === 4) d = -1;
-    digits.push(REV[d]);
-    num -= d;
-    num /= 5;
-  }
-  return _.reverse(digits).join('');
-}
 
 if (import.meta.main) {
   const lines = await readLinesFromArgs();
