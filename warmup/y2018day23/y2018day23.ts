@@ -61,15 +61,6 @@ function distance(a: Coord, b: Coord): number {
   return Math.abs(a[0] - b[0]) + Math.abs(a[1] - b[1]) + Math.abs(a[2] - b[2]);
 }
 
-function* neighbors8(c: Coord): Generator<Coord> {
-  const [x, y, z] = c;
-  for (let d = -1; d <= 1; d += 2) {
-    yield [x + d, y, z];
-    yield [x, y + d, z];
-    yield [x, y, z + d];
-  }
-}
-
 function corners(b: Nanobot): Coord[] {
   const [x, y, z] = b.pos;
   const {r} = b;
@@ -83,44 +74,35 @@ function corners(b: Nanobot): Coord[] {
   ]
 }
 
-function* pairs<T>(xs: T[]): Generator<[T, T]> {
-  for (let i = 0; i < xs.length - 1; i++) {
-    for (let j = i + 1; j < xs.length; j++) {
-      yield [xs[i], xs[j]];
-    }
-  }
-}
-
-const DIRS: Coord[] = [
-  [-1, 0,  0],
-  [1,  0,  0],
-  [0,  -1, 0],
-  [0,  1,  0],
-  [0,  0,  -1],
-  [0,  0,  1],
-]
-
-function* edges(b: Nanobot): Generator<Coord> {
-  const [x, y, z] = b.pos;
-  const {r} = b;
-  for (const [a, b] of pairs(DIRS)) {
-    if (a[0] * b[0] + a[1] * b[1] + a[2] * b[2] !== 0) {
-      continue;  // not an outside edge
-    }
-    for (let i = 0; i <= r; i++) {
-      yield [
-        x + a[0] * i + b[0] * (r - i),
-        y + a[1] * i + b[1] * (r - i),
-        z + a[2] * i + b[2] * (r - i),
-      ];
-    }
-  }
-}
-
 function botsInRange(bots: readonly Nanobot[], c: Coord): number {
   let n = 0;
   for (const bot of bots) {
     if (distance(bot.pos, c) <= bot.r) {
+      n++;
+    }
+  }
+  return n;
+}
+
+type Box = [Coord, Coord];
+
+/** Could any point in the box intersect the bot's range? */
+function isBoxInRange(bot: Nanobot, b: Box): boolean {
+  let d = 0;
+  const {pos, r} = bot;
+  const [low, hi] = b;
+  for (let i = 0; i <= 2; i++) {
+    if (pos[i] < low[i] || pos[i] > hi[i]) {
+      d += Math.min(Math.abs(pos[i] - low[i]), Math.abs(pos[i] - hi[i]));
+    }
+  }
+  return d <= r + 1;
+}
+
+function botsInBoxRange(bots: readonly Nanobot[], box: Box): number {
+  let n = 0;
+  for (const bot of bots) {
+    if (isBoxInRange(bot, box)) {
       n++;
     }
   }
@@ -166,6 +148,40 @@ function minWithArg<T>(xs: Iterable<T>, fn: (x: T, i: number) => number): [numbe
   return max;
 }
 
+function boxCenter(box: Box): Coord {
+  const [a, b] = box;
+  return a.map(
+    (ac, i) => Math.floor((ac + b[i]) / 2)
+  ) as Coord;
+}
+
+export function* splitBox(box: Box): Generator<Box> {
+  const [a, b] = box;
+  const m = boxCenter(box);
+  const halves = [0, 1, 2].map(i => tuple(
+    tuple(a[i], m[i]),
+    tuple(m[i] + 1, b[i])
+  ));
+  for (const [dx, dy, dz] of DELTAS) {
+    yield [
+      [
+        halves[0][dx][0],
+        halves[1][dy][0],
+        halves[2][dz][0]
+      ],[
+        halves[0][dx][1],
+        halves[1][dy][1],
+        halves[2][dz][1]
+      ],
+    ]
+  }
+}
+
+function boxVolume(box: Box): number {
+  const [a, b] = box;
+  return (b[0] - a[0] + 1) * (b[1] - a[1] + 1) * (b[2] - a[2] + 1);
+}
+
 if (import.meta.main) {
   const lines = await readLinesFromArgs();
   const bots = lines.map(parseNanobot);
@@ -198,19 +214,18 @@ if (import.meta.main) {
 
   // > Math.log2(235_151_681)
   // 27.809016404548867
-  let scale = 2 << 28;
-  // When positions and radii are scaled down by scale, this is
-  // the set of coordinates with >= lowerBound bots in range.
-  let candidates: Coord[] = [
-    [0, 0, 0],
-    [-1, 0, 0],
-    [0, -1, 0],
-    [0, 0, -1],
-    [-1, -1, 0],
-    [0, -1, -1],
-    [-1, 0, -1],
-    [-1, -1, -1],
+
+  const xR = minmax(bots.map(b => b.pos[0]));
+  const yR = minmax(bots.map(b => b.pos[1]));
+  const zR = minmax(bots.map(b => b.pos[2]));
+
+  let candidates: {box: Box, ints: number}[] = [
+    {box: [
+      [xR[0], yR[0], zR[0]],
+      [xR[1], yR[1], zR[1]],
+    ], ints: lowerBound}
   ];
+
   // box [x, y, z] is from:
   // [
   //   x*scale .. (x+1)*scale - 1,
@@ -224,66 +239,50 @@ if (import.meta.main) {
   // - calculate the true value at the center of each cell and possibly update the lower bound.
   // When we're down to scale=1, hopefully there are only a few left.
 
-  while (scale > 0) {
-    // const scaledBots: Nanobot[] = bots.map(({r, pos: [x, y, z]}) => ({
-    //   pos: [Math.floor(x / scale), Math.floor(y / scale), Math.floor(z / scale)],
-    //   r: Math.ceil(r / scale),
-    // }));
-
-    const keepers = candidates;  // .filter(c => botsInRange(scaledBots, c) >= lowerBound);
-
-    const [sampledRealCount, bestThisGen] = maxWithArg(keepers, (([x, y, z]) => {
-      const c = tuple((x + 0.5) * scale, (y+0.5)*scale, (z+0.5)*scale);
-      return botsInRange(bots, c);
-    }));
-
-    const volume = keepers.length * Math.pow(scale, 3);
-    console.log('scale=', scale, 'keeping', keepers.length, '/', candidates.length, 'real count=', sampledRealCount, bestThisGen, 'volume=', volume);
-
-    if (sampledRealCount > lowerBound) {
-      lowerBound = sampledRealCount;
-      const [x, y, z] = bestThisGen;
-      const c = tuple((x + 0.5) * scale, (y+0.5)*scale, (z+0.5)*scale);
-      console.log(c, 'raises lower limit to', lowerBound);
+  const finalCandidates = [];
+  while (candidates.length) {
+    const volume = _.sum(candidates.map(c => boxVolume(c.box)));
+    console.log(candidates.length, 'volume=', volume);
+    candidates = _.sortBy(candidates, c => c.ints, c => boxVolume(c.box));
+    const c = candidates.pop()!;
+    if (c.ints < lowerBound) {
+      continue;
     }
 
-    if (scale > 1) {
-      scale = scale >> 1;
-      const nextBots: Nanobot[] = bots.map(({r, pos: [x, y, z]}) => ({
-        pos: [Math.floor(x / scale), Math.floor(y / scale), Math.floor(z / scale)],
-        r: Math.ceil(r / scale),
-      }));
-      // console.log('r range=', minmax(nextBots.map(b => b.r)));
-      // console.log('x range=', minmax(nextBots.map(b => b.pos[0])));
-      // console.log('y range=', minmax(nextBots.map(b => b.pos[1])));
-      // console.log('z range=', minmax(nextBots.map(b => b.pos[2])));
-
-      candidates = [];
-      for (const [x, y, z] of keepers) {
-        // split in 8
-        for (const [dx, dy, dz] of DELTAS) {
-          const c = tuple(2*x+dx, 2*y+dy, 2*z+dz);
-          // I wish there were an easy way to parallelize this!
-          if (botsInRange(nextBots, c) >= lowerBound) {
-            candidates.push(c);
+    if (boxVolume(c.box) > 1) {
+      for (const box of splitBox(c.box)) {
+        const ints = botsInBoxRange(bots, box);
+        console.log(box, ints);
+        if (ints >= lowerBound) {
+          candidates.push({box, ints});
+          const c = boxCenter(box);
+          const realCount = botsInRange(bots, c);
+          if (realCount > lowerBound) {
+            lowerBound = realCount;
+            console.log('Point', c, 'raises lower bound to', lowerBound);
           }
         }
       }
-      console.log('Keeping', candidates.length, '/', 8 * keepers.length);
     } else {
-      candidates = keepers;
-      scale = scale >> 1;
+      const realCount = botsInRange(bots, c.box[0]);
+      if (realCount >= lowerBound) {
+        finalCandidates.push(tuple(c.box[0], realCount));
+        if (realCount > lowerBound) {
+          lowerBound = realCount;
+          console.log('Single point', c, 'raises lower bound to', lowerBound);
+        }
+      }
     }
   }
 
-  const inters = candidates.map(c => botsInRange(bots, c));
+  const inters = finalCandidates.map(c => c[1]);
   const mostIntersections = _.max(inters)!;
-  candidates = candidates.filter((_, i) => inters[i] === mostIntersections);
+  const bestCandidates = finalCandidates.filter((_, i) => inters[i] === mostIntersections).map(c => c[0]);
   // 672 -way tie at 939
-  console.log(candidates.length, '-way tie at', mostIntersections);
+  console.log(bestCandidates.length, '-way tie at', mostIntersections);
 
   const origin = tuple(0, 0, 0);
-  const best = minWithArg(candidates, c => distance(c, origin));
+  const best = minWithArg(bestCandidates, c => distance(c, origin));
   console.log('part 2:', best);
 }
 
