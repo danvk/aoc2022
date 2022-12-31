@@ -24,6 +24,22 @@
 // I'm glad there was only a 672-way tie and not, say, a billion-way tie.
 //
 // How would I parallelize this in Deno?
+//
+// reddit thread: https://www.reddit.com/r/adventofcode/comments/a8s17l/2018_day_23_solutions/
+// - `soln.py` works great for my input
+// - it is _way_ faster than my code
+// - it doesn't "cheat" (take a high lower bound as input) and probably doesn't have the same bug as mine.
+// - it uses the same divide and conquer strategy, but it only keeps the
+//   single best result so far, which doesn't seem like it would be valid in general?
+// - I'm also not convinced that its scaled count is a valid upper bound.
+//   It actually samples a real value at the top/left corner
+// - soln-orig.py seems more valid; it's also much faster than mine
+// - I could try beam search here to speed things up.
+// - soln3.py also works and is very fast
+//   - Key is to process the "best" box at every stage, rather than all
+//     the boxes of the same size at once.
+//   - This gives you a better lower bound on the answer faster.
+//   - I think their does_intersect has a bug, but it can be fixed by adding 1
 
 import { _ } from "../../deps.ts";
 import { assert, minmax, readInts, readLinesFromArgs, tuple } from "../../util.ts";

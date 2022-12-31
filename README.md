@@ -429,4 +429,5 @@ I'm also curious to use JS / TS for more numerical, performance-sensitive work. 
   - As before, very heavy on Dijkstra / BFS! I enjoyed some of the creative takes on Dijkstra like day 24.
   - Day 16 (valves), Day 19 (robot factories), Day 22 (cube) were the hardest
   - A thing I learned about this year was Beam search.
+  - Having a setup script was really nice.
   - But overall, pretty easy -- I think easier than 2018 which I did simultaneously.
