@@ -45,6 +45,12 @@
 // - My code using a more pure "divide and conquer" approach is much, much faster.
 //   but it says there's only a 1-way tie, whereas before I had a 672-way tie.
 //   Best result is 978 @ [ 18090900, 53369449, 57983828 ]
+//   Best result for the other approach is 939 @ [ 18090900, 52361979, 58991298 ]
+//   ... this is wrong, but happens to be the same distance from the origin.
+//   So there's a bug in my original approach that prevents it from finding the true
+//   best point. It's somewhat miraculous that this still yields the correct answer
+//   from AoC's perspective. There must be some reason for this.
+//   Do I care enough to find the bug?
 
 import { _ } from "../../deps.ts";
 import { assert, minmax, readInts, readLinesFromArgs, tuple } from "../../util.ts";
