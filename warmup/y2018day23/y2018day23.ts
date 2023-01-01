@@ -40,6 +40,11 @@
 //     the boxes of the same size at once.
 //   - This gives you a better lower bound on the answer faster.
 //   - I think their does_intersect has a bug, but it can be fixed by adding 1
+//     ... on second thought, the 45° angles might make this not an issue.
+//         if a bot's range intersects a box, it must intersect one of its 8 corners.
+// - My code using a more pure "divide and conquer" approach is much, much faster.
+//   but it says there's only a 1-way tie, whereas before I had a 672-way tie.
+//   Best result is 978 @ [ 18090900, 53369449, 57983828 ]
 
 import { _ } from "../../deps.ts";
 import { assert, minmax, readInts, readLinesFromArgs, tuple } from "../../util.ts";
@@ -206,7 +211,7 @@ if (import.meta.main) {
   ];
   const ds = _.sortBy(coords.map(c => tuple(botsInRange(bots, c), c)), c => -c[0]);
   console.log(ds.slice(0, 5));
-  let lowerBound = 905;  // ds[0][0];  // 873
+  let lowerBound = 879;  // ds[0][0];  // 873
   // ^^ Using a larger value here (like 920) crashes, which seems like a bug!
   // 879 [ 1134, 3227, 3539 ]
   // 902 [ 70668, 204795, 230177 ]
@@ -239,38 +244,48 @@ if (import.meta.main) {
   // - calculate the true value at the center of each cell and possibly update the lower bound.
   // When we're down to scale=1, hopefully there are only a few left.
 
+  let steps = 0;
   const finalCandidates = [];
   while (candidates.length) {
+    steps++;
     const volume = _.sum(candidates.map(c => boxVolume(c.box)));
-    console.log(candidates.length, 'volume=', volume);
+    console.log(steps, candidates.length, 'boxes, total volume=', volume);
     candidates = _.sortBy(candidates, c => c.ints, c => boxVolume(c.box));
     const c = candidates.pop()!;
     if (c.ints < lowerBound) {
       continue;
     }
+    console.log('  considering', c.ints, 'int, volume=', boxVolume(c.box), 'box');
 
     if (boxVolume(c.box) > 1) {
+      let keepers = 0;
       for (const box of splitBox(c.box)) {
+        if (boxVolume(box) === 0) continue;
         const ints = botsInBoxRange(bots, box);
-        console.log(box, ints);
+        console.log('  ', ints, box);
         if (ints >= lowerBound) {
           candidates.push({box, ints});
+          keepers++;
           const c = boxCenter(box);
           const realCount = botsInRange(bots, c);
           if (realCount > lowerBound) {
             lowerBound = realCount;
-            console.log('Point', c, 'raises lower bound to', lowerBound);
+            console.log('  Point', c, 'raises lower bound to', lowerBound);
+            candidates = candidates.filter(c => c.ints >= lowerBound);
           }
         }
       }
+      console.log('  kept', keepers, '/ 8 for volume', boxVolume(c.box), 'box');
     } else {
       const realCount = botsInRange(bots, c.box[0]);
       if (realCount >= lowerBound) {
         finalCandidates.push(tuple(c.box[0], realCount));
         if (realCount > lowerBound) {
           lowerBound = realCount;
-          console.log('Single point', c, 'raises lower bound to', lowerBound);
+          console.log('  Single point', c, 'raises lower bound to', lowerBound);
         }
+      } else {
+        console.log('  discarding single point', realCount, c.box[0]);
       }
     }
   }
@@ -280,6 +295,8 @@ if (import.meta.main) {
   const bestCandidates = finalCandidates.filter((_, i) => inters[i] === mostIntersections).map(c => c[0]);
   // 672 -way tie at 939
   console.log(bestCandidates.length, '-way tie at', mostIntersections);
+  console.log(bestCandidates);
+  console.log(botsInRange(bots, bestCandidates[0]));
 
   const origin = tuple(0, 0, 0);
   const best = minWithArg(bestCandidates, c => distance(c, origin));
