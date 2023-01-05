@@ -131,8 +131,8 @@ if (import.meta.main) {
 
   const closedValves = Object.values(valves).filter(v => v.flow > 0).map(v => v.valve);
   console.log('part 1', explore(valves, 'AA', 0, 0, closedValves, 0, 30, 0));
-  // console.log('part 2', explore(valves, 'AA', 0, 0, closedValves, 0, 26, 1));
   console.log('part 2 jack-style', jack(valves));
+  console.log('part 2', explore(valves, 'AA', 0, 0, closedValves, 0, 26, 1));
 
   // 1460; takes 1:34.02 to run part 1.
   // console.log("part 1", part1(valves));  // 1000 = too low, 1500 = too high

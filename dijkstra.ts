@@ -59,7 +59,7 @@ export function dijkstra<N>(
         parent.set(ms, ns);
       }
     }
-    if (steps++ % 10_000 === 0) {
+    if (++steps % 10_000 === 0) {
       console.log(steps, fringe.length);
     }
   }

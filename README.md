@@ -136,7 +136,7 @@ Afterwards I updated my Dijkstra/Flood Fill neighbor funtion from
     -  neighbors: (n: N) => [N, number][],
     +  neighbors: (n: N) => Iterable<[N, number]>,
 
-This requires no code changes (either in the `neighbors` functions or in the implementation) but does let me pass in a generator, which is quite convenient. Most of my previous implementations invovled building an array and returning it.
+This requires no code changes (either in the `neighbors` functions or in the implementation) but does let me pass in a generator, which is quite convenient. Most of my previous implementations involved building an array and returning it.
 
 - Start: 06:56:20
 - ⭐️: 07:03:22 (7m2s)
@@ -175,6 +175,8 @@ Overall: cool problem! I wish I'd realized that the valve order is all that matt
 - Start: 07:09:28
 - ⭐️: 08:29:33 (1h20m)
 - ⭐️⭐️: 10:29:47 (3h20m)
+
+Update: Jack pointed out that for part two, you can just enumerate all possible partitions of the valves between you and the elephant and use your solution from part 1. This winds up being much faster and simpler than my original solution to part 2.
 
 ### Day 15 (1184 / 831)
 
@@ -319,15 +321,19 @@ An opportunity to use one of my favorite tricks: exhaustiveness checking with a 
 Reading the input file into "chunks" has been a theme in past years, too.
 I got a wrong answer on part two because of an annoying JS footgun:
 
-    declare let sums: number[];
-    sums.sort();  // sorts sums lexicographically!
+```ts
+declare let sums: number[];
+sums.sort();  // sorts sums lexicographically!
+```
 
 Reference for using lodash with Deno: <https://github.com/lodash/lodash/issues/5411>. Getting types seems like a real headache https://stackoverflow.com/a/66073607/388951.
 
 Solution via Twitter https://twitter.com/brenelz/status/1598503663097503744
 
-    // @deno-types="npm:@types/lodash"
-    import _ from "npm:lodash";
+```ts
+// @deno-types="npm:@types/lodash"
+import _ from "npm:lodash";
+```
 
 ## Setup
 
@@ -431,3 +437,8 @@ I'm also curious to use JS / TS for more numerical, performance-sensitive work. 
   - A thing I learned about this year was Beam search.
   - Having a setup script was really nice.
   - But overall, pretty easy -- I think easier than 2018 which I did simultaneously.
+
+Deno debugger notes:
+
+- You can run with `--v8-flags=--prof` to get a profile, but the lines numbers don't match up.
+- You also need to run with `--inspect-brk` to get them.
