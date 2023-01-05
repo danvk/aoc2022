@@ -430,6 +430,14 @@ I'm also curious to use JS / TS for more numerical, performance-sensitive work. 
     When you write `T[]`, could you write `Iterable<T>`?
   - No operator overloading means no DSLs -- can't implement `operator+` for `Coord`, for example.
   - My `Grid` class was a godsend, but the constant serialization/deserialization makes it pretty annoying to work with (and presumably slower than necessary).
+  - Dijkstra
+    - As always, implementing a very generic Dijkstra is very helpful.
+    - I was happy with my `flood` variation as well, and how it was able to do some things I hadn't expected when I first wrote it.
+    - I implemented Dijkstra by sorting the frontier before removing an element because I figured this was slow but clearly correct and wouldn't matter too much in practice. That was mostly true, but with some glaring exceptions. When I plugged in a binary heap instead I saw some huge speedups:
+    - Day 24 3:32.63 -> 12.259
+    - y2018 day22: 4:21.56 -> 3.152
+    So note to self: use a priority queue!
+  - Tay pointed out that when your distance is always 1, Dijkstra is just bread-th first search. For that, you just need a plain old queue. I assume JS arrays are bad for this, maybe use a linked list? It would be an interesting exercise to have a specialized Dijkstra for BFS that shares as much code as possible.
 - AoC thoughts:
   - No matrix math this year
   - As before, very heavy on Dijkstra / BFS! I enjoyed some of the creative takes on Dijkstra like day 24.
