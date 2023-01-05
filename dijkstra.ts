@@ -1,6 +1,7 @@
 /** Generic implementation of Dijkstra */
 
 import { _ } from "./deps.ts";
+import { PriorityQueue } from "./priority-queue.ts";
 import { assert, tuple } from "./util.ts";
 
 /**
@@ -20,7 +21,7 @@ export function dijkstra<N>(
 ): [number, N[]] | null {
   assert(_.isEqual(start, deserialize(serialize(start))), 'Invalid ser/deser');
   const distance = new Map<string, number>();
-  distance.set(serialize(start), 0);
+  // distance.set(serialize(start), 0);
   let endFn: (n: N) => boolean;
   if (typeof end === 'function') {
     endFn = end as any;
@@ -31,36 +32,46 @@ export function dijkstra<N>(
 
   // TODO: change this to [distance, string]? Might reduce ser/deser.
   // TODO: pick a better structure here.
-  let fringe = [tuple(0, start)];
+  const fringe = new PriorityQueue<N>();
+  fringe.enqueue(start, 0);
   const parent = new Map<string, string>();
   let steps = 0;
   let lastState;
   while (true) {
-    fringe = _.sortBy(fringe, ([d, _c]) => d);
-    const next = fringe.shift();
+    // fringe = _.sortBy(fringe, ([d, _c]) => d);
+    // const next = fringe.shift();
+    const next = fringe.dequeue();
     if (!next) {
       return null;  // Out of options -- there can't be a path
     }
     const [d0, n] = next;
     const ns = serialize(n);
+    const prevD = distance.get(ns);
+    if (prevD && prevD <= d0) {
+      continue;  // already found a shorter path; must be a dupe in the queue
+    }
+    distance.set(ns, d0);
+
     if (endFn(n)) {
       lastState = n;
       break;  // we're done!
     }
+
     for (const [m, dm] of neighbors(n)) {
       const d = d0 + dm;
       const ms = serialize(m);
       const prevD = distance.get(ms);
       if (prevD === undefined || d < prevD) {
-        distance.set(ms, d);
+        // distance.set(ms, d);
         // Filter out any existing occurrence of this node in the fringe.
-        fringe = fringe.filter(([_, s]) => serialize(s) !== ms);
-        fringe.push([d, m]);
+        // fringe = fringe.filter(([_, s]) => serialize(s) !== ms);
+        // fringe.push([d, m]);
+        fringe.enqueue(m, d);
         parent.set(ms, ns);
       }
     }
     if (++steps % 10_000 === 0) {
-      console.log(steps, fringe.length);
+      console.log(steps, fringe.size());
     }
   }
 

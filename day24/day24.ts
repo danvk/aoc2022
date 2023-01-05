@@ -1,4 +1,6 @@
 #!/usr/bin/env -S deno run --allow-read --allow-write
+// --inspect-brk
+// --v8-flags=--prof
 // https://adventofcode.com/2022/day/24
 
 // Idea:

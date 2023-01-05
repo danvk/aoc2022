@@ -32,27 +32,6 @@ export function chunkLines(lines: readonly string[]): string[][] {
   return output;
 }
 
-/** Helper for inserting / updating a value in an object. */
-export function upsert<T>(
-  obj: { [key: string]: T },
-  key: string,
-  base: T,
-  update: (oldValue: T) => T
-) {
-  if (key in obj) {
-    obj[key] = update(obj[key]);
-  } else {
-    obj[key] = base;
-  }
-}
-
-/** Helper for using an object as a counter */
-export const increment = (
-  obj: { [key: string]: number },
-  key: string,
-  amount = 1
-) => upsert(obj, key, amount, (v) => amount + v);
-
 export function tuple<T extends Array<unknown>>(...x: T) {
   return x;
 }
