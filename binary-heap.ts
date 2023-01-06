@@ -1,4 +1,3 @@
-// helper class for PriorityQueue
 // See https://gist.github.com/Prottoy2938/66849e04b0bac459606059f5f9f3aa1a
 
 class Node<T> {
@@ -6,7 +5,7 @@ class Node<T> {
   }
 }
 
-export class PriorityQueue<T> {
+export class BinaryHeap<T> {
   values: Node<T>[];
   constructor() {
     this.values = [];

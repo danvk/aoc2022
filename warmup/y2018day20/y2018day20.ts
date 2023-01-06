@@ -2,7 +2,7 @@
 // https://adventofcode.com/2018/day/20
 
 import { _ } from "../../deps.ts";
-import { flood } from "../../dijkstra.ts";
+import { floodWithDistance } from "../../dijkstra.ts";
 import { Coord, Grid, neighbors4 } from "../../grid.ts";
 import { assert, assertUnreachable, coord2str, readLinesFromArgs, str2coord, tuple } from "../../util.ts";
 
@@ -298,7 +298,7 @@ if (import.meta.main) {
   // console.log(`^${regexStr}$\n`);
   printGrid(g);
 
-  const distances = flood(tuple(0, 0), p => {
+  const distances = floodWithDistance(tuple(0, 0), p => {
     const out: [Coord, number][] = [];
     for (const n of neighbors4(p)) {
       const c = g.get(n);

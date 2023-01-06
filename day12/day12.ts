@@ -2,7 +2,7 @@
 // https://adventofcode.com/2022/day/12
 
 import { _ } from "../deps.ts";
-import { dijkstra } from "../dijkstra.ts";
+import { bfs } from "../dijkstra.ts";
 import { Coord, Grid } from "../grid.ts";
 import { assert, coord2str, readLinesFromArgs, str2coord, tuple } from "../util.ts";
 
@@ -36,9 +36,8 @@ const dirs: Coord[] = [
 ];
 
 function findPath(g: Grid<number>, start: Coord, end: Coord) {
-  const neighbors = (c: Coord) => {
+  const neighbors = function* (c: Coord) {
     const [x, y] = c;
-    const out = [];
     for (const [dx, dy] of dirs) {
       const n = tuple(x + dx, y + dy);
       const h0 = g.get(c);
@@ -47,13 +46,12 @@ function findPath(g: Grid<number>, start: Coord, end: Coord) {
         continue;  // off the grid
       }
       if (h1 - h0 <= 1) {  // go up at most one step, down any number.
-        out.push(tuple(n, 1));
+        yield n;
       }
     }
-    return out;
   };
 
-  return dijkstra(start, end, neighbors, coord2str, str2coord);
+  return bfs(start, end, neighbors, coord2str, str2coord);
 }
 
 function part2(g: Grid<number>, end: Coord): number {

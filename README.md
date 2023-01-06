@@ -438,6 +438,8 @@ I'm also curious to use JS / TS for more numerical, performance-sensitive work. 
     - y2018 day22: 4:21.56 -> 3.152
     So note to self: use a priority queue!
   - Tay pointed out that when your distance is always 1, Dijkstra is just bread-th first search. For that, you just need a plain old queue. I assume JS arrays are bad for this, maybe use a linked list? It would be an interesting exercise to have a specialized Dijkstra for BFS that shares as much code as possible.
+    - Using a simple array for Dijkstra outperforms a binary heap. V8 must optimize `Array.prototype.shift`.
+  - `flood` is mostly `dijkstra` with no goal and you return more information (the distance to every node).
 - AoC thoughts:
   - No matrix math this year
   - As before, very heavy on Dijkstra / BFS! I enjoyed some of the creative takes on Dijkstra like day 24.

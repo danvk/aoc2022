@@ -20,7 +20,7 @@
 //   had the happy effect of producing a cool animation in my terminal.
 
 import { _ } from "../../deps.ts";
-import { dijkstra, flood } from "../../dijkstra.ts";
+import { bfs, flood } from "../../dijkstra.ts";
 import { Coord, Grid, neighbors4 } from "../../grid.ts";
 import {
   coord2str,
@@ -82,13 +82,12 @@ function round(g: Grid<string>, units: Unit[], elfPower: number): boolean {
       const target = others[0].type;
       const neighborFn = (n: Coord) =>
         neighbors4(n)
-          .filter((c) => g.get(c) === "." || g.get(c) === target)
-          .map((c) => tuple(c, 1));
+          .filter((c) => g.get(c) === "." || g.get(c) === target);
       // console.log(others);
       const ds = _.sortBy(
         others
           .map((target) =>
-            dijkstra(unit.pos, target.pos, neighborFn, coord2str, str2coord)
+            bfs(unit.pos, target.pos, neighborFn, coord2str, str2coord)
           )
           .filter(isNonNullish),
         0

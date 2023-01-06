@@ -11,7 +11,7 @@
 // So do Dijkstra with (x, y, t % lcm(w, h)) as the state.
 
 import { _ } from "../deps.ts";
-import { dijkstra } from "../dijkstra.ts";
+import { bfs } from "../dijkstra.ts";
 import { Grid } from "../grid.ts";
 import { assert, readLinesFromArgs, safeParseInt, tuple, zeros } from "../util.ts";
 
@@ -72,7 +72,7 @@ if (import.meta.main) {
   const done1 = (s: State) => (s[1] === h);
   const done2 = (s: State) => (s[1] === h && s[3] === OUT_AGAIN);
   // const done = (s: State) => (s[1] === h);
-  const neighbors = function* ([x, y, t, leg]: State): Generator<[State, number]> {
+  const neighbors = function* ([x, y, t, leg]: State): Generator<State> {
     for (const [dx, dy] of DELTAS) {
       const nx = x + dx;
       const ny = y + dy;
@@ -81,16 +81,16 @@ if (import.meta.main) {
       if (nx === 0 && ny === -1) {
         if (leg === BACK) {
           // console.log('OUT AGAIN');
-          yield tuple(tuple(nx, ny, nt, OUT_AGAIN), 1);
+          yield [nx, ny, nt, OUT_AGAIN];
         } else {
-          yield tuple(tuple(nx, ny, nt, leg), 1);
+          yield [nx, ny, nt, leg];
         }
       } else if (nx === w - 1 && ny === h) {
         if (leg === OUT) {
           // console.log('BACK');
-          yield tuple(tuple(nx, ny, nt, BACK), 1);
+          yield [nx, ny, nt, BACK];
         } else {
-          yield tuple(tuple(nx, ny, nt, leg), 1);
+          yield [nx, ny, nt, leg];
         }
       }
 
@@ -115,7 +115,7 @@ if (import.meta.main) {
       }
 
       if (!isBliz) {
-        yield tuple(tuple(nx, ny, nt, leg), 1);
+        yield [nx, ny, nt, leg];
       }
     }
   };
@@ -169,7 +169,7 @@ if (import.meta.main) {
     console.log(g.format(v => v, '.'));
   };
 
-  const [steps1, path1] = dijkstra(
+  const [steps1, path1] = bfs(
     init,
     done1,
     neighbors,
@@ -179,7 +179,7 @@ if (import.meta.main) {
   console.log(path1);
   console.log('part 1', steps1);  // 147=too low
 
-  const [steps2, path2] = dijkstra(
+  const [steps2, path2] = bfs(
     init,
     done2,
     neighbors,

@@ -2,7 +2,7 @@
 // https://adventofcode.com/2018/day/14
 
 import { _ } from "../../deps.ts";
-import { assert, safeParseInt } from "../../util.ts";
+import { safeParseInt } from "../../util.ts";
 
 function part1(n: number): string {
   const recipes = [3, 7];

@@ -3,7 +3,7 @@
 
 import { _ } from "../deps.ts";
 import { flood } from "../dijkstra.ts";
-import { minmax, readInts, readLinesFromArgs, tuple } from "../util.ts";
+import { minmax, readInts, readLinesFromArgs } from "../util.ts";
 
 const ser = (([x, y, z]: [number, number, number]) => `${x},${y},${z}`);
 const deser = (xyz: string) => readInts(xyz, {expect: 3});
@@ -89,7 +89,7 @@ if (import.meta.main) {
       if (definitelyOutside.has(s)) {
         throw new InfiniteFloodException();
       } else {
-        yield tuple(n, 1);
+        yield n;
       }
     }
   };
