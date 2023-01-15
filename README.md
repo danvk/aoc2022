@@ -116,6 +116,10 @@ So I got my stars but I'm not sure why my code works! Maybe there's some greedy 
 
 Vaguely reminiscent of https://adventofcode.com/2019/day/14.
 
+I learned later that my approach here is called "Beam Search" and the number of states you save is the beam size. [BULB][] is a fancier algorithm that blends the optimality of BFS with the low memory requirements of DFS. It might be fun to implement, though I'm not sure how applicable it would be to this problem where the goal is to find the global optimal path, rather than just _a_ good path using limited memory.
+
+[bulb]: https://www.ijcai.org/Proceedings/05/Papers/0596.pdf
+
 ### Day 18 (11204 / 8025)
 
 A surprisingly easy one -- maybe Erik is giving us the weekend off?
