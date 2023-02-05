@@ -1,7 +1,7 @@
 // https://adventofcode.com/2018/day/2
 
 import { _ } from "../../deps.ts";
-import { increment, readLinesFromArgs } from "../../util.ts";
+import { readLinesFromArgs } from "../../util.ts";
 
 interface Claim {
   num: number;
@@ -27,8 +27,8 @@ function countOverlaps(claims: readonly Claim[]): number {
     for (let x = claim.x; x < claim.x + claim.w; x++) {
       for (let y = claim.y; y < claim.y + claim.h; y++) {
         const key = `${x},${y}`;
-        increment(counts, key);
-        // counts[key] = 1 + (counts[key] ?? 0);
+        // increment(counts, key);
+        counts[key] = 1 + (counts[key] ?? 0);
       }
     }
   }

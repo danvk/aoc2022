@@ -32,7 +32,7 @@ export function chunkLines(lines: readonly string[]): string[][] {
   return output;
 }
 
-export function tuple<T extends Array<unknown>>(...x: T) {
+export function tuple<T extends unknown[]>(...x: T) {
   return x;
 }
 
