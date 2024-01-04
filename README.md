@@ -1,5 +1,7 @@
 # Advent of Code 2022
 
+See my _Effective TypeScript_ blog post for a high-level overview: [A first look at Deno through the Advent of Code 2022][post].
+
 ## Daily Notes
 
 ### Day 25 (7159 / 5127)
@@ -212,7 +214,7 @@ Paired with @mshron on this one. He said that having helpers (especially the `Gr
 
 One of the rare cases where passing a `compare` function to `sort` is more convenient than passing a `key` function. Very convenient that the inputs are all valid JSON.
 
-I ran into some trouble with a stack overflow on part 2. I wasted some time trying to increase the stack size before realizing that I'd forgotton to `JSON.parse` the packets and was comparing the strings.
+I ran into some trouble with a stack overflow on part 2. I wasted some time trying to increase the stack size before realizing that I'd forgotten to `JSON.parse` the packets and was comparing the strings.
 
 - Start: 07:24:14
 - ⭐️: 07:34:59 (11m)
@@ -456,3 +458,5 @@ Deno debugger notes:
 
 - You can run with `--v8-flags=--prof` to get a profile, but the lines numbers don't match up.
 - You also need to run with `--inspect-brk` to get them.
+
+[post]: https://effectivetypescript.com/2023/04/27/aoc2022/
